@@ -16,10 +16,6 @@ For handling low level MIDI data you may look into:
 
 **Please note that this is a work in progress project !**
 
-**This version doesn't work because of a bug in coremidi-sys.
- Please see [this PR](https://github.com/jonas-k/coremidi-sys/pull/3)
- for more information on an ongoing fix for it.**
-
 # Installation
 
 Add this to your *Cargo.toml*.
