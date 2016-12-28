@@ -8,7 +8,7 @@ fn main() {
     let destination_index = get_destination_index();
     println!("Destination index: {}", destination_index);
 
-    let destination = coremidi::destinations::from_index(destination_index);
+    let destination = coremidi::Destination::from_index(destination_index);
 
     let client = coremidi::Client::new("example-client").unwrap();
     let output_port = client.create_output_port("example-port").unwrap();
@@ -29,11 +29,14 @@ fn main() {
 
 fn get_destination_index() -> usize {
     let mut args_iter = env::args();
-    args_iter.next();
+    let tool_name = args_iter.next()
+        .and_then(|path| path.split(std::path::MAIN_SEPARATOR).last().map(|v| v.to_string()))
+        .unwrap_or("send-notes".to_string());
+
     match args_iter.next() {
         Some(arg) => match arg.parse::<usize>() {
             Ok(index) => {
-                if index >= coremidi::destinations::count() {
+                if index >= coremidi::Destinations::count() {
                     println!("Destination index out of range: {}", index);
                     std::process::exit(-1);
                 }
@@ -45,7 +48,7 @@ fn get_destination_index() -> usize {
             }
         },
         None => {
-            println!("Usage: send <destination-index>");
+            println!("Usage: {} <destination-index>", tool_name);
             println!("");
             println!("Available Destinations:");
             print_destinations();
@@ -55,10 +58,8 @@ fn get_destination_index() -> usize {
 }
 
 fn print_destinations() {
-    let num_dest = coremidi::destinations::count();
-    for i in 0..num_dest {
-        let dest = coremidi::destinations::from_index(i);
-        match dest.get_display_name() {
+    for (i, destination) in coremidi::Destinations.into_iter().enumerate() {
+        match destination.get_display_name() {
             Some(display_name) => println!("[{}] {}", i, display_name),
             None => ()
         }

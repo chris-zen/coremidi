@@ -1,56 +1,77 @@
-use core_foundation::string::{CFString, CFStringRef};
-use core_foundation::base::TCFType;
-
 use coremidi_sys::{
-    MIDIGetDestination,
-    MIDIObjectGetStringProperty,
-    kMIDIPropertyDisplayName,
-    MIDIEndpointRef,
+    MIDIGetNumberOfDestinations, MIDIGetDestination,
     ItemCount
 };
 
-use std::mem;
-
 use Destination;
+use properties;
 
 impl Destination {
-    fn from_index(index: usize) -> Destination {
-        Destination {
-            endpoint_ref: unsafe { MIDIGetDestination(index as ItemCount) }
-        }
+    /// Create a destination endpoint from its index.
+    ///
+    pub fn from_index(index: usize) -> Destination {
+        let endpoint_ref = unsafe { MIDIGetDestination(index as ItemCount) };
+        Destination(endpoint_ref)
     }
 
-    pub fn get_display_name(self: &Self) -> Option<String> {
-        get_display_name(self.endpoint_ref)
-    }
-}
-
-fn get_display_name(endpoint: MIDIEndpointRef) -> Option<String> {
-    let mut display_name_ref: CFStringRef = unsafe { mem::uninitialized() };
-    let status = unsafe { MIDIObjectGetStringProperty(
-        endpoint,
-        kMIDIPropertyDisplayName,
-        &mut display_name_ref) };
-    if status == 0 {
-        let display_name: CFString = unsafe { TCFType::wrap_under_create_rule(display_name_ref) };
-        Some(format!("{}", display_name))
-    }
-    else {
-        None
+    /// Get the display name for the destination endpoint.
+    ///
+    pub fn get_display_name(&self) -> Option<String> {
+        properties::get_display_name(self.0)
     }
 }
 
-pub mod destinations {
-    use Destination;
+/// Destination endpoints available in the system.
+///
+/// The number of destinations available in the system can be retrieved with:
+///
+/// ```
+/// let number_of_destinations = coremidi::Destinations::count();
+/// ```
+///
+/// The destinations in the system can be iterated as:
+///
+/// ```
+/// for destination in coremidi::Destinations {
+///   println!("{}", destination.get_display_name());
+/// }
+/// ```
+///
+pub struct Destinations;
 
-    use coremidi_sys::MIDIGetNumberOfDestinations;
-
+impl Destinations {
+    /// Get the number of destinations available for sending MIDI messages.
+    ///
     pub fn count() -> usize {
         unsafe { MIDIGetNumberOfDestinations() as usize }
     }
+}
 
-    pub fn from_index(index: usize) -> Destination {
-        assert!(index < count(), "Index greater than the available number of destinations");
-        Destination::from_index(index)
+impl IntoIterator for Destinations {
+    type Item = Destination;
+    type IntoIter = DestinationsIterator;
+
+    fn into_iter(self) -> Self::IntoIter {
+        DestinationsIterator { index: 0, count: Self::count() }
+    }
+}
+
+pub struct DestinationsIterator {
+    index: usize,
+    count: usize
+}
+
+impl Iterator for DestinationsIterator {
+    type Item = Destination;
+
+    fn next(&mut self) -> Option<Destination> {
+        if self.index < self.count {
+            let destination = Some(Destination::from_index(self.index));
+            self.index += 1;
+            destination
+        }
+        else {
+            None
+        }
     }
 }

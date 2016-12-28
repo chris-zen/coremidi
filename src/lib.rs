@@ -1,82 +1,59 @@
+/*!
+CoreMIDI library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
+
+This library tries to be as transparent as possible to the original CoreMIDI framework, while being as rust idiomatic as possible. This means that if you already know [CoreMIDI](https://developer.apple.com/reference/coremidi) you will find very easy to start using it.
+
+*/
+
 extern crate core_foundation_sys;
 extern crate core_foundation;
 extern crate coremidi_sys;
 
-use core_foundation::string::CFString;
-use core_foundation::base::{OSStatus, TCFType};
+use coremidi_sys::{MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIPacketList};
 
-use coremidi_sys::{
-    MIDIClientRef, MIDIClientCreate, MIDIClientDispose,
-    MIDIPortRef, MIDIOutputPortCreate, MIDIPortDispose,
-    MIDIEndpointRef, MIDIPacketList, MIDISend
-};
+/// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).
+///
+/// A simple example to create a Client:
+///
+/// ```
+/// let client = coremidi::Client::new("example-client").unwrap();
+/// ```
+pub struct Client(MIDIClientRef);
 
-use std::mem;
-use std::ptr;
+/// An output [MIDI connection port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
+///
+/// A simple example to create an output port and send a MIDI event:
+///
+/// ```
+/// let client = coremidi::Client::new("example-client").unwrap();
+/// let output_port = client.create_output_port("example-port").unwrap();
+/// let destination = coremidi::Destination::from_index(0);
+/// let packets = coremidi::PacketList::from_data(0, vec![0x90, 0x40, 0x7f]);
+/// output_port.send(&destination, &packets).unwrap();
+/// ```
+pub struct OutputPort(MIDIPortRef);
 
-pub mod packets;
-mod endpoints;
-pub use endpoints::destinations;
+/// A [MIDI destination](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
+///
+/// A destination can be created from an index:
+///
+/// ```
+/// let destination = coremidi::Destination::from_index(0);
+/// println!("The destination at index 0 has display name '{}'", destination.get_display_name());
+/// ```
+///
+pub struct Destination(MIDIEndpointRef);
 
+/// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
+///
 pub struct PacketList(MIDIPacketList);
 
-pub struct Destination { endpoint_ref: MIDIEndpointRef }
-
-pub struct Client { client_ref: MIDIClientRef }
-
-pub struct OutputPort { port_ref: MIDIPortRef }
-
-
-impl Client {
-    pub fn new(name: &str) -> Result<Client, OSStatus> {
-        let client_name = CFString::new(name);
-        let mut client: MIDIClientRef = unsafe { mem::uninitialized() };
-        let status = unsafe { MIDIClientCreate(
-            client_name.as_concrete_TypeRef(),
-            None, ptr::null_mut(),
-            &mut client)
-        };
-        if status == 0 { Ok(Client { client_ref: client }) } else { Err(status) }
-    }
-
-    pub fn create_output_port(self: &Self, name: &str) -> Result<OutputPort, OSStatus> {
-        OutputPort::new(self, name)
-    }
-}
-
-impl Drop for Client {
-    fn drop(&mut self) {
-        unsafe { MIDIClientDispose(self.client_ref) };
-    }
-}
-
-impl OutputPort {
-    fn new(client: &Client, name: &str) -> Result<OutputPort, OSStatus> {
-        let output_port_name = CFString::new(name);
-        let mut output_port: MIDIPortRef = unsafe { mem::uninitialized() };
-        let status = unsafe { MIDIOutputPortCreate(
-            client.client_ref,
-            output_port_name.as_concrete_TypeRef(),
-            &mut output_port)
-        };
-        if status == 0 { Ok(OutputPort { port_ref: output_port }) } else { Err(status) }
-    }
-
-    pub fn send(self: &Self, destination: &Destination, packet_list: &PacketList) -> Result<(), OSStatus> {
-        let status = unsafe { MIDISend(
-            self.port_ref,
-            destination.endpoint_ref,
-            &packet_list.0)
-        };
-        if status == 0 { Ok(()) } else { Err(status) }
-    }
-}
-
-impl Drop for OutputPort {
-    fn drop(&mut self) {
-        unsafe { MIDIPortDispose(self.port_ref) };
-    }
-}
+mod client;
+mod ports;
+mod packets;
+mod properties;
+mod endpoints;
+pub use endpoints::Destinations;
 
 #[cfg(test)]
 mod tests {
