@@ -41,22 +41,22 @@ cargo run --example send-notes
 
 # Roadmap
 
-[x] Enumerate destinations
-[x] Create output ports
-[x] Create a PacketList from MIDI bytes
-[x] Send a PacketList into an output port
-[ ] Create a source virtual port
-[ ] Send a PacketList into a source virtual port
-[ ] Flush an output port
-[ ] Enumerate sources
-[ ] Create input ports
-[ ] Support callbacks from input messages
-[ ] Create a destination virtual port
-[ ] Support callbacks for destination virtual ports
-[ ] Connect and disconnect sources
-[ ] Stop and restart MIDI I/O
-[ ] Improve PacketList to support multiple packets and arbitrary sizes
-[ ] Support Sysex
-[ ] Support devices
-[ ] Support entities
-[ ] Support more MIDI Object properties (other than display name)
+- [x] Enumerate destinations
+- [x] Create output ports
+- [x] Create a PacketList from MIDI bytes
+- [x] Send a PacketList into an output port
+- [ ] Create a source virtual port
+- [ ] Send a PacketList into a source virtual port
+- [ ] Flush an output port
+- [ ] Enumerate sources
+- [ ] Create input ports
+- [ ] Support callbacks from input messages
+- [ ] Create a destination virtual port
+- [ ] Support callbacks for destination virtual ports
+- [ ] Connect and disconnect sources
+- [ ] Stop and restart MIDI I/O
+- [ ] Improve PacketList to support multiple packets and arbitrary sizes
+- [ ] Support Sysex
+- [ ] Support devices
+- [ ] Support entities
+- [ ] Support more MIDI Object properties (other than display name)
