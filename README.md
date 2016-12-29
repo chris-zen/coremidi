@@ -44,6 +44,7 @@ cargo run --example send-notes
 - [x] Send a PacketList into an output port
 - [x] Create a source virtual port
 - [x] Send a PacketList into a source virtual port
+- [x] Flush output
 - [ ] Enumerate sources
 - [ ] Create input ports
 - [ ] Support callbacks from input messages
@@ -52,7 +53,6 @@ cargo run --example send-notes
 - [ ] Improve PacketList to support multiple packets and arbitrary sizes
 - [ ] Connect and disconnect sources
 - [ ] Stop and restart MIDI I/O
-- [ ] Flush output
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities

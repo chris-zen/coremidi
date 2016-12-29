@@ -16,7 +16,7 @@ impl OutputPort {
     pub fn send(&self, destination: &Destination, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDISend(
             self.0,
-            destination.0,
+            destination.endpoint.0,
             &packet_list.0)
         };
         if status == 0 { Ok(()) } else { Err(status) }

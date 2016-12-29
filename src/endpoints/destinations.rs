@@ -1,10 +1,11 @@
 use coremidi_sys::{
-    MIDIGetNumberOfDestinations, MIDIGetDestination,
-    MIDIEndpointDispose, ItemCount
+    MIDIGetNumberOfDestinations, MIDIGetDestination, ItemCount
 };
 
+use std::ops::Deref;
+
+use Endpoint;
 use Destination;
-use properties;
 
 impl Destination {
     /// Create a destination endpoint from its index.
@@ -12,22 +13,17 @@ impl Destination {
     ///
     pub fn from_index(index: usize) -> Destination {
         let endpoint_ref = unsafe { MIDIGetDestination(index as ItemCount) };
-        Destination(endpoint_ref)
-    }
-
-    /// Get the display name for the destination endpoint.
-    ///
-    pub fn display_name(&self) -> Option<String> {
-        properties::get_display_name(self.0)
+        Destination { endpoint: Endpoint(endpoint_ref) }
     }
 }
 
-impl Drop for Destination {
-    fn drop(&mut self) {
-        unsafe { MIDIEndpointDispose(self.0) };
+impl Deref for Destination {
+    type Target = Endpoint;
+
+    fn deref(&self) -> &Endpoint {
+        &self.endpoint
     }
 }
-
 
 /// Destination endpoints available in the system.
 ///

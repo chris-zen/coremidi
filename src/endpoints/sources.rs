@@ -1,9 +1,12 @@
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIReceived, MIDIEndpointDispose
+    MIDIReceived
 };
 
+use std::ops::Deref;
+
+use Endpoint;
 use VirtualSource;
 use PacketList;
 
@@ -13,15 +16,17 @@ impl VirtualSource {
     ///
     pub fn received(&self, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDIReceived(
-            self.0,
+            self.endpoint.0,
             &packet_list.0)
         };
         if status == 0 { Ok(()) } else { Err(status) }
     }
 }
 
-impl Drop for VirtualSource {
-    fn drop(&mut self) {
-        unsafe { MIDIEndpointDispose(self.0) };
+impl Deref for VirtualSource {
+    type Target = Endpoint;
+
+    fn deref(&self) -> &Endpoint {
+        &self.endpoint
     }
 }

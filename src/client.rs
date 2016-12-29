@@ -12,6 +12,7 @@ use std::ptr;
 
 use Client;
 use OutputPort;
+use Endpoint;
 use VirtualSource;
 
 impl Client {
@@ -54,7 +55,7 @@ impl Client {
             virtual_source_name.as_concrete_TypeRef(),
             &mut virtual_source)
         };
-        if status == 0 { Ok(VirtualSource(virtual_source)) } else { Err(status) }
+        if status == 0 { Ok(VirtualSource { endpoint: Endpoint(virtual_source) }) } else { Err(status) }
     }
 }
 

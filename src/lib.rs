@@ -9,7 +9,8 @@ extern crate core_foundation_sys;
 extern crate core_foundation;
 extern crate coremidi_sys;
 
-use coremidi_sys::{MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIPacketList};
+use core_foundation_sys::base::OSStatus;
+use coremidi_sys::{MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIPacketList, MIDIFlushOutput};
 
 /// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).
 ///
@@ -33,16 +34,23 @@ pub struct Client(MIDIClientRef);
 /// ```
 pub struct OutputPort(MIDIPortRef);
 
+/// A MIDI source or destination, owned by an entity.
+/// See [MIDIEndpointRef](https://developer.apple.com/reference/coremidi/midiendpointref).
+///
+/// You don't need to create an endpoint directly, instead you can create system sources and destinations or virtual ones from a client.
+///
+pub struct Endpoint(MIDIEndpointRef);
+
 /// A [MIDI destination](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
 ///
-/// A destination can be created from an index:
+/// A destination can be created from an index like this:
 ///
 /// ```
 /// let destination = coremidi::Destination::from_index(0);
 /// println!("The destination at index 0 has display name '{}'", destination.get_display_name());
 /// ```
 ///
-pub struct Destination(MIDIEndpointRef);
+pub struct Destination { endpoint: Endpoint }
 
 /// A [MIDI virtual source](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate) owned by a client.
 ///
@@ -53,7 +61,7 @@ pub struct Destination(MIDIEndpointRef);
 /// let source = client.virtual_source("example-source").unwrap();
 /// ```
 ///
-pub struct VirtualSource(MIDIEndpointRef);
+pub struct VirtualSource { endpoint: Endpoint }
 
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
@@ -66,9 +74,10 @@ mod properties;
 mod endpoints;
 pub use endpoints::destinations::Destinations;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-    }
+/// Unschedules previously-sent packets for all the endpoints.
+/// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).
+///
+pub fn flush() -> Result<(), OSStatus> {
+    let status = unsafe { MIDIFlushOutput(0) };
+    if status == 0 { Ok(()) } else { Err(status) }
 }
