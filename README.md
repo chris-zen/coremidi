@@ -33,6 +33,7 @@ The examples can be run with:
 cargo run --example send-notes
 ```
 
+- [system-endpoints](examples/system-endpoints.rs): shows how to enumerate sources and destinations.
 - [send-notes](examples/send-notes.rs): shows how to create an output port and send MIDI messages.
 - [virtual-source](examples/virtual-source.rs): shows how to create a virtual source and generate MIDI messages.
 
