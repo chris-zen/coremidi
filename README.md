@@ -22,7 +22,7 @@ Add this to your *Cargo.toml*.
 
 ```toml
 [dependencies]
-coremidi = "^0.0.1"
+coremidi = "^0.0.2"
 ```
 
 # Examples
@@ -34,6 +34,7 @@ cargo run --example send-notes
 ```
 
 - [send-notes](examples/send-notes.rs): shows how to create an output port and send MIDI messages.
+- [virtual-source](examples/virtual-source.rs): shows how to create a virtual source and generate MIDI messages.
 
 # Roadmap
 
@@ -41,17 +42,17 @@ cargo run --example send-notes
 - [x] Create output ports
 - [x] Create a PacketList from MIDI bytes
 - [x] Send a PacketList into an output port
-- [ ] Create a source virtual port
-- [ ] Send a PacketList into a source virtual port
-- [ ] Flush an output port
+- [x] Create a source virtual port
+- [x] Send a PacketList into a source virtual port
 - [ ] Enumerate sources
 - [ ] Create input ports
 - [ ] Support callbacks from input messages
 - [ ] Create a destination virtual port
 - [ ] Support callbacks for destination virtual ports
+- [ ] Improve PacketList to support multiple packets and arbitrary sizes
 - [ ] Connect and disconnect sources
 - [ ] Stop and restart MIDI I/O
-- [ ] Improve PacketList to support multiple packets and arbitrary sizes
+- [ ] Flush output
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities

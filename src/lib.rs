@@ -26,7 +26,7 @@ pub struct Client(MIDIClientRef);
 ///
 /// ```
 /// let client = coremidi::Client::new("example-client").unwrap();
-/// let output_port = client.create_output_port("example-port").unwrap();
+/// let output_port = client.output_port("example-port").unwrap();
 /// let destination = coremidi::Destination::from_index(0);
 /// let packets = coremidi::PacketList::from_data(0, vec![0x90, 0x40, 0x7f]);
 /// output_port.send(&destination, &packets).unwrap();
@@ -44,6 +44,17 @@ pub struct OutputPort(MIDIPortRef);
 ///
 pub struct Destination(MIDIEndpointRef);
 
+/// A [MIDI virtual source](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate) owned by a client.
+///
+/// A virtual source can be created like:
+///
+/// ```
+/// let client = coremidi::Client::new("example-client").unwrap();
+/// let source = client.virtual_source("example-source").unwrap();
+/// ```
+///
+pub struct VirtualSource(MIDIEndpointRef);
+
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
 pub struct PacketList(MIDIPacketList);
@@ -53,7 +64,7 @@ mod ports;
 mod packets;
 mod properties;
 mod endpoints;
-pub use endpoints::Destinations;
+pub use endpoints::destinations::Destinations;
 
 #[cfg(test)]
 mod tests {

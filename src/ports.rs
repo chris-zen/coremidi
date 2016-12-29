@@ -11,6 +11,7 @@ use PacketList;
 
 impl OutputPort {
     /// Send a list of packets to a destination.
+    /// See [MIDISend](https://developer.apple.com/reference/coremidi/1495289-midisend).
     ///
     pub fn send(&self, destination: &Destination, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDISend(

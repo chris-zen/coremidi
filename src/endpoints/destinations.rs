@@ -1,6 +1,6 @@
 use coremidi_sys::{
     MIDIGetNumberOfDestinations, MIDIGetDestination,
-    ItemCount
+    MIDIEndpointDispose, ItemCount
 };
 
 use Destination;
@@ -8,6 +8,7 @@ use properties;
 
 impl Destination {
     /// Create a destination endpoint from its index.
+    /// See [MIDIGetDestination](https://developer.apple.com/reference/coremidi/1495108-midigetdestination)
     ///
     pub fn from_index(index: usize) -> Destination {
         let endpoint_ref = unsafe { MIDIGetDestination(index as ItemCount) };
@@ -16,10 +17,17 @@ impl Destination {
 
     /// Get the display name for the destination endpoint.
     ///
-    pub fn get_display_name(&self) -> Option<String> {
+    pub fn display_name(&self) -> Option<String> {
         properties::get_display_name(self.0)
     }
 }
+
+impl Drop for Destination {
+    fn drop(&mut self) {
+        unsafe { MIDIEndpointDispose(self.0) };
+    }
+}
+
 
 /// Destination endpoints available in the system.
 ///
@@ -41,6 +49,7 @@ pub struct Destinations;
 
 impl Destinations {
     /// Get the number of destinations available for sending MIDI messages.
+    /// See [MIDIGetNumberOfDestinations](https://developer.apple.com/reference/coremidi/1495309-midigetnumberofdestinations).
     ///
     pub fn count() -> usize {
         unsafe { MIDIGetNumberOfDestinations() as usize }

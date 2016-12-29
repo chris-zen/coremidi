@@ -11,7 +11,7 @@ fn main() {
     let destination = coremidi::Destination::from_index(destination_index);
 
     let client = coremidi::Client::new("example-client").unwrap();
-    let output_port = client.create_output_port("example-port").unwrap();
+    let output_port = client.output_port("example-port").unwrap();
 
     let note_on = create_note_on(0, 64, 127);
     let note_off = create_note_off(0, 64, 127);
@@ -59,7 +59,7 @@ fn get_destination_index() -> usize {
 
 fn print_destinations() {
     for (i, destination) in coremidi::Destinations.into_iter().enumerate() {
-        match destination.get_display_name() {
+        match destination.display_name() {
             Some(display_name) => println!("[{}] {}", i, display_name),
             None => ()
         }
