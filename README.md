@@ -42,14 +42,14 @@ cargo run --example send-notes
 - [x] Create output ports
 - [x] Create a PacketList from MIDI bytes
 - [x] Send a PacketList into an output port
-- [x] Create a source virtual port
-- [x] Send a PacketList into a source virtual port
+- [x] Create virtual sources
+- [x] Support a virtual source receiving a PacketList
 - [x] Flush output
-- [ ] Enumerate sources
+- [x] Enumerate sources
 - [ ] Create input ports
 - [ ] Support callbacks from input messages
-- [ ] Create a destination virtual port
-- [ ] Support callbacks for destination virtual ports
+- [ ] Create virtual destinations
+- [ ] Support callbacks for virtual destinations
 - [ ] Improve PacketList to support multiple packets and arbitrary sizes
 - [ ] Connect and disconnect sources
 - [ ] Stop and restart MIDI I/O

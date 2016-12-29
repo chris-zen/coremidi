@@ -28,29 +28,40 @@ pub struct Client(MIDIClientRef);
 /// ```
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
-/// let destination = coremidi::Destination::from_index(0);
+/// let source = coremidi::Destination::from_index(0);
 /// let packets = coremidi::PacketList::from_data(0, vec![0x90, 0x40, 0x7f]);
-/// output_port.send(&destination, &packets).unwrap();
+/// output_port.send(&source, &packets).unwrap();
 /// ```
 pub struct OutputPort(MIDIPortRef);
 
-/// A MIDI source or destination, owned by an entity.
+/// A MIDI source or source, owned by an entity.
 /// See [MIDIEndpointRef](https://developer.apple.com/reference/coremidi/midiendpointref).
 ///
-/// You don't need to create an endpoint directly, instead you can create system sources and destinations or virtual ones from a client.
+/// You don't need to create an endpoint directly, instead you can create system sources and sources or virtual ones from a client.
 ///
 pub struct Endpoint(MIDIEndpointRef);
 
-/// A [MIDI destination](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
+/// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
 ///
-/// A destination can be created from an index like this:
+/// A source can be created from an index like this:
 ///
 /// ```
-/// let destination = coremidi::Destination::from_index(0);
-/// println!("The destination at index 0 has display name '{}'", destination.get_display_name());
+/// let source = coremidi::Destination::from_index(0);
+/// println!("The source at index 0 has display name '{}'", source.display_name());
 /// ```
 ///
 pub struct Destination { endpoint: Endpoint }
+
+/// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
+///
+/// A source can be created from an index like this:
+///
+/// ```
+/// let source = coremidi::Source::from_index(0);
+/// println!("The source at index 0 has display name '{}'", source.display_name());
+/// ```
+///
+pub struct Source { endpoint: Endpoint }
 
 /// A [MIDI virtual source](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate) owned by a client.
 ///
@@ -73,6 +84,7 @@ mod packets;
 mod properties;
 mod endpoints;
 pub use endpoints::destinations::Destinations;
+pub use endpoints::sources::Sources;
 
 /// Unschedules previously-sent packets for all the endpoints.
 /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).

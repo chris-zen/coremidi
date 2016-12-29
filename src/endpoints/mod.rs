@@ -1,6 +1,6 @@
 use core_foundation_sys::base::OSStatus;
 
-use coremidi_sys::{MIDIFlushOutput, MIDIEndpointDispose};
+use coremidi_sys::MIDIFlushOutput;
 
 use Endpoint;
 use properties;
@@ -18,12 +18,6 @@ impl Endpoint {
     pub fn flush(&self) -> Result<(), OSStatus> {
         let status = unsafe { MIDIFlushOutput(self.0) };
         if status == 0 { Ok(()) } else { Err(status) }
-    }
-}
-
-impl Drop for Endpoint {
-    fn drop(&mut self) {
-        unsafe { MIDIEndpointDispose(self.0) };
     }
 }
 

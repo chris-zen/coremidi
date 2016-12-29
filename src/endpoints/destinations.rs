@@ -37,14 +37,14 @@ impl Deref for Destination {
 ///
 /// ```
 /// for destination in coremidi::Destinations {
-///   println!("{}", destination.get_display_name());
+///   println!("{}", destination.display_name());
 /// }
 /// ```
 ///
 pub struct Destinations;
 
 impl Destinations {
-    /// Get the number of destinations available for sending MIDI messages.
+    /// Get the number of destinations available in the system for sending MIDI messages.
     /// See [MIDIGetNumberOfDestinations](https://developer.apple.com/reference/coremidi/1495309-midigetnumberofdestinations).
     ///
     pub fn count() -> usize {
