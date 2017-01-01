@@ -13,6 +13,7 @@ keywords = ["CoreMIDI", "MIDI"]
 [dependencies]
 core-foundation-sys = "0.2"
 core-foundation = "0.2"
-# coremidi-sys = "1.0.0"
-coremidi-sys = { git = "https://github.com/chris-zen/coremidi-sys", branch="fix-packed-structs" }
+coremidi-sys = "1.0.0"
+# coremidi-sys = { git = "https://github.com/chris-zen/coremidi-sys", branch="fix-packed-structs" }
 time = "0.1"
+libc = "0.2"

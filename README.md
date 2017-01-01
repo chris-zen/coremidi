@@ -47,12 +47,12 @@ cargo run --example send-notes
 - [x] Support a virtual source receiving a PacketList
 - [x] Flush output
 - [x] Enumerate sources
-- [ ] Create input ports
-- [ ] Support callbacks from input messages
+- [x] Create input ports
+- [x] Support callbacks from input messages
+- [x] Connect and disconnect sources
 - [ ] Create virtual destinations
 - [ ] Support callbacks for virtual destinations
 - [ ] Improve PacketList to support multiple packets and arbitrary sizes
-- [ ] Connect and disconnect sources
 - [ ] Stop and restart MIDI I/O
 - [ ] Support Sysex
 - [ ] Support devices

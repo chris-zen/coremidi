@@ -1,13 +1,28 @@
 use core_foundation::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIPortDispose,
+    MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose
+};
+
+use coremidi_sys_ext::{
     MIDISend
 };
 
+use std::ptr;
+use std::ops::Deref;
+
+use Port;
 use OutputPort;
+use InputPort;
 use Destination;
+use Source;
 use PacketList;
+
+impl Drop for Port {
+    fn drop(&mut self) {
+        unsafe { MIDIPortDispose(self.0) };
+    }
+}
 
 impl OutputPort {
     /// Send a list of packets to a destination.
@@ -15,7 +30,7 @@ impl OutputPort {
     ///
     pub fn send(&self, destination: &Destination, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDISend(
-            self.0,
+            self.port.0,
             destination.endpoint.0,
             &packet_list.0)
         };
@@ -23,8 +38,38 @@ impl OutputPort {
     }
 }
 
-impl Drop for OutputPort {
-    fn drop(&mut self) {
-        unsafe { MIDIPortDispose(self.0) };
+impl Deref for OutputPort {
+    type Target = Port;
+
+    fn deref(&self) -> &Port {
+        &self.port
+    }
+}
+
+impl InputPort {
+
+    pub fn connect_source(&self, source: &Source) -> Result<(), OSStatus> {
+        let status = unsafe { MIDIPortConnectSource(
+            self.0,
+            source.0,
+            ptr::null_mut())
+        };
+        if status == 0 { Ok(()) } else { Err(status) }
+    }
+
+    pub fn disconnect_source(&self, source: &Source) -> Result<(), OSStatus> {
+        let status = unsafe { MIDIPortDisconnectSource(
+            self.0,
+            source.0)
+        };
+        if status == 0 { Ok(()) } else { Err(status) }
+    }
+}
+
+impl Deref for InputPort {
+    type Target = Port;
+
+    fn deref(&self) -> &Port {
+        &self.port
     }
 }

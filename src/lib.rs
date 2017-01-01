@@ -8,9 +8,17 @@ This library tries to be as transparent as possible to the original CoreMIDI fra
 extern crate core_foundation_sys;
 extern crate core_foundation;
 extern crate coremidi_sys;
+extern crate libc;
 
 use core_foundation_sys::base::OSStatus;
-use coremidi_sys::{MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIPacketList, MIDIFlushOutput};
+
+use coremidi_sys::{
+    MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIFlushOutput
+};
+
+use coremidi_sys_ext::{
+    MIDIPacketList
+};
 
 /// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).
 ///
@@ -21,18 +29,37 @@ use coremidi_sys::{MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIPacketList, 
 /// ```
 pub struct Client(MIDIClientRef);
 
-/// An output [MIDI connection port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
+/// A MIDI connection port owned by a client.
+/// See [MIDIPortRef](https://developer.apple.com/reference/coremidi/midiportref).
+///
+/// Ports can't be instantiated directly, but through a client.
+///
+pub struct Port(MIDIPortRef);
+
+/// An output [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
 ///
 /// A simple example to create an output port and send a MIDI event:
 ///
 /// ```
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
-/// let source = coremidi::Destination::from_index(0);
+/// let destination = coremidi::Destination::from_index(0);
 /// let packets = coremidi::PacketList::from_data(0, vec![0x90, 0x40, 0x7f]);
-/// output_port.send(&source, &packets).unwrap();
+/// output_port.send(&destination, &packets).unwrap();
 /// ```
-pub struct OutputPort(MIDIPortRef);
+pub struct OutputPort { port: Port }
+
+/// An input [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
+///
+/// A simple example to create an input port:
+///
+/// ```
+/// let client = coremidi::Client::new("example-client").unwrap();
+/// let input_port = client.input_port("example-port").unwrap();
+/// let source = coremidi::Source::from_index(0);
+/// ...
+/// ```
+pub struct InputPort { port: Port }
 
 /// A MIDI source or source, owned by an entity.
 /// See [MIDIEndpointRef](https://developer.apple.com/reference/coremidi/midiendpointref).
@@ -78,6 +105,7 @@ pub struct VirtualSource { endpoint: Endpoint }
 ///
 pub struct PacketList(MIDIPacketList);
 
+mod coremidi_sys_ext;
 mod client;
 mod ports;
 mod packets;

@@ -7,13 +7,20 @@ use coremidi_sys::{
     MIDIEndpointRef, MIDISourceCreate
 };
 
+use coremidi_sys_ext::{
+    MIDIPacketList, MIDIInputPortCreate
+};
+
 use std::mem;
 use std::ptr;
 
 use Client;
+use Port;
+use InputPort;
 use OutputPort;
 use Endpoint;
 use VirtualSource;
+use PacketList;
 
 impl Client {
     /// Creates a new CoreMIDI client.
@@ -34,14 +41,45 @@ impl Client {
     /// See [MIDIOutputPortCreate](https://developer.apple.com/reference/coremidi/1495166-midioutputportcreate).
     ///
     pub fn output_port(&self, name: &str) -> Result<OutputPort, OSStatus> {
-        let output_port_name = CFString::new(name);
-        let mut output_port: MIDIPortRef = unsafe { mem::uninitialized() };
+        let port_name = CFString::new(name);
+        let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
         let status = unsafe { MIDIOutputPortCreate(
             self.0,
-            output_port_name.as_concrete_TypeRef(),
-            &mut output_port)
+            port_name.as_concrete_TypeRef(),
+            &mut port_ref)
         };
-        if status == 0 { Ok(OutputPort(output_port)) } else { Err(status) }
+        if status == 0 { Ok(OutputPort { port: Port(port_ref) }) } else { Err(status) }
+    }
+
+    /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
+    /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
+    ///
+    pub fn input_port<F>(&self, name: &str, callback: &F) -> Result<InputPort, OSStatus>
+            where F: Fn(PacketList) {
+
+        extern "C" fn read_proc<F: Fn(PacketList)>(
+                pktlist: *const MIDIPacketList,
+                read_proc_ref_con: *mut ::libc::c_void,
+                _: *mut ::libc::c_void) { //srcConnRefCon
+
+            let _ = ::std::panic::catch_unwind(|| unsafe {
+                let packet_list = PacketList(*pktlist);
+                let ref callback = *(read_proc_ref_con as *const F);
+                // println!("read_proc: pl={:x}, mpl={:x}", &packet_list as *const _ as usize, pktlist as usize);
+                callback(packet_list);
+            });
+        }
+
+        let port_name = CFString::new(name);
+        let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
+        let status = unsafe { MIDIInputPortCreate(
+            self.0,
+            port_name.as_concrete_TypeRef(),
+            Some(read_proc::<F> as extern "C" fn(_, _, _)),
+            callback as *const _ as *mut ::libc::c_void,
+            &mut port_ref)
+        };
+        if status == 0 { Ok(InputPort { port: Port(port_ref) }) } else { Err(status) }
     }
 
     /// Creates a virtual source in the client.
