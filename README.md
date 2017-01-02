@@ -36,6 +36,12 @@ For handling low level MIDI data you may look into:
 
 **Beta-testers are more than welcomed ;-)**
 
+[![Build Status](https://travis-ci.org/chris-zen/coremidi.svg?branch=master)](https://travis-ci.org/chris-zen/coremidi)
+[![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
+[![Crates.io](https://img.shields.io/crates/d/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
+[![Crates.io](https://img.shields.io/crates/dv/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
+[![GitHub tag](https://img.shields.io/github/tag/chris-zen/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
+
 # Installation
 
 Add this to your *Cargo.toml*.
