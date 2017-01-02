@@ -8,7 +8,7 @@ use coremidi_sys::{
 };
 
 use coremidi_sys_ext::{
-    MIDIPacketList, MIDIInputPortCreate
+    MIDIPacketList, MIDIInputPortCreate, MIDIDestinationCreate
 };
 
 use std::mem;
@@ -16,10 +16,11 @@ use std::ptr;
 
 use Client;
 use Port;
-use InputPort;
 use OutputPort;
+use InputPort;
 use Endpoint;
 use VirtualSource;
+use VirtualDestination;
 use PacketList;
 
 impl Client {
@@ -57,25 +58,12 @@ impl Client {
     pub fn input_port<F>(&self, name: &str, callback: F) -> Result<InputPort, OSStatus>
             where F: Fn(PacketList) {
 
-        extern "C" fn read_proc<F: Fn(PacketList)>(
-                pktlist: *const MIDIPacketList,
-                read_proc_ref_con: *mut ::libc::c_void,
-                _: *mut ::libc::c_void) { //srcConnRefCon
-
-            let _ = ::std::panic::catch_unwind(|| unsafe {
-                let packet_list = PacketList(pktlist);
-                let ref callback = *(read_proc_ref_con as *const F);
-                // println!("read_proc: pl={:x}, mpl={:x}", &packet_list as *const _ as usize, pktlist as usize);
-                callback(packet_list);
-            });
-        }
-
         let port_name = CFString::new(name);
         let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
         let status = unsafe { MIDIInputPortCreate(
             self.0,
             port_name.as_concrete_TypeRef(),
-            Some(read_proc::<F> as extern "C" fn(_, _, _)),
+            Some(Self::read_proc::<F> as extern "C" fn(_, _, _)),
             &callback as *const _ as *mut ::libc::c_void,
             &mut port_ref)
         };
@@ -94,6 +82,36 @@ impl Client {
             &mut virtual_source)
         };
         if status == 0 { Ok(VirtualSource { endpoint: Endpoint(virtual_source) }) } else { Err(status) }
+    }
+
+    /// Creates a virtual destination in the client.
+    /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
+    ///
+    pub fn virtual_destination<F>(&self, name: &str, callback: F) -> Result<VirtualDestination, OSStatus>
+            where F: Fn(PacketList) {
+
+        let virtual_destination_name = CFString::new(name);
+        let mut virtual_destination: MIDIEndpointRef = unsafe { mem::uninitialized() };
+        let status = unsafe { MIDIDestinationCreate(
+            self.0,
+            virtual_destination_name.as_concrete_TypeRef(),
+            Some(Self::read_proc::<F> as extern "C" fn(_, _, _)),
+            &callback as *const _ as *mut ::libc::c_void,
+            &mut virtual_destination)
+        };
+        if status == 0 { Ok(VirtualDestination { endpoint: Endpoint(virtual_destination) }) } else { Err(status) }
+    }
+
+    extern "C" fn read_proc<F: Fn(PacketList)>(
+            pktlist: *const MIDIPacketList,
+            read_proc_ref_con: *mut ::libc::c_void,
+            _: *mut ::libc::c_void) { //srcConnRefCon
+
+        let _ = ::std::panic::catch_unwind(|| unsafe {
+            let packet_list = PacketList(pktlist);
+            let ref callback = *(read_proc_ref_con as *const F);
+            callback(packet_list);
+        });
     }
 }
 

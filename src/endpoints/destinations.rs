@@ -6,6 +6,7 @@ use std::ops::Deref;
 
 use Endpoint;
 use Destination;
+use VirtualDestination;
 
 impl Destination {
     /// Create a destination endpoint from its index.
@@ -78,5 +79,17 @@ impl Iterator for DestinationsIterator {
         else {
             None
         }
+    }
+}
+
+impl VirtualDestination {
+
+}
+
+impl Deref for VirtualDestination {
+    type Target = Endpoint;
+
+    fn deref(&self) -> &Endpoint {
+        &self.endpoint
     }
 }

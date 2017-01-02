@@ -19,6 +19,7 @@ fn main() {
     input_port.connect_source(&source).unwrap();
 
     let mut input_line = String::new();
+    println!("Press [Intro] to finish ...");
     std::io::stdin().read_line(&mut input_line).ok().expect("Failed to read line");
 
     input_port.disconnect_source(&source).unwrap();
@@ -28,7 +29,7 @@ fn get_source_index() -> usize {
     let mut args_iter = env::args();
     let tool_name = args_iter.next()
         .and_then(|path| path.split(std::path::MAIN_SEPARATOR).last().map(|v| v.to_string()))
-        .unwrap_or("dump".to_string());
+        .unwrap_or("receive".to_string());
 
     match args_iter.next() {
         Some(arg) => match arg.parse::<usize>() {

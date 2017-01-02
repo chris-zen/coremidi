@@ -134,6 +134,17 @@ pub struct Source { endpoint: Endpoint }
 ///
 pub struct VirtualSource { endpoint: Endpoint }
 
+/// A [MIDI virtual destination](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate) owned by a client.
+///
+/// A virtual destination can be created like:
+///
+/// ```rust,no_run
+/// let client = coremidi::Client::new("example-client").unwrap();
+/// client.virtual_destination("example-destination", |packet_list| println!("{}", packet_list)).unwrap();
+/// ```
+///
+pub struct VirtualDestination { endpoint: Endpoint }
+
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
 pub struct PacketList(*const MIDIPacketList);

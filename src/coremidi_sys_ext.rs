@@ -62,6 +62,11 @@ extern "C" {
                                refCon: *mut ::libc::c_void,
                                outPort: *mut MIDIPortRef) -> OSStatus;
 
+    pub fn MIDIDestinationCreate(client: MIDIClientRef, name: CFStringRef,
+                                readProc: MIDIReadProc,
+                                refCon: *mut ::libc::c_void,
+                                outDest: *mut MIDIEndpointRef) -> OSStatus;
+
     pub fn MIDIPacketListInit(pktlist: *mut MIDIPacketList) -> *mut MIDIPacket;
 }
 
