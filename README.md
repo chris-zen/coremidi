@@ -29,8 +29,8 @@ If you are looking for a portable MIDI library then you can look into:
 - [midir](https://github.com/Boddlnagg/midir)
 
 For handling low level MIDI data you may look into:
-- [midi-rs](https://github.com/samdoshi/midi-rs)
 - [rimd](https://github.com/RustAudio/rimd)
+- [midi-rs](https://github.com/samdoshi/midi-rs)
 
 **Please note that this is a work in progress project !**
 
@@ -82,9 +82,10 @@ These are the provided examples:
 - [x] Connect and disconnect sources
 - [x] Add support to build PacketList (PacketBuffer)
 - [x] Create virtual destinations with callback
-- [ ] Stop and restart MIDI I/O
+- [x] Stop and restart MIDI I/O
+- [ ] Support MIDI Objects
 - [ ] Client notifications
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities
-- [ ] Support more MIDI Object properties (other than display name)
+- [ ] MIDIThru connections

@@ -46,7 +46,8 @@ extern crate libc;
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIFlushOutput
+    MIDIClientRef, MIDIPortRef, MIDIEndpointRef,
+    MIDIFlushOutput, MIDIRestart
 };
 
 use coremidi_sys_ext::{
@@ -164,5 +165,13 @@ pub use packets::PacketBuffer;
 ///
 pub fn flush() -> Result<(), OSStatus> {
     let status = unsafe { MIDIFlushOutput(0) };
+    if status == 0 { Ok(()) } else { Err(status) }
+}
+
+/// Stops and restarts MIDI I/O.
+/// See [MIDIRestart](https://developer.apple.com/reference/coremidi/1495146-midirestart).
+///
+pub fn restart() -> Result<(), OSStatus> {
+    let status = unsafe { MIDIRestart() };
     if status == 0 { Ok(()) } else { Err(status) }
 }
