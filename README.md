@@ -5,6 +5,8 @@ CoreMIDI is a Mac OSX framework that provides APIs for communicating with MIDI (
 
 This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
 
+The **documentation** for the master branch can be found here: https://chris-zen.github.io/coremidi/coremidi/
+
 Please see the [examples](examples) for an idea on how it looks like, but if you are eager to see some code, this is how you would send some note:
 
 ```rust
@@ -31,6 +33,8 @@ For handling low level MIDI data you may look into:
 - [rimd](https://github.com/RustAudio/rimd)
 
 **Please note that this is a work in progress project !**
+
+**Beta-testers are more than welcomed ;-)**
 
 # Installation
 

@@ -6,6 +6,7 @@ description = "CoreMIDI library for Rust"
 license = "MIT"
 homepage = "https://github.com/chris-zen/coremidi"
 repository = "https://github.com/chris-zen/coremidi"
+documentation = "https://chris-zen.github.io/coremidi/coremidi/"
 readme = "README.md"
 keywords = ["CoreMIDI", "MIDI", "OSX"]
 

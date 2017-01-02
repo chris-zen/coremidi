@@ -1,3 +1,7 @@
+#![crate_name = "coremidi"]
+#![crate_type = "lib"]
+#![doc(html_root_url = "https://chris-zen.github.io/coremidi/")]
+
 /*!
 This is a [CoreMIDI](https://developer.apple.com/reference/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
 CoreMIDI is a Mac OSX framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
