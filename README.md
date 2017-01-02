@@ -61,7 +61,7 @@ cargo run --example send-notes
 
 These are the provided examples:
 
-- [endpoints](examples/system-endpoints.rs): how to enumerate sources and destinations.
+- [endpoints](examples/endpoints.rs): how to enumerate sources and destinations.
 - [send](examples/send.rs): how to create an output port and send MIDI messages.
 - [receive](examples/receive.rs): how to create an input port and receive MIDI messages.
 - [virtual-source](examples/virtual-source.rs): how to create a virtual source and generate MIDI messages.
@@ -83,6 +83,7 @@ These are the provided examples:
 - [x] Add support to build PacketList (PacketBuffer)
 - [x] Create virtual destinations with callback
 - [ ] Stop and restart MIDI I/O
+- [ ] Client notifications
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities
