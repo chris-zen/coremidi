@@ -8,6 +8,7 @@ use coremidi_sys::{
 
 use std::mem;
 
+#[doc(hidden)]
 pub fn get_display_name(object_ref: MIDIObjectRef) -> Option<String> {
     let mut display_name_ref: CFStringRef = unsafe { mem::uninitialized() };
     let status = unsafe { MIDIObjectGetStringProperty(

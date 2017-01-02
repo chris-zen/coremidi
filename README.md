@@ -5,7 +5,7 @@ CoreMIDI is a Mac OSX framework that provides APIs for communicating with MIDI (
 
 This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
 
-Please see the [examples](examples) for an idea on how it looks like, but if you are eager to see an example, this is how you would send some note:
+Please see the [examples](examples) for an idea on how it looks like, but if you are eager to see some code, this is how you would send some note:
 
 ```rust
 extern crate coremidi;

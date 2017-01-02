@@ -53,7 +53,7 @@ use coremidi_sys_ext::{
 ///
 /// A simple example to create a Client:
 ///
-/// ```
+/// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// ```
 pub struct Client(MIDIClientRef);
@@ -69,7 +69,7 @@ pub struct Port(MIDIPortRef);
 ///
 /// A simple example to create an output port and send a MIDI event:
 ///
-/// ```
+/// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
 /// let destination = coremidi::Destination::from_index(0);
@@ -82,7 +82,7 @@ pub struct OutputPort { port: Port }
 ///
 /// A simple example to create an input port:
 ///
-/// ```
+/// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let input_port = client.input_port("example-port", |packet_list| println!("{}", packet_list)).unwrap();
 /// let source = coremidi::Source::from_index(0);
@@ -101,7 +101,7 @@ pub struct Endpoint(MIDIEndpointRef);
 ///
 /// A source can be created from an index like this:
 ///
-/// ```
+/// ```rust,no_run
 /// let source = coremidi::Destination::from_index(0);
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
@@ -112,7 +112,7 @@ pub struct Destination { endpoint: Endpoint }
 ///
 /// A source can be created from an index like this:
 ///
-/// ```
+/// ```rust,no_run
 /// let source = coremidi::Source::from_index(0);
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
@@ -123,7 +123,7 @@ pub struct Source { endpoint: Endpoint }
 ///
 /// A virtual source can be created like:
 ///
-/// ```
+/// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let source = client.virtual_source("example-source").unwrap();
 /// ```

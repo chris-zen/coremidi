@@ -37,13 +37,13 @@ impl Deref for Source {
 ///
 /// The number of sources available in the system can be retrieved with:
 ///
-/// ```
+/// ```rust,no_run
 /// let number_of_sources = coremidi::Sources::count();
 /// ```
 ///
 /// The sources in the system can be iterated as:
 ///
-/// ```
+/// ```rust,no_run
 /// for source in coremidi::Sources {
 ///   println!("{}", source.display_name().unwrap());
 /// }

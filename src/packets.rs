@@ -49,8 +49,9 @@ impl Packet {
     ///
     /// will print:
     ///
+    /// ```text
     ///  90 40 7f
-    ///
+    /// ```
     pub fn iter(&self) -> PacketIterator {
         PacketIterator {
             count: self.length(),
@@ -221,6 +222,10 @@ impl PacketBuffer {
 
     /// Create a `PacketBuffer` with a single packet containing the provided timestamp and data.
     ///
+    /// According to the official documentation for CoreMIDI, the timestamp represents
+    /// the time at which the events are to be played, where zero means "now".
+    /// The timestamp applies to the first MIDI byte in the packet.
+    ///
     /// Example on how to create a `PacketBuffer` with a single packet for a MIDI note on for C-5:
     ///
     /// ```
@@ -232,6 +237,10 @@ impl PacketBuffer {
     }
 
     /// Add a new packet containing the provided timestamp and data.
+    ///
+    /// According to the official documentation for CoreMIDI, the timestamp represents
+    /// the time at which the events are to be played, where zero means "now".
+    /// The timestamp applies to the first MIDI byte in the packet.
     ///
     /// Example:
     ///

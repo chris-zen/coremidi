@@ -35,7 +35,7 @@ impl Deref for Destination {
 ///
 /// The destinations in the system can be iterated as:
 ///
-/// ```
+/// ```rust,no_run
 /// for destination in coremidi::Destinations {
 ///   println!("{}", destination.display_name().unwrap());
 /// }
