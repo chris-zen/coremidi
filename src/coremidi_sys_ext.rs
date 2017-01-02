@@ -16,13 +16,15 @@ pub type MIDIReadProc =
                                         srcConnRefCon: *mut ::libc::c_void)
                               -> ()>;
 
+pub const MAX_PACKET_DATA_LENGTH: usize = 0xffffusize;
+
 #[repr(C)]
 #[repr(packed)]
 #[derive(Copy)]
 pub struct Struct_MIDIPacket {
     pub timeStamp: MIDITimeStamp,
     pub length: UInt16,
-    pub data: [Byte; 256usize],
+    pub data: [Byte; MAX_PACKET_DATA_LENGTH],
 }
 impl ::std::clone::Clone for Struct_MIDIPacket {
     fn clone(&self) -> Self { *self }
@@ -59,6 +61,8 @@ extern "C" {
                                readProc: MIDIReadProc,
                                refCon: *mut ::libc::c_void,
                                outPort: *mut MIDIPortRef) -> OSStatus;
+
+    pub fn MIDIPacketListInit(pktlist: *mut MIDIPacketList) -> *mut MIDIPacket;
 }
 
 pub unsafe fn MIDIPacketNext(packet: *const MIDIPacket) -> *const MIDIPacket {

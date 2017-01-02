@@ -21,18 +21,18 @@ fn main() {
     }
 }
 
-fn create_note_on(channel: u8, note: u8, velocity: u8) -> coremidi::PacketList {
+fn create_note_on(channel: u8, note: u8, velocity: u8) -> coremidi::PacketBuffer {
     let data = vec![
         0x90 | (channel & 0x0f),
         note & 0x7f,
         velocity & 0x7f];
-    coremidi::PacketList::from_data(0, data)
+    coremidi::PacketBuffer::from_data(0, data)
 }
 
-fn create_note_off(channel: u8, note: u8, velocity: u8) -> coremidi::PacketList {
+fn create_note_off(channel: u8, note: u8, velocity: u8) -> coremidi::PacketBuffer {
     let data = vec![
         0x80 | (channel & 0x0f),
         note & 0x7f,
         velocity & 0x7f];
-    coremidi::PacketList::from_data(0, data)
+    coremidi::PacketBuffer::from_data(0, data)
 }

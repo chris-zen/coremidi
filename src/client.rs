@@ -54,7 +54,7 @@ impl Client {
     /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
     /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
     ///
-    pub fn input_port<F>(&self, name: &str, callback: &F) -> Result<InputPort, OSStatus>
+    pub fn input_port<F>(&self, name: &str, callback: F) -> Result<InputPort, OSStatus>
             where F: Fn(PacketList) {
 
         extern "C" fn read_proc<F: Fn(PacketList)>(
@@ -63,7 +63,7 @@ impl Client {
                 _: *mut ::libc::c_void) { //srcConnRefCon
 
             let _ = ::std::panic::catch_unwind(|| unsafe {
-                let packet_list = PacketList(*pktlist);
+                let packet_list = PacketList(pktlist);
                 let ref callback = *(read_proc_ref_con as *const F);
                 // println!("read_proc: pl={:x}, mpl={:x}", &packet_list as *const _ as usize, pktlist as usize);
                 callback(packet_list);
@@ -76,7 +76,7 @@ impl Client {
             self.0,
             port_name.as_concrete_TypeRef(),
             Some(read_proc::<F> as extern "C" fn(_, _, _)),
-            callback as *const _ as *mut ::libc::c_void,
+            &callback as *const _ as *mut ::libc::c_void,
             &mut port_ref)
         };
         if status == 0 { Ok(InputPort { port: Port(port_ref) }) } else { Err(status) }

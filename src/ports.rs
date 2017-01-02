@@ -32,7 +32,7 @@ impl OutputPort {
         let status = unsafe { MIDISend(
             self.port.0,
             destination.endpoint.0,
-            &packet_list.0)
+            packet_list.0)
         };
         if status == 0 { Ok(()) } else { Err(status) }
     }

@@ -37,7 +37,7 @@ impl Deref for Destination {
 ///
 /// ```
 /// for destination in coremidi::Destinations {
-///   println!("{}", destination.display_name());
+///   println!("{}", destination.display_name().unwrap());
 /// }
 /// ```
 ///

@@ -45,7 +45,7 @@ impl Deref for Source {
 ///
 /// ```
 /// for source in coremidi::Sources {
-///   println!("{}", source.display_name());
+///   println!("{}", source.display_name().unwrap());
 /// }
 /// ```
 ///
@@ -96,7 +96,7 @@ impl VirtualSource {
     pub fn received(&self, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDIReceived(
             self.endpoint.0,
-            &packet_list.0)
+            packet_list.0)
         };
         if status == 0 { Ok(()) } else { Err(status) }
     }

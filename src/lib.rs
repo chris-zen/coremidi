@@ -1,7 +1,36 @@
 /*!
-CoreMIDI library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
+This is a [CoreMIDI](https://developer.apple.com/reference/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
+CoreMIDI is a Mac OSX framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
 
-This library tries to be as transparent as possible to the original CoreMIDI framework, while being as rust idiomatic as possible. This means that if you already know [CoreMIDI](https://developer.apple.com/reference/coremidi) you will find very easy to start using it.
+This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
+
+Please see the [examples](examples) for an idea on how it looks like, but if you are eager to see an example, this is how you would send some note:
+
+```rust,no_run
+extern crate coremidi;
+use std::time::Duration;
+use std::thread;
+let client = coremidi::Client::new("example-client").unwrap();
+let output_port = client.output_port("example-port").unwrap();
+let destination = coremidi::Destination::from_index(0);
+let note_on = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
+let note_off = coremidi::PacketBuffer::from_data(0, vec![0x80, 0x40, 0x7f]);
+output_port.send(&destination, &note_on).unwrap();
+thread::sleep(Duration::from_millis(1000));
+output_port.send(&destination, &note_off).unwrap();
+```
+
+If you are looking for a portable MIDI library then you can look into:
+
+- [portmidi-rs](https://github.com/musitdev/portmidi-rs)
+- [midir](https://github.com/Boddlnagg/midir)
+
+For handling low level MIDI data you may look into:
+
+- [midi-rs](https://github.com/samdoshi/midi-rs)
+- [rimd](https://github.com/RustAudio/rimd)
+
+**Please note that this is a work in progress project !**
 
 */
 
@@ -44,7 +73,7 @@ pub struct Port(MIDIPortRef);
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
 /// let destination = coremidi::Destination::from_index(0);
-/// let packets = coremidi::PacketList::from_data(0, vec![0x90, 0x40, 0x7f]);
+/// let packets = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
 /// output_port.send(&destination, &packets).unwrap();
 /// ```
 pub struct OutputPort { port: Port }
@@ -55,9 +84,9 @@ pub struct OutputPort { port: Port }
 ///
 /// ```
 /// let client = coremidi::Client::new("example-client").unwrap();
-/// let input_port = client.input_port("example-port").unwrap();
+/// let input_port = client.input_port("example-port", |packet_list| println!("{}", packet_list)).unwrap();
 /// let source = coremidi::Source::from_index(0);
-/// ...
+/// input_port.connect_source(&source);
 /// ```
 pub struct InputPort { port: Port }
 
@@ -74,7 +103,7 @@ pub struct Endpoint(MIDIEndpointRef);
 ///
 /// ```
 /// let source = coremidi::Destination::from_index(0);
-/// println!("The source at index 0 has display name '{}'", source.display_name());
+/// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
 pub struct Destination { endpoint: Endpoint }
@@ -85,7 +114,7 @@ pub struct Destination { endpoint: Endpoint }
 ///
 /// ```
 /// let source = coremidi::Source::from_index(0);
-/// println!("The source at index 0 has display name '{}'", source.display_name());
+/// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
 pub struct Source { endpoint: Endpoint }
@@ -103,7 +132,7 @@ pub struct VirtualSource { endpoint: Endpoint }
 
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
-pub struct PacketList(MIDIPacketList);
+pub struct PacketList(*const MIDIPacketList);
 
 mod coremidi_sys_ext;
 mod client;
@@ -113,6 +142,7 @@ mod properties;
 mod endpoints;
 pub use endpoints::destinations::Destinations;
 pub use endpoints::sources::Sources;
+pub use packets::PacketBuffer;
 
 /// Unschedules previously-sent packets for all the endpoints.
 /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).

@@ -7,7 +7,7 @@ license = "MIT"
 homepage = "https://github.com/chris-zen/coremidi"
 repository = "https://github.com/chris-zen/coremidi"
 readme = "README.md"
-keywords = ["CoreMIDI", "MIDI"]
+keywords = ["CoreMIDI", "MIDI", "OSX"]
 
 
 [dependencies]
