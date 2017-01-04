@@ -32,7 +32,7 @@ fn get_destination_index() -> usize {
     let mut args_iter = env::args();
     let tool_name = args_iter.next()
         .and_then(|path| path.split(std::path::MAIN_SEPARATOR).last().map(|v| v.to_string()))
-        .unwrap_or("send-notes".to_string());
+        .unwrap_or("send".to_string());
 
     match args_iter.next() {
         Some(arg) => match arg.parse::<usize>() {

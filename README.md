@@ -37,18 +37,36 @@ For handling low level MIDI data you may look into:
 **Beta-testers are more than welcomed ;-)**
 
 [![Build Status](https://travis-ci.org/chris-zen/coremidi.svg?branch=master)](https://travis-ci.org/chris-zen/coremidi)
-[![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
-[![Crates.io](https://img.shields.io/crates/d/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
-[![Crates.io](https://img.shields.io/crates/dv/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
+[![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://crates.io/crates/coremidi)
+[![Crates.io](https://img.shields.io/crates/d/coremidi.svg)](https://crates.io/crates/coremidi)
+[![Crates.io](https://img.shields.io/crates/dv/coremidi.svg)](https://crates.io/crates/coremidi)
 [![GitHub tag](https://img.shields.io/github/tag/chris-zen/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
 
 # Installation
 
-Add this to your *Cargo.toml*.
+The library is published into [crates.io](https://crates.io/crates/coremidi), so it can be used by adding the following lines into your `Cargo.toml` file (but remember to update the version number accordingly):
 
 ```toml
 [dependencies]
 coremidi = "^0.0.2"
+```
+
+If you prefer to live in the edge ;-) you can use the master branch by including this instead:
+
+```toml
+[dependencies]
+coremidi = { git = "https://github.com/chris-zen/coremidi", branch="master" }
+```
+
+To play with the source code yourself you can clone the repo and build the code and documentation with the following commands:
+
+```sh
+git clone https://github.com/chris-zen/coremidi.git
+cd coremidi
+cargo build
+cargo test
+cargo doc
+open target/doc/coremidi/index.html
 ```
 
 # Examples
@@ -56,7 +74,7 @@ coremidi = "^0.0.2"
 The examples can be run with:
 
 ```sh
-cargo run --example send-notes
+cargo run --example send
 ```
 
 These are the provided examples:
@@ -83,9 +101,10 @@ These are the provided examples:
 - [x] Add support to build PacketList (PacketBuffer)
 - [x] Create virtual destinations with callback
 - [x] Stop and restart MIDI I/O
-- [ ] Support MIDI Objects
+- [x] MIDI Objects
 - [ ] Client notifications
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities
 - [ ] MIDIThru connections
+- [ ] More Object properties

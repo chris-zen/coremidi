@@ -4,6 +4,7 @@ use coremidi_sys::{
 
 use std::ops::Deref;
 
+use Object;
 use Endpoint;
 use Destination;
 use VirtualDestination;
@@ -14,7 +15,7 @@ impl Destination {
     ///
     pub fn from_index(index: usize) -> Destination {
         let endpoint_ref = unsafe { MIDIGetDestination(index as ItemCount) };
-        Destination { endpoint: Endpoint(endpoint_ref) }
+        Destination { endpoint: Endpoint { object: Object(endpoint_ref) } }
     }
 }
 

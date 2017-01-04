@@ -17,8 +17,5 @@ fn main() {
 }
 
 fn get_display_name(endpoint: &coremidi::Endpoint) -> String {
-    match endpoint.display_name() {
-        Some(name) => name,
-        None => "[Unknown Display Name]".to_string()
-    }
+    endpoint.display_name().unwrap_or("[Unknown Display Name]".to_string())
 }

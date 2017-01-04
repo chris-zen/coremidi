@@ -14,6 +14,7 @@ use coremidi_sys_ext::{
 use std::mem;
 use std::ptr;
 
+use Object;
 use Client;
 use Port;
 use OutputPort;
@@ -29,13 +30,13 @@ impl Client {
     ///
     pub fn new(name: &str) -> Result<Client, OSStatus> {
         let client_name = CFString::new(name);
-        let mut client: MIDIClientRef = unsafe { mem::uninitialized() };
+        let mut client_ref: MIDIClientRef = unsafe { mem::uninitialized() };
         let status = unsafe { MIDIClientCreate(
             client_name.as_concrete_TypeRef(),
             None, ptr::null_mut(),
-            &mut client)
+            &mut client_ref)
         };
-        if status == 0 { Ok(Client(client)) } else { Err(status) }
+        if status == 0 { Ok(Client { object: Object(client_ref) }) } else { Err(status) }
     }
 
     /// Creates an output port through which the client may send outgoing MIDI messages to any MIDI destination.
@@ -45,11 +46,11 @@ impl Client {
         let port_name = CFString::new(name);
         let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
         let status = unsafe { MIDIOutputPortCreate(
-            self.0,
+            self.object.0,
             port_name.as_concrete_TypeRef(),
             &mut port_ref)
         };
-        if status == 0 { Ok(OutputPort { port: Port(port_ref) }) } else { Err(status) }
+        if status == 0 { Ok(OutputPort { port: Port { object: Object(port_ref) } }) } else { Err(status) }
     }
 
     /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
@@ -61,13 +62,13 @@ impl Client {
         let port_name = CFString::new(name);
         let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
         let status = unsafe { MIDIInputPortCreate(
-            self.0,
+            self.object.0,
             port_name.as_concrete_TypeRef(),
             Some(Self::read_proc::<F> as extern "C" fn(_, _, _)),
             &callback as *const _ as *mut ::libc::c_void,
             &mut port_ref)
         };
-        if status == 0 { Ok(InputPort { port: Port(port_ref) }) } else { Err(status) }
+        if status == 0 { Ok(InputPort { port: Port { object: Object(port_ref) } }) } else { Err(status) }
     }
 
     /// Creates a virtual source in the client.
@@ -77,11 +78,11 @@ impl Client {
         let virtual_source_name = CFString::new(name);
         let mut virtual_source: MIDIEndpointRef = unsafe { mem::uninitialized() };
         let status = unsafe { MIDISourceCreate(
-            self.0,
+            self.object.0,
             virtual_source_name.as_concrete_TypeRef(),
             &mut virtual_source)
         };
-        if status == 0 { Ok(VirtualSource { endpoint: Endpoint(virtual_source) }) } else { Err(status) }
+        if status == 0 { Ok(VirtualSource { endpoint: Endpoint { object: Object(virtual_source) } }) } else { Err(status) }
     }
 
     /// Creates a virtual destination in the client.
@@ -93,13 +94,13 @@ impl Client {
         let virtual_destination_name = CFString::new(name);
         let mut virtual_destination: MIDIEndpointRef = unsafe { mem::uninitialized() };
         let status = unsafe { MIDIDestinationCreate(
-            self.0,
+            self.object.0,
             virtual_destination_name.as_concrete_TypeRef(),
             Some(Self::read_proc::<F> as extern "C" fn(_, _, _)),
             &callback as *const _ as *mut ::libc::c_void,
             &mut virtual_destination)
         };
-        if status == 0 { Ok(VirtualDestination { endpoint: Endpoint(virtual_destination) }) } else { Err(status) }
+        if status == 0 { Ok(VirtualDestination { endpoint: Endpoint { object: Object(virtual_destination) } }) } else { Err(status) }
     }
 
     extern "C" fn read_proc<F: Fn(PacketList)>(
@@ -117,6 +118,6 @@ impl Client {
 
 impl Drop for Client {
     fn drop(&mut self) {
-        unsafe { MIDIClientDispose(self.0) };
+        unsafe { MIDIClientDispose(self.object.0) };
     }
 }

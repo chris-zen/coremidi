@@ -46,13 +46,18 @@ extern crate libc;
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIClientRef, MIDIPortRef, MIDIEndpointRef,
-    MIDIFlushOutput, MIDIRestart
+    MIDIObjectRef, MIDIFlushOutput, MIDIRestart
 };
 
 use coremidi_sys_ext::{
     MIDIPacketList
 };
+
+/// A [MIDI Object](https://developer.apple.com/reference/coremidi/midiobjectref).
+///
+/// It is the base class of many CoreMIDI objects.
+///
+pub struct Object(MIDIObjectRef);
 
 /// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).
 ///
@@ -61,14 +66,14 @@ use coremidi_sys_ext::{
 /// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// ```
-pub struct Client(MIDIClientRef);
+pub struct Client { object: Object }
 
 /// A MIDI connection port owned by a client.
 /// See [MIDIPortRef](https://developer.apple.com/reference/coremidi/midiportref).
 ///
 /// Ports can't be instantiated directly, but through a client.
 ///
-pub struct Port(MIDIPortRef);
+pub struct Port { object: Object }
 
 /// An output [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
 ///
@@ -100,7 +105,7 @@ pub struct InputPort { port: Port }
 ///
 /// You don't need to create an endpoint directly, instead you can create system sources and sources or virtual ones from a client.
 ///
-pub struct Endpoint(MIDIEndpointRef);
+pub struct Endpoint { object: Object }
 
 /// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
 ///
@@ -151,6 +156,8 @@ pub struct VirtualDestination { endpoint: Endpoint }
 pub struct PacketList(*const MIDIPacketList);
 
 mod coremidi_sys_ext;
+
+mod object;
 mod client;
 mod ports;
 mod packets;
@@ -159,6 +166,7 @@ mod endpoints;
 pub use endpoints::destinations::Destinations;
 pub use endpoints::sources::Sources;
 pub use packets::PacketBuffer;
+pub use properties::Properties;
 
 /// Unschedules previously-sent packets for all the endpoints.
 /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).

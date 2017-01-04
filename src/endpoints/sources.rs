@@ -10,6 +10,7 @@ use coremidi_sys_ext::{
 
 use std::ops::Deref;
 
+use Object;
 use Endpoint;
 use Source;
 use VirtualSource;
@@ -21,7 +22,7 @@ impl Source {
     ///
     pub fn from_index(index: usize) -> Source {
         let endpoint_ref = unsafe { MIDIGetSource(index as ItemCount) };
-        Source { endpoint: Endpoint(endpoint_ref) }
+        Source { endpoint: Endpoint { object: Object(endpoint_ref) } }
     }
 }
 
@@ -95,7 +96,7 @@ impl VirtualSource {
     ///
     pub fn received(&self, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDIReceived(
-            self.endpoint.0,
+            self.endpoint.object.0,
             packet_list.0)
         };
         if status == 0 { Ok(()) } else { Err(status) }
