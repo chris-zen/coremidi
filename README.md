@@ -34,7 +34,7 @@ For handling low level MIDI data you may look into:
 
 **Please note that this is a work in progress project !**
 
-**Beta-testers are more than welcomed ;-)**
+**Beta-testers are more than welcome ;-)**
 
 [![Build Status](https://travis-ci.org/chris-zen/coremidi.svg?branch=master)](https://travis-ci.org/chris-zen/coremidi)
 [![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://crates.io/crates/coremidi)
