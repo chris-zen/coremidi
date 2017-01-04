@@ -101,10 +101,9 @@ These are the provided examples:
 - [x] Add support to build PacketList (PacketBuffer)
 - [x] Create virtual destinations with callback
 - [x] Stop and restart MIDI I/O
-- [x] MIDI Objects
+- [x] MIDI Objects and properties
 - [ ] Client notifications
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities
 - [ ] MIDIThru connections
-- [ ] More Object properties
