@@ -41,6 +41,7 @@ For handling low level MIDI data you may look into:
 [![Crates.io](https://img.shields.io/crates/d/coremidi.svg)](https://crates.io/crates/coremidi)
 [![Crates.io](https://img.shields.io/crates/dv/coremidi.svg)](https://crates.io/crates/coremidi)
 [![GitHub tag](https://img.shields.io/github/tag/chris-zen/coremidi.svg)](https://travis-ci.org/chris-zen/coremidi)
+[![Join the chat at https://gitter.im/coremidi/Lobby](https://badges.gitter.im/coremidi/Lobby.svg)](https://gitter.im/coremidi/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Installation
 
