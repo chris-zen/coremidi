@@ -102,7 +102,7 @@ These are the provided examples:
 - [x] Create virtual destinations with callback
 - [x] Stop and restart MIDI I/O
 - [x] MIDI Objects and properties
-- [ ] Client notifications
+- [x] Client notifications
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities

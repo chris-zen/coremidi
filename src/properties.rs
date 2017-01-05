@@ -39,10 +39,12 @@ impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
     }
 }
 
-impl<T> PropertySetter<T> for StringProperty where T: Into<String> {
+impl<'a, T> PropertySetter<T> for StringProperty where T: Into<String> {
     fn set_value(&self, object: &Object, value: T) -> Result<(), OSStatus> {
         unsafe {
-            let string_ref = CFString::new(value.into().as_ref()).as_concrete_TypeRef();
+            let value: String = value.into();
+            let string = CFString::new(&value);
+            let string_ref = string.as_concrete_TypeRef();
             let status = MIDIObjectSetStringProperty(object.0, self.0, string_ref);
             if status == 0 { Ok(()) } else { Err(status) }
         }

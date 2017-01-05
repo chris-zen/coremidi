@@ -55,17 +55,21 @@ use coremidi_sys_ext::{
 
 /// A [MIDI Object](https://developer.apple.com/reference/coremidi/midiobjectref).
 ///
-/// It is the base class of many CoreMIDI objects.
+/// The base class of many CoreMIDI objects.
 ///
+#[derive(PartialEq)]
 pub struct Object(MIDIObjectRef);
 
 /// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).
+///
+/// An object maintaining per-client state.
 ///
 /// A simple example to create a Client:
 ///
 /// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// ```
+#[derive(Debug)]
 pub struct Client { object: Object }
 
 /// A MIDI connection port owned by a client.
@@ -73,6 +77,7 @@ pub struct Client { object: Object }
 ///
 /// Ports can't be instantiated directly, but through a client.
 ///
+#[derive(Debug)]
 pub struct Port { object: Object }
 
 /// An output [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
@@ -86,6 +91,7 @@ pub struct Port { object: Object }
 /// let packets = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
 /// output_port.send(&destination, &packets).unwrap();
 /// ```
+#[derive(Debug)]
 pub struct OutputPort { port: Port }
 
 /// An input [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
@@ -98,6 +104,7 @@ pub struct OutputPort { port: Port }
 /// let source = coremidi::Source::from_index(0);
 /// input_port.connect_source(&source);
 /// ```
+#[derive(Debug)]
 pub struct InputPort { port: Port }
 
 /// A MIDI source or source, owned by an entity.
@@ -105,6 +112,7 @@ pub struct InputPort { port: Port }
 ///
 /// You don't need to create an endpoint directly, instead you can create system sources and sources or virtual ones from a client.
 ///
+#[derive(Debug)]
 pub struct Endpoint { object: Object }
 
 /// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
@@ -116,6 +124,7 @@ pub struct Endpoint { object: Object }
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
+#[derive(Debug)]
 pub struct Destination { endpoint: Endpoint }
 
 /// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
@@ -127,6 +136,7 @@ pub struct Destination { endpoint: Endpoint }
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
+#[derive(Debug)]
 pub struct Source { endpoint: Endpoint }
 
 /// A [MIDI virtual source](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate) owned by a client.
@@ -138,6 +148,7 @@ pub struct Source { endpoint: Endpoint }
 /// let source = client.virtual_source("example-source").unwrap();
 /// ```
 ///
+#[derive(Debug)]
 pub struct VirtualSource { endpoint: Endpoint }
 
 /// A [MIDI virtual destination](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate) owned by a client.
@@ -149,24 +160,37 @@ pub struct VirtualSource { endpoint: Endpoint }
 /// client.virtual_destination("example-destination", |packet_list| println!("{}", packet_list)).unwrap();
 /// ```
 ///
+#[derive(Debug)]
 pub struct VirtualDestination { endpoint: Endpoint }
+
+/// A [MIDI object](https://developer.apple.com/reference/coremidi/midideviceref).
+///
+/// A MIDI device or external device, containing entities.
+///
+#[derive(Debug)]
+#[derive(PartialEq)]
+pub struct Device { object: Object }
 
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
+#[derive(PartialEq)]
 pub struct PacketList(*const MIDIPacketList);
 
 mod coremidi_sys_ext;
 
 mod object;
+mod devices;
 mod client;
 mod ports;
 mod packets;
 mod properties;
 mod endpoints;
+mod notifications;
 pub use endpoints::destinations::Destinations;
 pub use endpoints::sources::Sources;
 pub use packets::PacketBuffer;
-pub use properties::Properties;
+pub use properties::{Properties, PropertyGetter, PropertySetter};
+pub use notifications::Notification;
 
 /// Unschedules previously-sent packets for all the endpoints.
 /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).

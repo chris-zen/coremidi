@@ -2,15 +2,15 @@ use core_foundation::string::CFString;
 use core_foundation::base::{OSStatus, TCFType};
 
 use coremidi_sys::{
-    MIDIClientRef, MIDIClientCreate, MIDIClientDispose,
-    MIDIPortRef, MIDIOutputPortCreate,
-    MIDIEndpointRef, MIDISourceCreate
+    MIDIClientRef, MIDIClientCreate, MIDIClientDispose, MIDINotification,
+    MIDIPortRef, MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate
 };
 
 use coremidi_sys_ext::{
     MIDIPacketList, MIDIInputPortCreate, MIDIDestinationCreate
 };
 
+use std::ops::Deref;
 use std::mem;
 use std::ptr;
 
@@ -23,8 +23,24 @@ use Endpoint;
 use VirtualSource;
 use VirtualDestination;
 use PacketList;
+use notifications::Notification;
 
 impl Client {
+    /// Creates a new CoreMIDI client with support for notifications.
+    /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
+    ///
+    pub fn new_with_notifications<F: Fn(Notification)>(name: &str, callback: F) -> Result<Client, OSStatus> {
+        let client_name = CFString::new(name);
+        let mut client_ref: MIDIClientRef = unsafe { mem::uninitialized() };
+        let status = unsafe { MIDIClientCreate(
+            client_name.as_concrete_TypeRef(),
+            Some(Self::notify_proc::<F> as extern "C" fn(_, _)),
+            &callback as *const _ as *mut ::libc::c_void,
+            &mut client_ref)
+        };
+        if status == 0 { Ok(Client { object: Object(client_ref) }) } else { Err(status) }
+    }
+
     /// Creates a new CoreMIDI client.
     /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
     ///
@@ -103,6 +119,21 @@ impl Client {
         if status == 0 { Ok(VirtualDestination { endpoint: Endpoint { object: Object(virtual_destination) } }) } else { Err(status) }
     }
 
+    extern "C" fn notify_proc<F: Fn(Notification)>(
+            notification_ptr: *const MIDINotification,
+            ref_con: *mut ::libc::c_void) {
+
+        let _ = ::std::panic::catch_unwind(|| unsafe {
+            match Notification::from(&*notification_ptr) {
+                Ok(notification) => {
+                    let ref callback = *(ref_con as *const F);
+                    callback(notification);
+                },
+                Err(_) => {} // Skip unknown notifications
+            }
+        });
+    }
+
     extern "C" fn read_proc<F: Fn(PacketList)>(
             pktlist: *const MIDIPacketList,
             read_proc_ref_con: *mut ::libc::c_void,
@@ -113,6 +144,14 @@ impl Client {
             let ref callback = *(read_proc_ref_con as *const F);
             callback(packet_list);
         });
+    }
+}
+
+impl Deref for Client {
+    type Target = Object;
+
+    fn deref(&self) -> &Object {
+        &self.object
     }
 }
 
