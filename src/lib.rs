@@ -70,7 +70,45 @@ pub struct Object(MIDIObjectRef);
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// ```
 #[derive(Debug)]
-pub struct Client { object: Object }
+pub struct Client {
+    // Order is important, object needs to be dropped first
+    object: Object,
+    callback: BoxedCallback<Notification>,
+}
+
+// A lifetime-managed wrapper for callback functions
+#[derive(Debug, PartialEq)]
+struct BoxedCallback<T>(*mut Box<FnMut(&T)>);
+
+impl<T> BoxedCallback<T> {
+    fn new<F: FnMut(&T) + Send + 'static>(f: F) -> BoxedCallback<T> {
+        BoxedCallback(Box::into_raw(Box::new(Box::new(f))))
+    }
+
+    fn null() -> BoxedCallback<T> {
+        BoxedCallback(::std::ptr::null_mut())
+    }
+
+    fn raw_ptr(&mut self) -> *mut ::libc::c_void {
+        self.0 as *mut ::libc::c_void
+    }
+
+    // must not be null
+    unsafe fn call_from_raw_ptr(raw_ptr: *mut ::libc::c_void, arg: &T) {
+        let callback = &mut *(raw_ptr as *mut Box<FnMut(&T)>);
+        callback(arg);
+    }
+}
+
+impl<T> Drop for BoxedCallback<T> {
+    fn drop(&mut self) {
+        unsafe {
+            if !self.0.is_null() {
+                let _ = Box::from_raw(self.0);
+            }
+        }
+    }
+}
 
 /// A MIDI connection port owned by a client.
 /// See [MIDIPortRef](https://developer.apple.com/reference/coremidi/midiportref).
@@ -105,7 +143,11 @@ pub struct OutputPort { port: Port }
 /// input_port.connect_source(&source);
 /// ```
 #[derive(Debug)]
-pub struct InputPort { port: Port }
+pub struct InputPort {
+    // Note: the order is important here, port needs to be dropped first
+    port: Port,
+    callback: BoxedCallback<PacketList>,
+}
 
 /// A MIDI source or source, owned by an entity.
 /// See [MIDIEndpointRef](https://developer.apple.com/reference/coremidi/midiendpointref).
@@ -161,7 +203,11 @@ pub struct VirtualSource { endpoint: Endpoint }
 /// ```
 ///
 #[derive(Debug)]
-pub struct VirtualDestination { endpoint: Endpoint }
+pub struct VirtualDestination {
+    // Note: the order is important here, endpoint needs to be dropped first
+    endpoint: Endpoint,
+    callback: BoxedCallback<PacketList>,
+}
 
 /// A [MIDI object](https://developer.apple.com/reference/coremidi/midideviceref).
 ///
@@ -188,7 +234,7 @@ mod endpoints;
 mod notifications;
 pub use endpoints::destinations::Destinations;
 pub use endpoints::sources::Sources;
-pub use packets::PacketBuffer;
+pub use packets::{PacketListIterator, Packet, PacketBuffer};
 pub use properties::{Properties, PropertyGetter, PropertySetter};
 pub use notifications::Notification;
 

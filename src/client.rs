@@ -23,22 +23,30 @@ use Endpoint;
 use VirtualSource;
 use VirtualDestination;
 use PacketList;
+use BoxedCallback;
 use notifications::Notification;
 
 impl Client {
     /// Creates a new CoreMIDI client with support for notifications.
     /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
     ///
-    pub fn new_with_notifications<F: Fn(Notification)>(name: &str, callback: F) -> Result<Client, OSStatus> {
+    pub fn new_with_notifications<F>(name: &str, callback: F) -> Result<Client, OSStatus>
+        where F: FnMut(&Notification) + Send + 'static
+    {
         let client_name = CFString::new(name);
         let mut client_ref: MIDIClientRef = unsafe { mem::uninitialized() };
+        let mut boxed_callback = BoxedCallback::new(callback);
         let status = unsafe { MIDIClientCreate(
             client_name.as_concrete_TypeRef(),
-            Some(Self::notify_proc::<F> as extern "C" fn(_, _)),
-            &callback as *const _ as *mut ::libc::c_void,
+            Some(Self::notify_proc as extern "C" fn(_, _)),
+            boxed_callback.raw_ptr(),
             &mut client_ref)
         };
-        if status == 0 { Ok(Client { object: Object(client_ref) }) } else { Err(status) }
+        if status == 0 {
+            Ok(Client { object: Object(client_ref), callback: boxed_callback })
+        } else {
+            Err(status)
+        }
     }
 
     /// Creates a new CoreMIDI client.
@@ -52,7 +60,11 @@ impl Client {
             None, ptr::null_mut(),
             &mut client_ref)
         };
-        if status == 0 { Ok(Client { object: Object(client_ref) }) } else { Err(status) }
+        if status == 0 {
+            Ok(Client { object: Object(client_ref), callback: BoxedCallback::null() })
+        } else {
+            Err(status)
+        }
     }
 
     /// Creates an output port through which the client may send outgoing MIDI messages to any MIDI destination.
@@ -73,18 +85,26 @@ impl Client {
     /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
     ///
     pub fn input_port<F>(&self, name: &str, callback: F) -> Result<InputPort, OSStatus>
-            where F: Fn(PacketList) {
+            where F: FnMut(&PacketList) + Send + 'static {
 
         let port_name = CFString::new(name);
         let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
+        let mut box_callback = BoxedCallback::new(callback);
         let status = unsafe { MIDIInputPortCreate(
             self.object.0,
             port_name.as_concrete_TypeRef(),
-            Some(Self::read_proc::<F> as extern "C" fn(_, _, _)),
-            &callback as *const _ as *mut ::libc::c_void,
+            Some(Self::read_proc as extern "C" fn(_, _, _)),
+            box_callback.raw_ptr(),
             &mut port_ref)
         };
-        if status == 0 { Ok(InputPort { port: Port { object: Object(port_ref) } }) } else { Err(status) }
+        if status == 0 {
+            Ok(InputPort {
+                port: Port { object: Object(port_ref) },
+                callback: box_callback,
+            })
+        } else {
+            Err(status)
+        }
     }
 
     /// Creates a virtual source in the client.
@@ -105,44 +125,52 @@ impl Client {
     /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
     ///
     pub fn virtual_destination<F>(&self, name: &str, callback: F) -> Result<VirtualDestination, OSStatus>
-            where F: Fn(PacketList) {
+            where F: FnMut(&PacketList) + Send + 'static {
 
         let virtual_destination_name = CFString::new(name);
         let mut virtual_destination: MIDIEndpointRef = unsafe { mem::uninitialized() };
+        let mut boxed_callback = BoxedCallback::new(callback);
         let status = unsafe { MIDIDestinationCreate(
             self.object.0,
             virtual_destination_name.as_concrete_TypeRef(),
-            Some(Self::read_proc::<F> as extern "C" fn(_, _, _)),
-            &callback as *const _ as *mut ::libc::c_void,
+            Some(Self::read_proc as extern "C" fn(_, _, _)),
+            boxed_callback.raw_ptr(),
             &mut virtual_destination)
         };
-        if status == 0 { Ok(VirtualDestination { endpoint: Endpoint { object: Object(virtual_destination) } }) } else { Err(status) }
+        if status == 0 {
+            Ok(VirtualDestination {
+                endpoint: Endpoint {
+                    object: Object(virtual_destination),
+                },
+                callback: boxed_callback,
+            })
+        } else {
+            Err(status)
+        }
     }
 
-    extern "C" fn notify_proc<F: Fn(Notification)>(
+    extern "C" fn notify_proc(
             notification_ptr: *const MIDINotification,
             ref_con: *mut ::libc::c_void) {
 
         let _ = ::std::panic::catch_unwind(|| unsafe {
             match Notification::from(&*notification_ptr) {
                 Ok(notification) => {
-                    let ref callback = *(ref_con as *const F);
-                    callback(notification);
+                    BoxedCallback::call_from_raw_ptr(ref_con, &notification);
                 },
                 Err(_) => {} // Skip unknown notifications
             }
         });
     }
 
-    extern "C" fn read_proc<F: Fn(PacketList)>(
+    extern "C" fn read_proc(
             pktlist: *const MIDIPacketList,
             read_proc_ref_con: *mut ::libc::c_void,
             _: *mut ::libc::c_void) { //srcConnRefCon
 
         let _ = ::std::panic::catch_unwind(|| unsafe {
             let packet_list = PacketList(pktlist);
-            let ref callback = *(read_proc_ref_con as *const F);
-            callback(packet_list);
+            BoxedCallback::call_from_raw_ptr(read_proc_ref_con, &packet_list);
         });
     }
 }

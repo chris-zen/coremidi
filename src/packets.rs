@@ -8,6 +8,7 @@ use coremidi_sys_ext::{
 
 use std::fmt;
 use std::ops::Deref;
+use std::marker::PhantomData;
 
 use PacketList;
 
@@ -16,32 +17,28 @@ pub type Timestamp = u64;
 /// A collection of simultaneous MIDI events.
 /// See [MIDIPacket](https://developer.apple.com/reference/coremidi/midipacket).
 ///
-pub struct Packet(*const MIDIPacket);
+pub struct Packet<'a> {
+    inner: *const MIDIPacket,
+    _phantom: PhantomData<&'a MIDIPacket>,
+}
 
-impl Packet {
+impl<'a> Packet<'a> {
     /// Get the packet timestamp.
     ///
     pub fn timestamp(&self) -> Timestamp {
         self.packet().timeStamp as Timestamp
     }
 
-    /// Get the packet length (in bytes).
+    /// Get the packet data. This method just gives raw MIDI bytes. You would need another
+    /// library to decode them and work with higher level events.
     ///
-    pub fn length(&self) -> usize {
-        self.packet().length as usize
-    }
-
-    /// Get an iterator for the packet bytes.
-    ///
-    /// It just iterates over the raw MIDI bytes. You would need another library to decode them
-    /// and work with higer level events.
     ///
     /// The following example:
     ///
     /// ```
     /// let packet_list = &coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
     /// for packet in packet_list.iter() {
-    ///   for byte in packet.iter() {
+    ///   for byte in packet.data() {
     ///     print!(" {:x}", byte);
     ///   }
     /// }
@@ -52,31 +49,29 @@ impl Packet {
     /// ```text
     ///  90 40 7f
     /// ```
-    pub fn iter(&self) -> PacketIterator {
-        PacketIterator {
-            count: self.length(),
-            data: &self.packet().data[0]
-        }
+    pub fn data(&self) -> &[u8] {
+        let packet = self.packet();
+        let data_ptr = &packet.data as *const u8;
+        let data_len = packet.length as usize;
+        unsafe { ::std::slice::from_raw_parts(data_ptr, data_len) }
     }
 
     #[inline]
     fn packet(&self) -> &MIDIPacket {
-        unsafe { &*self.0 }
+        unsafe { &*self.inner }
     }
 }
 
-impl fmt::Debug for Packet {
+impl<'a> fmt::Debug for Packet<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let pkt = unsafe { *self.0 };
         let result = write!(f, "Packet(ptr={:x}, ts={:016x}, data=[",
-                            self.0 as usize, pkt.timeStamp as u64);
-        let indices = 0..(pkt.length as usize);
-        let result = indices.fold(result, |prev_result, i| {
+                            self.inner as usize, self.timestamp() as u64);
+        let result = self.data().iter().enumerate().fold(result, |prev_result, (i, b)| {
             match prev_result {
                 Err(err) => Err(err),
                 Ok(()) => {
                     let sep = if i > 0 { ", " } else { "" };
-                    write!(f, "{}{:02x}", sep, pkt.data[i])
+                    write!(f, "{}{:02x}", sep, b)
                 }
             }
         });
@@ -84,38 +79,15 @@ impl fmt::Debug for Packet {
     }
 }
 
-impl fmt::Display for Packet {
+impl<'a> fmt::Display for Packet<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let pkt = unsafe { &*self.0 };
-        let result = write!(f, "{:016x}:", pkt.timeStamp as u64);
-        let indices = 0..(pkt.length as usize);
-        indices.fold(result, |prev_result, i| {
+        let result = write!(f, "{:016x}:", self.timestamp());
+        self.data().iter().fold(result, |prev_result, b| {
             match prev_result {
                 Err(err) => Err(err),
-                Ok(()) => write!(f, " {:02x}", pkt.data[i])
+                Ok(()) => write!(f, " {:02x}", b)
             }
         })
-    }
-}
-
-pub struct PacketIterator {
-    count: usize,
-    data: *const u8
-}
-
-impl Iterator for PacketIterator {
-    type Item = u8;
-
-    fn next(&mut self) -> Option<u8> {
-        if self.count > 0 {
-            let d: u8 = unsafe { *self.data };
-            self.data = unsafe { self.data.offset(1) };
-            self.count -= 1;
-            Some(d)
-        }
-        else {
-            None
-        }
     }
 }
 
@@ -129,10 +101,11 @@ impl PacketList {
 
     /// Get an iterator for the packets in the list.
     ///
-    pub fn iter(&self) -> PacketListIterator {
+    pub fn iter<'a>(&'a self) -> PacketListIterator<'a> {
         PacketListIterator {
             count: self.length(),
-            packet_ptr: &self.packet_list().packet[0]
+            packet_ptr: &self.packet_list().packet[0],
+            _phantom: ::std::marker::PhantomData::default(),
         }
     }
 
@@ -169,17 +142,18 @@ impl fmt::Display for PacketList {
     }
 }
 
-pub struct PacketListIterator {
+pub struct PacketListIterator<'a> {
     count: usize,
-    packet_ptr: *const MIDIPacket
+    packet_ptr: *const MIDIPacket,
+    _phantom: ::std::marker::PhantomData<&'a MIDIPacket>,
 }
 
-impl Iterator for PacketListIterator {
-    type Item = Packet;
+impl<'a> Iterator for PacketListIterator<'a> {
+    type Item = Packet<'a>;
 
-    fn next(&mut self) -> Option<Packet> {
+    fn next(&mut self) -> Option<Packet<'a>> {
         if self.count > 0 {
-            let packet = Packet(self.packet_ptr);
+            let packet = Packet { inner: self.packet_ptr, _phantom: PhantomData::default() };
             self.count -= 1;
             self.packet_ptr = unsafe { MIDIPacketNext(self.packet_ptr) };
             Some(packet)
