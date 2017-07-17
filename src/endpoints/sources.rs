@@ -1,7 +1,7 @@
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIGetNumberOfSources, MIDIGetSource, ItemCount
+    MIDIGetNumberOfSources, MIDIGetSource, MIDIEndpointDispose, ItemCount
 };
 
 use coremidi_sys_ext::{
@@ -108,5 +108,11 @@ impl Deref for VirtualSource {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl Drop for VirtualSource {
+    fn drop(&mut self) {
+        unsafe { MIDIEndpointDispose(self.endpoint.object.0) };
     }
 }

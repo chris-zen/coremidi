@@ -1,5 +1,5 @@
 use coremidi_sys::{
-    MIDIGetNumberOfDestinations, MIDIGetDestination, ItemCount
+    MIDIGetNumberOfDestinations, MIDIGetDestination, MIDIEndpointDispose, ItemCount
 };
 
 use std::ops::Deref;
@@ -92,5 +92,11 @@ impl Deref for VirtualDestination {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl Drop for VirtualDestination {
+    fn drop(&mut self) {
+        unsafe { MIDIEndpointDispose(self.endpoint.object.0) };
     }
 }
