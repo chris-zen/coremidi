@@ -20,9 +20,12 @@ impl Source {
     /// Create a source endpoint from its index.
     /// See [MIDIGetSource](https://developer.apple.com/reference/coremidi/1495168-midigetsource)
     ///
-    pub fn from_index(index: usize) -> Source {
+    pub fn from_index(index: usize) -> Option<Source> {
         let endpoint_ref = unsafe { MIDIGetSource(index as ItemCount) };
-        Source { endpoint: Endpoint { object: Object(endpoint_ref) } }
+        match endpoint_ref {
+            0 => None,
+            _ => Some(Source { endpoint: Endpoint { object: Object(endpoint_ref) } })
+        }
     }
 }
 
@@ -80,7 +83,7 @@ impl Iterator for SourcesIterator {
 
     fn next(&mut self) -> Option<Source> {
         if self.index < self.count {
-            let source = Some(Source::from_index(self.index));
+            let source = Source::from_index(self.index);
             self.index += 1;
             source
         }

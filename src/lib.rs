@@ -16,7 +16,7 @@ use std::time::Duration;
 use std::thread;
 let client = coremidi::Client::new("example-client").unwrap();
 let output_port = client.output_port("example-port").unwrap();
-let destination = coremidi::Destination::from_index(0);
+let destination = coremidi::Destination::from_index(0).unwrap();
 let note_on = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
 let note_off = coremidi::PacketBuffer::from_data(0, vec![0x80, 0x40, 0x7f]);
 output_port.send(&destination, &note_on).unwrap();
@@ -125,7 +125,7 @@ pub struct Port { object: Object }
 /// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
-/// let destination = coremidi::Destination::from_index(0);
+/// let destination = coremidi::Destination::from_index(0).unwrap();
 /// let packets = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
 /// output_port.send(&destination, &packets).unwrap();
 /// ```
@@ -139,7 +139,7 @@ pub struct OutputPort { port: Port }
 /// ```rust,no_run
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let input_port = client.input_port("example-port", |packet_list| println!("{}", packet_list)).unwrap();
-/// let source = coremidi::Source::from_index(0);
+/// let source = coremidi::Source::from_index(0).unwrap();
 /// input_port.connect_source(&source);
 /// ```
 #[derive(Debug)]
@@ -162,7 +162,7 @@ pub struct Endpoint { object: Object }
 /// A source can be created from an index like this:
 ///
 /// ```rust,no_run
-/// let source = coremidi::Destination::from_index(0);
+/// let source = coremidi::Destination::from_index(0).unwrap();
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
@@ -174,7 +174,7 @@ pub struct Destination { endpoint: Endpoint }
 /// A source can be created from an index like this:
 ///
 /// ```rust,no_run
-/// let source = coremidi::Source::from_index(0);
+/// let source = coremidi::Source::from_index(0).unwrap();
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///

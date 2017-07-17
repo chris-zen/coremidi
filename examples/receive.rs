@@ -6,7 +6,7 @@ fn main() {
     let source_index = get_source_index();
     println!("Source index: {}", source_index);
 
-    let source = coremidi::Source::from_index(source_index);
+    let source = coremidi::Source::from_index(source_index).unwrap();
     println!("Source display name: {}", source.display_name().unwrap());
 
     let client = coremidi::Client::new("example-client").unwrap();

@@ -16,7 +16,7 @@ use std::time::Duration;
 use std::thread;
 let client = Client::new("example-client").unwrap();
 let output_port = client.output_port("example-port").unwrap();
-let destination = Destinations::from_index(0);
+let destination = Destinations::from_index(0).unwrap();
 let note_on = PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
 let note_off = PacketBuffer::from_data(0, vec![0x80, 0x40, 0x7f]);
 output_port.send(&destination, &note_on).unwrap();

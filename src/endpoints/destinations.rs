@@ -13,9 +13,12 @@ impl Destination {
     /// Create a destination endpoint from its index.
     /// See [MIDIGetDestination](https://developer.apple.com/reference/coremidi/1495108-midigetdestination)
     ///
-    pub fn from_index(index: usize) -> Destination {
+    pub fn from_index(index: usize) -> Option<Destination> {
         let endpoint_ref = unsafe { MIDIGetDestination(index as ItemCount) };
-        Destination { endpoint: Endpoint { object: Object(endpoint_ref) } }
+        match endpoint_ref {
+            0 => None,
+            _ => Some(Destination { endpoint: Endpoint { object: Object(endpoint_ref) } })
+        }
     }
 }
 
@@ -73,7 +76,7 @@ impl Iterator for DestinationsIterator {
 
     fn next(&mut self) -> Option<Destination> {
         if self.index < self.count {
-            let destination = Some(Destination::from_index(self.index));
+            let destination = Destination::from_index(self.index);
             self.index += 1;
             destination
         }
