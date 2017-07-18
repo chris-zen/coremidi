@@ -4,7 +4,7 @@ use coremidi_sys::{
     MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose
 };
 
-use coremidi_sys_ext::{
+use coremidi_sys::{
     MIDISend
 };
 

@@ -41,16 +41,11 @@ For handling low level MIDI data you may look into:
 extern crate core_foundation_sys;
 extern crate core_foundation;
 extern crate coremidi_sys;
-extern crate libc;
 
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIObjectRef, MIDIFlushOutput, MIDIRestart
-};
-
-use coremidi_sys_ext::{
-    MIDIPacketList
+    MIDIObjectRef, MIDIFlushOutput, MIDIRestart, MIDIPacketList
 };
 
 /// A [MIDI Object](https://developer.apple.com/reference/coremidi/midiobjectref).
@@ -89,12 +84,12 @@ impl<T> BoxedCallback<T> {
         BoxedCallback(::std::ptr::null_mut())
     }
 
-    fn raw_ptr(&mut self) -> *mut ::libc::c_void {
-        self.0 as *mut ::libc::c_void
+    fn raw_ptr(&mut self) -> *mut ::std::os::raw::c_void {
+        self.0 as *mut ::std::os::raw::c_void
     }
 
     // must not be null
-    unsafe fn call_from_raw_ptr(raw_ptr: *mut ::libc::c_void, arg: &T) {
+    unsafe fn call_from_raw_ptr(raw_ptr: *mut ::std::os::raw::c_void, arg: &T) {
         let callback = &mut *(raw_ptr as *mut Box<FnMut(&T)>);
         callback(arg);
     }
@@ -221,8 +216,6 @@ pub struct Device { object: Object }
 ///
 #[derive(PartialEq)]
 pub struct PacketList(*const MIDIPacketList);
-
-mod coremidi_sys_ext;
 
 mod object;
 mod devices;

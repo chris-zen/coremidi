@@ -62,7 +62,7 @@ pub enum Notification {
 
 impl Notification {
     pub fn from(notification: &MIDINotification) -> Result<Notification, i32> {
-        match notification.messageID as ::libc::c_uint {
+        match notification.messageID as ::std::os::raw::c_uint {
             kMIDIMsgSetupChanged => Ok(Notification::SetupChanged),
             kMIDIMsgObjectAdded | kMIDIMsgObjectRemoved => Self::from_object_added_removed(notification),
             kMIDIMsgPropertyChanged => Self::from_property_changed(notification),
@@ -84,7 +84,7 @@ impl Notification {
                 child: Object(add_remove_notification.child),
                 child_type: child_type.unwrap()
             };
-            match notification.messageID as ::libc::c_uint {
+            match notification.messageID as ::std::os::raw::c_uint {
                 kMIDIMsgObjectAdded => Ok(Notification::ObjectAdded(add_remove_info)),
                 kMIDIMsgObjectRemoved => Ok(Notification::ObjectRemoved(add_remove_info)),
                 _ => Err(0) // Never reached

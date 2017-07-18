@@ -1,9 +1,5 @@
 use coremidi_sys::{
-    MIDITimeStamp, UInt16
-};
-
-use coremidi_sys_ext::{
-    MIDIPacketList, MIDIPacket, MIDIPacketListInit, MIDIPacketNext, MAX_PACKET_DATA_LENGTH
+    MIDITimeStamp, UInt16, MIDIPacketList, MIDIPacket, MIDIPacketListInit, MIDIPacketNext
 };
 
 use std::fmt;
@@ -13,6 +9,8 @@ use std::marker::PhantomData;
 use PacketList;
 
 pub type Timestamp = u64;
+
+const MAX_PACKET_DATA_LENGTH: usize = 0xffffusize;
 
 /// A collection of simultaneous MIDI events.
 /// See [MIDIPacket](https://developer.apple.com/reference/coremidi/midipacket).
@@ -269,8 +267,7 @@ impl Deref for PacketBuffer {
 
 #[cfg(test)]
 mod tests {
-    use coremidi_sys::MIDITimeStamp;
-    use coremidi_sys_ext::MIDIPacketList;
+    use coremidi_sys::{MIDITimeStamp, MIDIPacketList};
     use PacketList;
     use PacketBuffer;
 
