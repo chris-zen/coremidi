@@ -17,8 +17,8 @@ use std::thread;
 let client = coremidi::Client::new("example-client").unwrap();
 let output_port = client.output_port("example-port").unwrap();
 let destination = coremidi::Destination::from_index(0).unwrap();
-let note_on = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
-let note_off = coremidi::PacketBuffer::from_data(0, vec![0x80, 0x40, 0x7f]);
+let note_on = coremidi::PacketBuffer::new(0, &[0x90, 0x40, 0x7f]);
+let note_off = coremidi::PacketBuffer::new(0, &[0x80, 0x40, 0x7f]);
 output_port.send(&destination, &note_on).unwrap();
 thread::sleep(Duration::from_millis(1000));
 output_port.send(&destination, &note_off).unwrap();
@@ -121,7 +121,7 @@ pub struct Port { object: Object }
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
 /// let destination = coremidi::Destination::from_index(0).unwrap();
-/// let packets = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
+/// let packets = coremidi::PacketBuffer::new(0, &[0x90, 0x40, 0x7f]);
 /// output_port.send(&destination, &packets).unwrap();
 /// ```
 #[derive(Debug)]
