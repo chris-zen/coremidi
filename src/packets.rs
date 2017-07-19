@@ -6,6 +6,7 @@ use std::fmt;
 use std::ops::Deref;
 
 use PacketList;
+use AlignmentMarker;
 
 pub type Timestamp = u64;
 
@@ -14,11 +15,14 @@ const MAX_PACKET_DATA_LENGTH: usize = 0xffffusize;
 /// A collection of simultaneous MIDI events.
 /// See [MIDIPacket](https://developer.apple.com/reference/coremidi/midipacket).
 ///
+#[repr(C)]
 pub struct Packet {
-    // NOTE: At runtime this type must only be used behind references
-    //       that point to valid instances of MIDIPacket.
+    // NOTE: At runtime this type must only be used behind immutable references
+    //       that point to valid instances of MIDIPacket (mutable references would allow mem::swap).
+    //       This type must NOT implement `Copy`!
+    //       On ARM, this must be 4-byte aligned.
     inner: PacketInner,
-    _do_not_construct: [u32; 0] // u32 also guarantees at least 4-byte alignment
+    _do_not_construct: AlignmentMarker
 }
 
 #[repr(packed)]
@@ -56,16 +60,9 @@ impl Packet {
     ///  90 40 7f
     /// ```
     pub fn data(&self) -> &[u8] {
-        let packet = self.packet();
-        let data_ptr = packet.inner.data.as_ptr();
-        let data_len = packet.inner.length as usize;
+        let data_ptr = self.inner.data.as_ptr();
+        let data_len = self.inner.length as usize;
         unsafe { ::std::slice::from_raw_parts(data_ptr, data_len) }
-    }
-
-    #[inline]
-    // TODO: this is wrong, a &MIDIPacket must not exist if the length is smaller than 256 bytes
-    fn packet(&self) -> &Packet {
-        self
     }
 }
 
@@ -103,7 +100,7 @@ impl PacketList {
     /// Get the number of packets in the list.
     ///
     pub fn length(&self) -> usize {
-        self.packet_list().numPackets as usize
+        self.inner.num_packets as usize
     }
 
     /// Get an iterator for the packets in the list.
@@ -111,15 +108,9 @@ impl PacketList {
     pub fn iter<'a>(&'a self) -> PacketListIterator<'a> {
         PacketListIterator {
             count: self.length(),
-            packet_ptr: &self.packet_list().packet[0],
+            packet_ptr: self.inner.data.as_ptr(),
             _phantom: ::std::marker::PhantomData::default(),
         }
-    }
-
-    #[inline]
-    // TODO: This must be removed
-    fn packet_list(&self) -> &MIDIPacketList {
-        unsafe { &*(self.as_ptr() as *const MIDIPacketList) }
     }
 }
 
@@ -140,7 +131,7 @@ impl fmt::Debug for PacketList {
 
 impl fmt::Display for PacketList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let result = write!(f, "PacketList(len={})", self.packet_list().numPackets);
+        let result = write!(f, "PacketList(len={})", self.inner.num_packets);
         self.iter().fold(result, |prev_result, packet| {
             match prev_result {
                 Err(err) => Err(err),
@@ -274,9 +265,27 @@ impl Deref for PacketBuffer {
 
 #[cfg(test)]
 mod tests {
+    use std::mem;
     use coremidi_sys::{MIDITimeStamp, MIDIPacketList};
     use PacketList;
     use PacketBuffer;
+    use Packet;
+    use super::{PACKET_HEADER_SIZE, PACKET_LIST_HEADER_SIZE};
+
+    #[test]
+    pub fn packet_struct_layout() {
+        let expected_align = if cfg!(any(target_arch = "arm", target_arch = "aarch64")) { 4 } else { 1 };
+        assert_eq!(expected_align, mem::align_of::<Packet>());
+        assert_eq!(expected_align, mem::align_of::<PacketList>());
+
+        let dummy_packet: Packet = unsafe { mem::zeroed() };
+        let ptr = &dummy_packet as *const _ as *const u8;
+        assert_eq!(PACKET_HEADER_SIZE, dummy_packet.inner.data.as_ptr() as usize - ptr as usize);
+
+        let dummy_packet_list: PacketList = unsafe { mem::zeroed() };
+        let ptr = &dummy_packet_list as *const _ as *const u8;
+        assert_eq!(PACKET_LIST_HEADER_SIZE, dummy_packet_list.inner.data.as_ptr() as usize - ptr as usize);
+    }
 
     #[test]
     pub fn packet_buffer_new() {

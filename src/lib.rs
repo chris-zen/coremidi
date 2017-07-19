@@ -45,7 +45,7 @@ extern crate coremidi_sys;
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIObjectRef, MIDIFlushOutput, MIDIRestart, MIDIPacketList
+    MIDIObjectRef, MIDIFlushOutput, MIDIRestart, MIDIPacket, MIDIPacketList
 };
 
 /// A [MIDI Object](https://developer.apple.com/reference/coremidi/midiobjectref).
@@ -212,16 +212,29 @@ pub struct VirtualDestination {
 #[derive(PartialEq)]
 pub struct Device { object: Object }
 
+#[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
+type AlignmentMarker = [u32; 0]; // ensures 4-byte alignment (on ARM)
+
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+type AlignmentMarker = [u8; 0]; // unaligned
+
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
-#[derive(PartialEq)]
 #[repr(C)]
-// This type must only exist in the form of references and always point
-// to a valid instance of MIDIPacketList.
-// `u32` is the fixed-size header (numPackages) that every instance has.
-// Everything after that is dynamically sized (but not in the sense of Rust DST).
-// This type must NOT implement `Copy`!
-pub struct PacketList { _do_not_construct: u32 }
+pub struct PacketList {
+    // NOTE: This type must only exist in the form of immutable references
+    //       pointing to valid instances of MIDIPacketList.
+    //       This type must NOT implement `Copy`!
+    inner: PacketListInner,
+    _do_not_construct: AlignmentMarker
+}
+
+#[repr(packed)]
+struct PacketListInner {
+    num_packets: u32,
+    data: [MIDIPacket; 0]
+}
 
 impl PacketList {
     /// For internal usage only.
