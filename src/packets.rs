@@ -55,6 +55,7 @@ impl<'a> Packet<'a> {
     }
 
     #[inline]
+    // TODO: this is wrong, a &MIDIPacket must not exist if the length is smaller than 256 bytes
     fn packet(&self) -> &MIDIPacket {
         unsafe { &*self.inner }
     }
@@ -162,9 +163,9 @@ impl<'a> Iterator for PacketListIterator<'a> {
     }
 }
 
-const PACKET_LIST_SIZE: usize = 4;  // MIDIPacketList::numPackets: UInt32
-const PACKET_SIZE: usize = 8 +      // MIDIPacket::timeStamp: MIDITimeStamp/UInt64
-                           2;       // MIDIPacket::length: UInt16
+const PACKET_LIST_HEADER_SIZE: usize = 4;  // MIDIPacketList::numPackets: UInt32
+const PACKET_HEADER_SIZE: usize = 8 +      // MIDIPacket::timeStamp: MIDITimeStamp/UInt64
+                                  2;       // MIDIPacket::length: UInt16
 
 /// A mutable `PacketList` builder.
 ///
@@ -181,9 +182,9 @@ impl PacketBuffer {
     /// Create an empty `PacketBuffer`.
     ///
     pub fn new() -> PacketBuffer {
-        let capacity = PACKET_LIST_SIZE + PACKET_SIZE + 3;
+        let capacity = PACKET_LIST_HEADER_SIZE + PACKET_HEADER_SIZE + 3;
         let mut data = Vec::<u8>::with_capacity(capacity);
-        unsafe { data.set_len(PACKET_LIST_SIZE) };
+        unsafe { data.set_len(PACKET_LIST_HEADER_SIZE) };
         let pkt_list_ptr = data.as_mut_ptr() as *mut MIDIPacketList;
         let _ = unsafe { MIDIPacketListInit(pkt_list_ptr) };
         PacketBuffer {
@@ -236,7 +237,7 @@ impl PacketBuffer {
                 "The maximum allowed size for a packet is {}, but found {}.",
                 MAX_PACKET_DATA_LENGTH, data_len);
 
-        let additional_size = PACKET_SIZE + data_len;
+        let additional_size = PACKET_HEADER_SIZE + data_len;
         self.data.reserve(additional_size);
 
         let mut pkt = unsafe {
@@ -306,5 +307,68 @@ mod tests {
             .with_data(0, vec![0x80u8, 0x40, 0x7f])
             .with_data(0, vec![0x81u8, 0x40, 0x7f]);
         assert_eq!(packet_buf.length(), 4);
+    }
+
+    #[test]
+    fn compare_with_native1() {
+        unsafe { build_packet_list(vec![
+            (0, vec![0x90, 0x40, 0x7f]),
+            (0, vec![0x90, 0x41, 0x7f]),
+            (0, vec![0x90, 0x42, 0x7f])
+        ]) }
+    }
+
+    #[test]
+    fn compare_with_native2() {
+        unsafe { build_packet_list(vec![
+            (0, vec![0x90, 0x40, 0x7f]),
+            (1, vec![0x90, 0x40, 0x7f]),
+            (2, vec![0x90, 0x40, 0x7f])
+        ]) }
+    }
+
+    #[test]
+    fn compare_with_native3() {
+        let mut sysex = vec![0xF0];
+        for _ in 0..300 {
+            sysex.push(0x00);
+        }
+        sysex.push(0xF7);
+        unsafe { build_packet_list(vec![
+            (0, vec![0x90, 0x40, 0x7f]),
+            (0, vec![0x90, 0x41, 0x7f]),
+            (0, sysex)
+        ]) }
+    }
+    
+    unsafe fn build_packet_list(packets: Vec<(MIDITimeStamp, Vec<u8>)>) {
+        use coremidi_sys::{MIDIPacketList, MIDIPacketListInit, MIDIPacketListAdd};
+
+        // allocate a buffer on the stack for building the list using native methods
+        const BUFFER_SIZE: usize = 65536; // maximum allowed size
+        let buffer: &mut [u8] = &mut [0; BUFFER_SIZE];
+        let pkt_list_ptr = buffer.as_mut_ptr() as *mut MIDIPacketList;
+
+        // build the list
+        let mut pkt_ptr = MIDIPacketListInit(pkt_list_ptr);
+        for pkt in &packets {
+            pkt_ptr = MIDIPacketListAdd(pkt_list_ptr, BUFFER_SIZE as u64, pkt_ptr, pkt.0, pkt.1.len() as u64, pkt.1.as_ptr());
+            assert!(!pkt_ptr.is_null());
+        }
+        let list_native = PacketList(pkt_list_ptr);
+
+        // build the PacketBuffer, containing the same packets
+        /*let mut packet_buf = PacketBuffer::new();
+        for pkt in &packets {
+            packet_buf = packet_buf.with_data(pkt.0, pkt.1.clone());
+        }
+        let list: &PacketList = &packet_buf;
+
+        // check if the contents match
+        assert_eq!(list_native.length(), list.length());
+        // TODO: check if data matches
+        */
+
+        assert_eq!(packets.len(), list_native.length());
     }
 }
