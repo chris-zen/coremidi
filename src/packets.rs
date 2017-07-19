@@ -4,7 +4,6 @@ use coremidi_sys::{
 
 use std::fmt;
 use std::ops::Deref;
-use std::marker::PhantomData;
 
 use PacketList;
 
@@ -15,16 +14,25 @@ const MAX_PACKET_DATA_LENGTH: usize = 0xffffusize;
 /// A collection of simultaneous MIDI events.
 /// See [MIDIPacket](https://developer.apple.com/reference/coremidi/midipacket).
 ///
-pub struct Packet<'a> {
-    inner: *const MIDIPacket,
-    _phantom: PhantomData<&'a MIDIPacket>,
+pub struct Packet {
+    // NOTE: At runtime this type must only be used behind references
+    //       that point to valid instances of MIDIPacket.
+    inner: PacketInner,
+    _do_not_construct: [u32; 0] // u32 also guarantees at least 4-byte alignment
 }
 
-impl<'a> Packet<'a> {
+#[repr(packed)]
+struct PacketInner {
+    timestamp: MIDITimeStamp,
+    length: u16,
+    data: [u8; 0], // zero-length, because we cannot make this type bigger without knowing how much data there actually is
+}
+
+impl Packet {
     /// Get the packet timestamp.
     ///
     pub fn timestamp(&self) -> Timestamp {
-        self.packet().timeStamp as Timestamp
+        self.inner.timestamp as Timestamp
     }
 
     /// Get the packet data. This method just gives raw MIDI bytes. You would need another
@@ -49,22 +57,22 @@ impl<'a> Packet<'a> {
     /// ```
     pub fn data(&self) -> &[u8] {
         let packet = self.packet();
-        let data_ptr = &packet.data as *const u8;
-        let data_len = packet.length as usize;
+        let data_ptr = packet.inner.data.as_ptr();
+        let data_len = packet.inner.length as usize;
         unsafe { ::std::slice::from_raw_parts(data_ptr, data_len) }
     }
 
     #[inline]
     // TODO: this is wrong, a &MIDIPacket must not exist if the length is smaller than 256 bytes
-    fn packet(&self) -> &MIDIPacket {
-        unsafe { &*self.inner }
+    fn packet(&self) -> &Packet {
+        self
     }
 }
 
-impl<'a> fmt::Debug for Packet<'a> {
+impl fmt::Debug for Packet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let result = write!(f, "Packet(ptr={:x}, ts={:016x}, data=[",
-                            self.inner as usize, self.timestamp() as u64);
+                            self as *const _ as usize, self.timestamp() as u64);
         let result = self.data().iter().enumerate().fold(result, |prev_result, (i, b)| {
             match prev_result {
                 Err(err) => Err(err),
@@ -78,7 +86,7 @@ impl<'a> fmt::Debug for Packet<'a> {
     }
 }
 
-impl<'a> fmt::Display for Packet<'a> {
+impl fmt::Display for Packet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let result = write!(f, "{:016x}:", self.timestamp());
         self.data().iter().fold(result, |prev_result, b| {
@@ -145,15 +153,15 @@ impl fmt::Display for PacketList {
 pub struct PacketListIterator<'a> {
     count: usize,
     packet_ptr: *const MIDIPacket,
-    _phantom: ::std::marker::PhantomData<&'a MIDIPacket>,
+    _phantom: ::std::marker::PhantomData<&'a Packet>,
 }
 
 impl<'a> Iterator for PacketListIterator<'a> {
-    type Item = Packet<'a>;
+    type Item = &'a Packet;
 
-    fn next(&mut self) -> Option<Packet<'a>> {
+    fn next(&mut self) -> Option<&'a Packet> {
         if self.count > 0 {
-            let packet = Packet { inner: self.packet_ptr, _phantom: PhantomData::default() };
+            let packet = unsafe { &*(self.packet_ptr as *const Packet) };
             self.count -= 1;
             self.packet_ptr = unsafe { MIDIPacketNext(self.packet_ptr) };
             Some(packet)
