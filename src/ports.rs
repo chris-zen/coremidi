@@ -41,7 +41,7 @@ impl OutputPort {
         let status = unsafe { MIDISend(
             self.port.object.0,
             destination.endpoint.object.0,
-            packet_list.0)
+            packet_list.as_ptr())
         };
         if status == 0 { Ok(()) } else { Err(status) }
     }

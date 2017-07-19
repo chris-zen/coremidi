@@ -109,14 +109,15 @@ impl PacketList {
     }
 
     #[inline]
+    // TODO: This must be removed
     fn packet_list(&self) -> &MIDIPacketList {
-        unsafe { &*self.0 }
+        unsafe { &*(self.as_ptr() as *const MIDIPacketList) }
     }
 }
 
 impl fmt::Debug for PacketList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let result = write!(f, "PacketList(ptr={:x}, packets=[", &self.0 as *const _ as usize);
+        let result = write!(f, "PacketList(ptr={:x}, packets=[", unsafe { self.as_ptr() as usize });
         self.iter().enumerate().fold(result, |prev_result, (i, packet)| {
             match prev_result {
                 Err(err) => Err(err),
@@ -174,8 +175,7 @@ const PACKET_HEADER_SIZE: usize = 8 +      // MIDIPacket::timeStamp: MIDITimeSta
 /// It dereferences to a `PacketList`, so it can be used whenever a `PacketList` is needed.
 ///
 pub struct PacketBuffer {
-    data: Vec<u8>,
-    packet_list: PacketList
+    data: Vec<u8>
 }
 
 impl PacketBuffer {
@@ -188,8 +188,7 @@ impl PacketBuffer {
         let pkt_list_ptr = data.as_mut_ptr() as *mut MIDIPacketList;
         let _ = unsafe { MIDIPacketListInit(pkt_list_ptr) };
         PacketBuffer {
-            data: data,
-            packet_list: PacketList(pkt_list_ptr)
+            data: data
         }
     }
 
@@ -252,7 +251,6 @@ impl PacketBuffer {
 
         let mut pkt_list = unsafe { &mut *(self.data.as_mut_ptr() as *mut MIDIPacketList) };
         pkt_list.numPackets += 1;
-        self.packet_list = PacketList(pkt_list);
 
         self
     }
@@ -262,7 +260,7 @@ impl Deref for PacketBuffer {
     type Target = PacketList;
 
     fn deref(&self) -> &PacketList {
-        &self.packet_list
+        unsafe { &*(self.data.as_ptr() as *const PacketList) }
     }
 }
 
@@ -296,7 +294,7 @@ mod tests {
     fn packet_buffer_deref() {
         let packet_buf = PacketBuffer::new();
         let packet_list: &PacketList = &packet_buf;
-        assert_eq!(packet_list.0, &packet_buf.data[0] as *const _ as *const MIDIPacketList);
+        assert_eq!(unsafe { packet_list.as_ptr() as *const MIDIPacketList }, &packet_buf.data[0] as *const _ as *const MIDIPacketList);
     }
 
     #[test]
@@ -355,7 +353,7 @@ mod tests {
             pkt_ptr = MIDIPacketListAdd(pkt_list_ptr, BUFFER_SIZE as u64, pkt_ptr, pkt.0, pkt.1.len() as u64, pkt.1.as_ptr());
             assert!(!pkt_ptr.is_null());
         }
-        let list_native = PacketList(pkt_list_ptr);
+        let list_native = &*(pkt_list_ptr as *const _ as *const PacketList);
 
         // build the PacketBuffer, containing the same packets
         /*let mut packet_buf = PacketBuffer::new();

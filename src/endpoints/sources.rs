@@ -96,7 +96,7 @@ impl VirtualSource {
     pub fn received(&self, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDIReceived(
             self.endpoint.object.0,
-            packet_list.0)
+            packet_list.as_ptr())
         };
         if status == 0 { Ok(()) } else { Err(status) }
     }

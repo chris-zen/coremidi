@@ -215,7 +215,21 @@ pub struct Device { object: Object }
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
 #[derive(PartialEq)]
-pub struct PacketList(*const MIDIPacketList);
+#[repr(C)]
+// This type must only exist in the form of references and always point
+// to a valid instance of MIDIPacketList.
+// `u32` is the fixed-size header (numPackages) that every instance has.
+// Everything after that is dynamically sized (but not in the sense of Rust DST).
+// This type must NOT implement `Copy`!
+pub struct PacketList { _do_not_construct: u32 }
+
+impl PacketList {
+    /// For internal usage only.
+    /// Requires this instance to actually point to a valid MIDIPacketList
+    unsafe fn as_ptr(&self) -> *mut MIDIPacketList {
+        self as *const PacketList as *mut PacketList as *mut MIDIPacketList
+    }
+}
 
 mod object;
 mod devices;

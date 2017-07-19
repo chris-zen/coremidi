@@ -169,8 +169,8 @@ impl Client {
             _: *mut ::std::os::raw::c_void) { //srcConnRefCon
 
         let _ = ::std::panic::catch_unwind(|| unsafe {
-            let packet_list = PacketList(pktlist);
-            BoxedCallback::call_from_raw_ptr(read_proc_ref_con, &packet_list);
+            let packet_list = &*(pktlist as *const PacketList);
+            BoxedCallback::call_from_raw_ptr(read_proc_ref_con, packet_list);
         });
     }
 }
