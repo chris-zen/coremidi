@@ -100,7 +100,7 @@ impl PacketList {
 
     /// Get the number of packets in the list.
     ///
-    pub fn length(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.inner.num_packets as usize
     }
 
@@ -108,7 +108,7 @@ impl PacketList {
     ///
     pub fn iter<'a>(&'a self) -> PacketListIterator<'a> {
         PacketListIterator {
-            count: self.length(),
+            count: self.len(),
             packet_ptr: self.inner.data.as_ptr(),
             _phantom: ::std::marker::PhantomData::default(),
         }
@@ -447,7 +447,7 @@ mod tests {
         packet_buf.push_packet(43, &[0x91u8, 0x40, 0x7f]);
         packet_buf.push_packet(44, &[0x80u8, 0x40, 0x7f]);
         packet_buf.push_packet(45, &[0x81u8, 0x40, 0x7f]);
-        assert_eq!(packet_buf.length(), 4);
+        assert_eq!(packet_buf.len(), 4);
     }
 
     #[test]
@@ -560,7 +560,7 @@ mod tests {
         let list: &PacketList = &packet_buf;
 
         // check if the contents match
-        assert_eq!(list_native.length(), list.length(), "PacketList lenghts must match");
+        assert_eq!(list_native.len(), list.len(), "PacketList lengths must match");
         for (n, p) in list_native.iter().zip(list.iter()) {
             assert_eq!(n.data(), p.data());
         }
