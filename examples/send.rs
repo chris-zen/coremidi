@@ -8,7 +8,7 @@ fn main() {
     let destination_index = get_destination_index();
     println!("Destination index: {}", destination_index);
 
-    let destination = coremidi::Destination::from_index(destination_index);
+    let destination = coremidi::Destination::from_index(destination_index).unwrap();
     println!("Destination display name: {}", destination.display_name().unwrap());
 
     let client = coremidi::Client::new("example-client").unwrap();
