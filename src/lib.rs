@@ -212,13 +212,6 @@ pub struct VirtualDestination {
 #[derive(PartialEq)]
 pub struct Device { object: Object }
 
-#[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
-type AlignmentMarker = [u32; 0]; // ensures 4-byte alignment (on ARM)
-
-
-#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-type AlignmentMarker = [u8; 0]; // unaligned
-
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
 #[repr(C)]
@@ -227,7 +220,7 @@ pub struct PacketList {
     //       pointing to valid instances of MIDIPacketList.
     //       This type must NOT implement `Copy`!
     inner: PacketListInner,
-    _do_not_construct: AlignmentMarker
+    _do_not_construct: packets::alignment::Marker
 }
 
 #[repr(packed)]

@@ -3,10 +3,7 @@ use core_foundation::base::{OSStatus, TCFType};
 
 use coremidi_sys::{
     MIDIClientRef, MIDIClientCreate, MIDIClientDispose, MIDINotification,
-    MIDIPortRef, MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate
-};
-
-use coremidi_sys::{
+    MIDIPortRef, MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate,
     MIDIPacketList, MIDIInputPortCreate, MIDIDestinationCreate
 };
 

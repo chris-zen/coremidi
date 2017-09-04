@@ -7,11 +7,22 @@ use std::slice;
 use std::ops::{Deref, DerefMut};
 
 use PacketList;
-use AlignmentMarker;
 
 pub type Timestamp = u64;
 
 const MAX_PACKET_DATA_LENGTH: usize = 0xffffusize;
+
+#[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
+pub mod alignment {
+    pub type Marker = [u32; 0]; // ensures 4-byte alignment (on ARM)
+    pub const NEEDS_ALIGNMENT: bool = true;
+}
+
+#[cfg(not(any(target_arch = "arm", target_arch = "aarch64")))]
+pub mod alignment {
+    pub type Marker = [u8; 0]; // unaligned
+    pub const NEEDS_ALIGNMENT: bool = false;
+}
 
 /// A collection of simultaneous MIDI events.
 /// See [MIDIPacket](https://developer.apple.com/reference/coremidi/midipacket).
@@ -23,7 +34,7 @@ pub struct Packet {
     //       This type must NOT implement `Copy`!
     //       On ARM, this must be 4-byte aligned.
     inner: PacketInner,
-    _do_not_construct: AlignmentMarker
+    _alignment_marker: alignment::Marker
 }
 
 #[repr(packed)]
@@ -171,8 +182,11 @@ const PACKET_HEADER_SIZE: usize = 8 +      // MIDIPacket::timeStamp: MIDITimeSta
 const INLINE_PACKET_BUFFER_SIZE: usize = 28; // must be divisible by 4
 
 enum PacketBufferStorage {
-    // using u32 ensures correct alignment (required on ARM)
+    /// Inline stores the data directy on the stack, if it is small enough.
+    /// NOTE: using u32 ensures correct alignment (required on ARM)
     Inline([u32; INLINE_PACKET_BUFFER_SIZE / 4]),
+    /// External is used whenever the size of the data exceeds INLINE_PACKET_BUFFER_SIZE.
+    /// This means that the size of the contained vector is always greater than INLINE_PACKET_BUFFER_SIZE.
     External(Vec<u32>)
 }
 
@@ -203,7 +217,7 @@ impl PacketBufferStorage {
     
     unsafe fn assign_packet(&mut self, offset: usize, time: MIDITimeStamp, data: &[u8]) {
         assert!(data.len() <= MAX_PACKET_DATA_LENGTH, "packet data too long"); // cannot store longer size in u16
-        if cfg!(any(target_arch = "arm", target_arch = "aarch64")) {
+        if alignment::NEEDS_ALIGNMENT {
             debug_assert!(offset & 0b11 == 0);
         }
         let slice = self.get_slice_mut();
@@ -324,20 +338,20 @@ impl PacketBuffer {
         }
     }
     
-    /// Add a new packet containing the provided timestamp and data.
+    /// Add a new event containing the provided timestamp and data.
     ///
     /// According to the official documentation for CoreMIDI, the timestamp represents
     /// the time at which the events are to be played, where zero means "now".
     /// The timestamp applies to the first MIDI byte in the packet.
     ///
-    /// A packet must not have a timestamp that is smaller than that of a previous packet
+    /// An event must not have a timestamp that is smaller than that of a previous event
     /// in the same `PacketList`
     ///
     /// Example:
     ///
     /// ```
     /// let mut chord = coremidi::PacketBuffer::new(0, &[0x90, 0x3c, 0x7f]);
-    /// chord.push_packet(0, &[0x90, 0x40, 0x7f]);
+    /// chord.push_data(0, &[0x90, 0x40, 0x7f]);
     /// println!("{}", &chord as &coremidi::PacketList);
     /// ```
     ///
@@ -348,21 +362,8 @@ impl PacketBuffer {
     ///   0000000000000000: 90 3c 7f
     ///   0000000000000000: 90 40 7f
     /// ```
-    pub fn push_packet(&mut self, time: MIDITimeStamp, data: &[u8]) -> &mut Self {
-        let can_merge;
-        let previous_data_len;
-        {
-            // new scope to please the borrow checker
-            let previous_packet = self.last_written_packet();
-            previous_data_len = previous_packet.data().len();
-            can_merge = 
-                previous_packet.timestamp() == time && // timestamps match
-                data[0] != 0xF0 && // not a sysex
-                data[0] & 0b10000000 != 0 && // but first byte is a status byte
-                previous_packet.data()[0] != 0xF0 && // previous packet not a sysex
-                previous_packet.data()[0] & 0b10000000 != 0 && // but first byte is a status byte
-                previous_data_len + data.len() < MAX_PACKET_DATA_LENGTH; // enough space left in the packet
-        }
+    pub fn push_data(&mut self, time: MIDITimeStamp, data: &[u8]) -> &mut Self {
+        let (can_merge, previous_data_len) = self.can_merge_into_previous(time, data);
 
         if can_merge {
             // write the data into the previous packet
@@ -383,18 +384,34 @@ impl PacketBuffer {
         self
     }
 
+    /// Checks whether the given tiemstamped data can be merged into the previous packet
+    fn can_merge_into_previous(&self, time: MIDITimeStamp, data: &[u8]) -> (bool, usize) {
+        let previous_packet = self.last_written_packet();
+        let previous_data_len = previous_packet.data().len();
+        let can_merge = 
+            previous_packet.timestamp() == time && // timestamps match
+            data[0] != 0xF0 && // not a sysex
+            data[0] & 0b10000000 != 0 && // but first byte is a status byte
+            previous_packet.data()[0] != 0xF0 && // previous packet not a sysex
+            previous_packet.data()[0] & 0b10000000 != 0 && // but first byte is a status byte
+            previous_data_len + data.len() < MAX_PACKET_DATA_LENGTH; // enough space left in the packet
+        (can_merge, previous_data_len)
+    }
+
     #[inline]
     fn last_written_packet(&self) -> &Packet {
         // NOTE: This requires that there always is at least one packet in the buffer
         //       (which is okay because we do not provide an empty constructor)
-        unsafe { &*(self.storage.get_slice()[self.last_written_pkt_offset..].as_ptr() as *const Packet) }
+        let packets_slice = self.storage.get_slice();
+        let packet_slot = &packets_slice[self.last_written_pkt_offset..];
+        unsafe { &*(packet_slot.as_ptr() as *const Packet) }
     }
     
     #[inline]
     fn get_next_offset(&self) -> usize {
         let length = self.last_written_packet().inner.length as usize;
         let next_unadjusted = self.last_written_pkt_offset + PACKET_HEADER_SIZE + length;
-        if cfg!(any(target_arch = "arm", target_arch = "aarch64")) {
+        if alignment::NEEDS_ALIGNMENT {
             (next_unadjusted + 3) & !(3usize)
         } else {
             next_unadjusted
@@ -413,7 +430,7 @@ mod tests {
 
     #[test]
     pub fn packet_struct_layout() {
-        let expected_align = if cfg!(any(target_arch = "arm", target_arch = "aarch64")) { 4 } else { 1 };
+        let expected_align = if super::alignment::NEEDS_ALIGNMENT { 4 } else { 1 };
         assert_eq!(expected_align, mem::align_of::<Packet>());
         assert_eq!(expected_align, mem::align_of::<PacketList>());
 
@@ -444,9 +461,9 @@ mod tests {
     #[test]
     fn packet_list_length() {
         let mut packet_buf = PacketBuffer::new(42, &[0x90u8, 0x40, 0x7f]);
-        packet_buf.push_packet(43, &[0x91u8, 0x40, 0x7f]);
-        packet_buf.push_packet(44, &[0x80u8, 0x40, 0x7f]);
-        packet_buf.push_packet(45, &[0x81u8, 0x40, 0x7f]);
+        packet_buf.push_data(43, &[0x91u8, 0x40, 0x7f]);
+        packet_buf.push_data(44, &[0x80u8, 0x40, 0x7f]);
+        packet_buf.push_data(45, &[0x81u8, 0x40, 0x7f]);
         assert_eq!(packet_buf.len(), 4);
     }
 
@@ -549,7 +566,7 @@ mod tests {
         // build the PacketBuffer, containing the same packets
         let mut packet_buf = PacketBuffer::new(packets[0].0, &packets[0].1);
         for pkt in &packets[1..] {
-            packet_buf.push_packet(pkt.0, &pkt.1);
+            packet_buf.push_data(pkt.0, &pkt.1);
         }
 
         // print buffer contents for debugging purposes

@@ -1,11 +1,7 @@
 use core_foundation::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose
-};
-
-use coremidi_sys::{
-    MIDISend
+    MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose, MIDISend
 };
 
 use std::ptr;
