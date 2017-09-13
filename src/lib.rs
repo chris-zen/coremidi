@@ -17,8 +17,8 @@ use std::thread;
 let client = coremidi::Client::new("example-client").unwrap();
 let output_port = client.output_port("example-port").unwrap();
 let destination = coremidi::Destination::from_index(0).unwrap();
-let note_on = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
-let note_off = coremidi::PacketBuffer::from_data(0, vec![0x80, 0x40, 0x7f]);
+let note_on = coremidi::PacketBuffer::new(0, &[0x90, 0x40, 0x7f]);
+let note_off = coremidi::PacketBuffer::new(0, &[0x80, 0x40, 0x7f]);
 output_port.send(&destination, &note_on).unwrap();
 thread::sleep(Duration::from_millis(1000));
 output_port.send(&destination, &note_off).unwrap();
@@ -41,16 +41,11 @@ For handling low level MIDI data you may look into:
 extern crate core_foundation_sys;
 extern crate core_foundation;
 extern crate coremidi_sys;
-extern crate libc;
 
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIObjectRef, MIDIFlushOutput, MIDIRestart
-};
-
-use coremidi_sys_ext::{
-    MIDIPacketList
+    MIDIObjectRef, MIDIFlushOutput, MIDIRestart, MIDIPacket, MIDIPacketList
 };
 
 /// A [MIDI Object](https://developer.apple.com/reference/coremidi/midiobjectref).
@@ -89,12 +84,12 @@ impl<T> BoxedCallback<T> {
         BoxedCallback(::std::ptr::null_mut())
     }
 
-    fn raw_ptr(&mut self) -> *mut ::libc::c_void {
-        self.0 as *mut ::libc::c_void
+    fn raw_ptr(&mut self) -> *mut ::std::os::raw::c_void {
+        self.0 as *mut ::std::os::raw::c_void
     }
 
     // must not be null
-    unsafe fn call_from_raw_ptr(raw_ptr: *mut ::libc::c_void, arg: &T) {
+    unsafe fn call_from_raw_ptr(raw_ptr: *mut ::std::os::raw::c_void, arg: &T) {
         let callback = &mut *(raw_ptr as *mut Box<FnMut(&T)>);
         callback(arg);
     }
@@ -126,7 +121,7 @@ pub struct Port { object: Object }
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
 /// let destination = coremidi::Destination::from_index(0).unwrap();
-/// let packets = coremidi::PacketBuffer::from_data(0, vec![0x90, 0x40, 0x7f]);
+/// let packets = coremidi::PacketBuffer::new(0, &[0x90, 0x40, 0x7f]);
 /// output_port.send(&destination, &packets).unwrap();
 /// ```
 #[derive(Debug)]
@@ -219,10 +214,28 @@ pub struct Device { object: Object }
 
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
-#[derive(PartialEq)]
-pub struct PacketList(*const MIDIPacketList);
+#[repr(C)]
+pub struct PacketList {
+    // NOTE: This type must only exist in the form of immutable references
+    //       pointing to valid instances of MIDIPacketList.
+    //       This type must NOT implement `Copy`!
+    inner: PacketListInner,
+    _do_not_construct: packets::alignment::Marker
+}
 
-mod coremidi_sys_ext;
+#[repr(packed)]
+struct PacketListInner {
+    num_packets: u32,
+    data: [MIDIPacket; 0]
+}
+
+impl PacketList {
+    /// For internal usage only.
+    /// Requires this instance to actually point to a valid MIDIPacketList
+    unsafe fn as_ptr(&self) -> *mut MIDIPacketList {
+        self as *const PacketList as *mut PacketList as *mut MIDIPacketList
+    }
+}
 
 mod object;
 mod devices;

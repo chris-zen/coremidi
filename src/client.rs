@@ -3,10 +3,7 @@ use core_foundation::base::{OSStatus, TCFType};
 
 use coremidi_sys::{
     MIDIClientRef, MIDIClientCreate, MIDIClientDispose, MIDINotification,
-    MIDIPortRef, MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate
-};
-
-use coremidi_sys_ext::{
+    MIDIPortRef, MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate,
     MIDIPacketList, MIDIInputPortCreate, MIDIDestinationCreate
 };
 
@@ -151,7 +148,7 @@ impl Client {
 
     extern "C" fn notify_proc(
             notification_ptr: *const MIDINotification,
-            ref_con: *mut ::libc::c_void) {
+            ref_con: *mut ::std::os::raw::c_void) {
 
         let _ = ::std::panic::catch_unwind(|| unsafe {
             match Notification::from(&*notification_ptr) {
@@ -165,12 +162,12 @@ impl Client {
 
     extern "C" fn read_proc(
             pktlist: *const MIDIPacketList,
-            read_proc_ref_con: *mut ::libc::c_void,
-            _: *mut ::libc::c_void) { //srcConnRefCon
+            read_proc_ref_con: *mut ::std::os::raw::c_void,
+            _: *mut ::std::os::raw::c_void) { //srcConnRefCon
 
         let _ = ::std::panic::catch_unwind(|| unsafe {
-            let packet_list = PacketList(pktlist);
-            BoxedCallback::call_from_raw_ptr(read_proc_ref_con, &packet_list);
+            let packet_list = &*(pktlist as *const PacketList);
+            BoxedCallback::call_from_raw_ptr(read_proc_ref_con, packet_list);
         });
     }
 }

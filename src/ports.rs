@@ -1,11 +1,7 @@
 use core_foundation::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose
-};
-
-use coremidi_sys_ext::{
-    MIDISend
+    MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose, MIDISend
 };
 
 use std::ptr;
@@ -41,7 +37,7 @@ impl OutputPort {
         let status = unsafe { MIDISend(
             self.port.object.0,
             destination.endpoint.object.0,
-            packet_list.0)
+            packet_list.as_ptr())
         };
         if status == 0 { Ok(()) } else { Err(status) }
     }

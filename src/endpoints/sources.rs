@@ -1,11 +1,7 @@
 use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{
-    MIDIGetNumberOfSources, MIDIGetSource, MIDIEndpointDispose, ItemCount
-};
-
-use coremidi_sys_ext::{
-    MIDIReceived
+    MIDIGetNumberOfSources, MIDIGetSource, MIDIReceived, MIDIEndpointDispose, ItemCount
 };
 
 use std::ops::Deref;
@@ -100,7 +96,7 @@ impl VirtualSource {
     pub fn received(&self, packet_list: &PacketList) -> Result<(), OSStatus> {
         let status = unsafe { MIDIReceived(
             self.endpoint.object.0,
-            packet_list.0)
+            packet_list.as_ptr())
         };
         if status == 0 { Ok(()) } else { Err(status) }
     }
