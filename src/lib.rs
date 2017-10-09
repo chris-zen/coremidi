@@ -204,13 +204,21 @@ pub struct VirtualDestination {
     callback: BoxedCallback<PacketList>,
 }
 
-/// A [MIDI object](https://developer.apple.com/reference/coremidi/midideviceref).
+/// A [MIDI device](https://developer.apple.com/reference/coremidi/midideviceref).
 ///
 /// A MIDI device or external device, containing entities.
 ///
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub struct Device { object: Object }
+
+/// A [MIDI entity](https://developer.apple.com/documentation/coremidi/midientityref).
+///
+/// A MIDI entity, owned by a device, containing endpoints.
+///
+#[derive(Debug)]
+#[derive(PartialEq)]
+pub struct Entity { object: Object }
 
 /// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
@@ -239,6 +247,7 @@ impl PacketList {
 
 mod object;
 mod devices;
+mod entities;
 mod client;
 mod ports;
 mod packets;
