@@ -256,6 +256,7 @@ mod endpoints;
 mod notifications;
 pub use endpoints::destinations::Destinations;
 pub use endpoints::sources::Sources;
+pub use devices::Devices;
 pub use packets::{PacketListIterator, Packet, PacketBuffer};
 pub use properties::{Properties, PropertyGetter, PropertySetter};
 pub use notifications::Notification;
