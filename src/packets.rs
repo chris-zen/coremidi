@@ -143,7 +143,7 @@ impl fmt::Debug for PacketList {
 
 impl fmt::Display for PacketList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let result = write!(f, "PacketList(len={})", self.inner.num_packets);
+        let result = write!(f, "PacketList(len={})", unsafe { self.inner.num_packets });
         self.iter().fold(result, |prev_result, packet| {
             match prev_result {
                 Err(err) => Err(err),
@@ -202,7 +202,7 @@ impl PacketBufferStorage {
             }
         }
     }
-    
+
     #[inline]
     fn get_slice_mut(&mut self) -> &mut [u8] {
         unsafe {
@@ -214,14 +214,14 @@ impl PacketBufferStorage {
             }
         }
     }
-    
+
     unsafe fn assign_packet(&mut self, offset: usize, time: MIDITimeStamp, data: &[u8]) {
         assert!(data.len() <= MAX_PACKET_DATA_LENGTH, "packet data too long"); // cannot store longer size in u16
         if alignment::NEEDS_ALIGNMENT {
             debug_assert!(offset & 0b11 == 0);
         }
         let slice = self.get_slice_mut();
-        let mut ptr = slice[offset..].as_mut_ptr() as *mut Packet;
+        let ptr = slice[offset..].as_mut_ptr() as *mut Packet;
         (*ptr).inner.timestamp = time;
         (*ptr).inner.length = data.len() as u16;
         let packet_data_start = offset + PACKET_HEADER_SIZE;
@@ -231,12 +231,12 @@ impl PacketBufferStorage {
     /// Requires that there is a valid Packet at `offset`, which has enough space for `data`
     unsafe fn extend_packet(&mut self, offset: usize, data: &[u8]) {
         let slice = self.get_slice_mut();
-        let mut ptr = slice[offset..].as_mut_ptr() as *mut Packet;
+        let ptr = slice[offset..].as_mut_ptr() as *mut Packet;
         let packet_data_start = offset + PACKET_HEADER_SIZE + (*ptr).inner.length as usize;
         (*ptr).inner.length += data.len() as u16;
         slice[packet_data_start..(packet_data_start + data.len())].copy_from_slice(data);
     }
-    
+
     /// Call this only with larger length values (won't make the buffer smaller)
     unsafe fn set_len(&mut self, new_length: usize) {
         if new_length < INLINE_PACKET_BUFFER_SIZE { return; }
@@ -256,7 +256,7 @@ impl PacketBufferStorage {
                 None
             }
         };
-        
+
         // to prevent borrowcheck errors, this must come after the `match`
         if let Some(v) = vec {
             *self = PacketBufferStorage::External(v);
@@ -326,18 +326,18 @@ impl PacketBuffer {
                 v
             })
         };
-        
+
         unsafe {
             storage.assign_packet(PACKET_LIST_HEADER_SIZE, time, data);
             storage.deref_mut().inner.num_packets = 1;
         }
-        
+
         PacketBuffer {
             storage: storage,
             last_written_pkt_offset: PACKET_LIST_HEADER_SIZE
         }
     }
-    
+
     /// Add a new event containing the provided timestamp and data.
     ///
     /// According to the official documentation for CoreMIDI, the timestamp represents
@@ -388,7 +388,7 @@ impl PacketBuffer {
     fn can_merge_into_previous(&self, time: MIDITimeStamp, data: &[u8]) -> (bool, usize) {
         let previous_packet = self.last_written_packet();
         let previous_data_len = previous_packet.data().len();
-        let can_merge = 
+        let can_merge =
             previous_packet.timestamp() == time && // timestamps match
             data[0] != 0xF0 && // not a sysex
             data[0] & 0b10000000 != 0 && // but first byte is a status byte
@@ -406,7 +406,7 @@ impl PacketBuffer {
         let packet_slot = &packets_slice[self.last_written_pkt_offset..];
         unsafe { &*(packet_slot.as_ptr() as *const Packet) }
     }
-    
+
     #[inline]
     fn get_next_offset(&self) -> usize {
         let length = self.last_written_packet().inner.length as usize;
@@ -544,7 +544,7 @@ mod tests {
             (43, sysex)
         ]) }
     }
-    
+
     /// Compares the results of building a PacketList using our PacketBuffer API
     /// and the native API (MIDIPacketListAdd, etc).
     unsafe fn compare_packet_list(packets: Vec<(MIDITimeStamp, Vec<u8>)>) {
@@ -573,7 +573,7 @@ mod tests {
         let packet_buf_slice = packet_buf.storage.get_slice();
         println!("\nbuffer: {:?}", packet_buf_slice);
         println!("\nnative: {:?}", &buffer[0..packet_buf_slice.len()]);
-        
+
         let list: &PacketList = &packet_buf;
 
         // check if the contents match
