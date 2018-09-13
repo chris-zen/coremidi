@@ -25,16 +25,12 @@ output_port.send(&destination, &note_off).unwrap();
 ```
 
 If you are looking for a portable MIDI library then you can look into:
+- [midir](https://github.com/Boddlnagg/midir) (which is using this lib)
 - [portmidi-rs](https://github.com/musitdev/portmidi-rs)
-- [midir](https://github.com/Boddlnagg/midir)
 
 For handling low level MIDI data you may look into:
 - [rimd](https://github.com/RustAudio/rimd)
 - [midi-rs](https://github.com/samdoshi/midi-rs)
-
-**Please note that this is a work in progress project !**
-
-**Beta-testers are more than welcome ;-)**
 
 [![Build Status](https://travis-ci.org/chris-zen/coremidi.svg?branch=master)](https://travis-ci.org/chris-zen/coremidi)
 [![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://crates.io/crates/coremidi)
