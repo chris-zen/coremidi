@@ -25,7 +25,6 @@ deploy:
     skip_cleanup: true
     github_token: $GH_TOKEN
     local_dir: target/doc
-    keep-history: false
     on:
       tags: true
       rust: stable
@@ -33,8 +32,7 @@ deploy:
     skip_cleanup: true
     script: ./ci/publish.sh
     on:
-      # tags: true
-      all_branches: true
+      tags: true
       rust: stable
 
 env:
