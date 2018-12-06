@@ -143,7 +143,8 @@ impl fmt::Debug for PacketList {
 
 impl fmt::Display for PacketList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let result = write!(f, "PacketList(len={})", unsafe { self.inner.num_packets });
+        let num_packets = self.inner.num_packets;
+        let result = write!(f, "PacketList(len={})", num_packets);
         self.iter().fold(result, |prev_result, packet| {
             match prev_result {
                 Err(err) => Err(err),
