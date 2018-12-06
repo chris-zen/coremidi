@@ -35,6 +35,10 @@ deploy:
       tags: true
       rust: stable
 
+notifications:
+  email:
+    on_success: never
+
 env:
   global:
     - secure: "bJonMOXVCuSpIR+UnzLiitJAfhJFQn6JcTLacFzzEPa6hknrQo6SM96Mi91fvqu4S7OXevo9bIyUL+kQIfuU1VOggFxAroyF3Jw2UN+h0S9GgQnSOthnBcNi76QpZRDJWhOtoYPTq1Yp3UZjbh/OkVUfLNtfICJgAV3dM0cF4dpGPSA2d7eoXvx2wBaAa1pIuzPXvVlWPtQ9lcX8EhZgn3jp+ci2Cae5TQr9hGP7KdTAuuU2VqJYL9+JNnNpQasMiNgvqk7p2o/LIPcZIp8RbJSxkkBt+KAwMjuSEqfxv+2rL4oW7KkB7FwmY3GjJRmSXrElJZUKAJiLEUwlugr3gJ0vRJ5GsFg7qUthJ3Y/yf05iK8K6fQ5EuTqdFv8e2/CdJZBSIfhfHg6To/wu0oKPawGVZr/jAFU1MUVF8YpFHFpo4c/cdGUbwC9Qup2bQVLaxVbuaBhy3bcu7n8Aij/5W+V2lytyo5LbCDoyJwLOn7Xm4FupaAbNcdX5iT8K7WBSHk3N2ZIrSZyWrx96o450EdSWoabSEzVDx5mO2juU1Yt1iyEFI/kQwCWBVhsFx9HqN+FB0d+j06tq+OmlVqYqB24qfRFIFJGfMaYUtNM0eWFQ36aF/oKm/n3lGh+SF6q3hgKwdu8eXShkU2bS8EW0eOPIaPxQlTJFnQgjrkxGtE=" # GH_TOKEN
