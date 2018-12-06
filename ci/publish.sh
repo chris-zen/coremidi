@@ -3,4 +3,6 @@
 set -ex
 
 cargo login $CRATES_TOKEN
-cargo publish --dry-run
+
+# --allow-dirty is required because Cargo.toml version has been updated by an script
+cargo publish --dry-run --allow-dirty

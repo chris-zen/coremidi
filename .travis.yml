@@ -19,7 +19,6 @@ before_script:
 
 before_deploy:
   - ./ci/build-docs.sh
-  - cargo package --allow-dirty
 
 deploy:
   - provider: pages
