@@ -14,9 +14,11 @@ os:
 
 cache: cargo
 
+before_script:
+  - ./ci/update-version.sh
+
 before_deploy:
-  - cargo doc &&
-    echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2`/index.html>" > target/doc/index.html
+  - ./ci/build-docs.sh
   - cargo package
 
 deploy:
@@ -32,7 +34,8 @@ deploy:
     skip_cleanup: true
     script: ./ci/publish.sh
     on:
-      tags: true
+      # tags: true
+      all_branches: true
       rust: stable
 
 env:
