@@ -6,7 +6,7 @@ use std::fmt;
 use std::slice;
 use std::ops::{Deref, DerefMut};
 
-use PacketList;
+use {PacketList, PacketListInner};
 
 pub type Timestamp = u64;
 
@@ -192,6 +192,27 @@ enum PacketBufferStorage {
 }
 
 impl PacketBufferStorage {
+
+    #[inline]
+    pub fn with_capacity(capacity: usize) -> PacketBufferStorage {
+        if capacity <= INLINE_PACKET_BUFFER_SIZE {
+            PacketBufferStorage::Inline([0; INLINE_PACKET_BUFFER_SIZE / 4])
+        } else {
+            let u32_len = ((capacity - 1) / 4) + 1;
+            let mut buffer = Vec::with_capacity(u32_len);
+            unsafe { buffer.set_len(u32_len); }
+            PacketBufferStorage::External(buffer)
+        }
+    }
+
+    #[inline]
+    fn capacity(&self) -> usize {
+        match *self {
+            PacketBufferStorage::Inline(ref inline) => inline.len() * 4,
+            PacketBufferStorage::External(ref vec) => vec.len() * 4
+        }
+    }
+
     #[inline]
     fn get_slice(&self) -> &[u8] {
         unsafe {
@@ -216,44 +237,48 @@ impl PacketBufferStorage {
         }
     }
 
-    unsafe fn assign_packet(&mut self, offset: usize, time: MIDITimeStamp, data: &[u8]) {
+    unsafe fn assign_packet(&mut self, packet_offset: usize, time: MIDITimeStamp, data: &[u8]) {
         assert!(data.len() <= MAX_PACKET_DATA_LENGTH, "packet data too long"); // cannot store longer size in u16
+
         if alignment::NEEDS_ALIGNMENT {
-            debug_assert!(offset & 0b11 == 0);
+            debug_assert!(packet_offset & 0b11 == 0);
         }
+
         let slice = self.get_slice_mut();
-        let ptr = slice[offset..].as_mut_ptr() as *mut Packet;
+        let ptr = slice[packet_offset..].as_mut_ptr() as *mut Packet;
         (*ptr).inner.timestamp = time;
         (*ptr).inner.length = data.len() as u16;
-        let packet_data_start = offset + PACKET_HEADER_SIZE;
+        let packet_data_start = packet_offset + PACKET_HEADER_SIZE;
         slice[packet_data_start..(packet_data_start + data.len())].copy_from_slice(data);
     }
 
     /// Requires that there is a valid Packet at `offset`, which has enough space for `data`
-    unsafe fn extend_packet(&mut self, offset: usize, data: &[u8]) {
+    unsafe fn extend_packet(&mut self, packet_offset: usize, data: &[u8]) {
         let slice = self.get_slice_mut();
-        let ptr = slice[offset..].as_mut_ptr() as *mut Packet;
-        let packet_data_start = offset + PACKET_HEADER_SIZE + (*ptr).inner.length as usize;
+        let ptr = slice[packet_offset..].as_mut_ptr() as *mut Packet;
+        let packet_data_start = packet_offset + PACKET_HEADER_SIZE + (*ptr).inner.length as usize;
         (*ptr).inner.length += data.len() as u16;
         slice[packet_data_start..(packet_data_start + data.len())].copy_from_slice(data);
     }
 
     /// Call this only with larger length values (won't make the buffer smaller)
-    unsafe fn set_len(&mut self, new_length: usize) {
-        if new_length < INLINE_PACKET_BUFFER_SIZE { return; }
-        if new_length < self.get_slice().len() { return; }
-        let u32_len = ((new_length - 1) / 4) + 1;
+    unsafe fn ensure_capacity(&mut self, capacity: usize) {
+        if capacity < INLINE_PACKET_BUFFER_SIZE || capacity < self.get_slice().len() {
+            return;
+        }
+
+        let vec_capacity = ((capacity - 1) / 4) + 1;
         let vec: Option<Vec<u32>> = match *self {
             PacketBufferStorage::Inline(ref inline) => {
-                let mut v = Vec::with_capacity(u32_len);
+                let mut v = Vec::with_capacity(vec_capacity);
                 v.extend_from_slice(inline);
-                v.set_len(u32_len);
+                v.set_len(vec_capacity);
                 Some(v)
             },
             PacketBufferStorage::External(ref mut vec) => {
                 let current_len = vec.len();
-                vec.reserve(u32_len - current_len);
-                vec.set_len(u32_len);
+                vec.reserve(vec_capacity - current_len);
+                vec.set_len(vec_capacity);
                 None
             }
         };
@@ -291,7 +316,7 @@ impl DerefMut for PacketBufferStorage {
 ///
 pub struct PacketBuffer {
     storage: PacketBufferStorage,
-    last_written_pkt_offset: usize
+    last_packet_offset: usize
 }
 
 impl Deref for PacketBuffer {
@@ -313,30 +338,46 @@ impl PacketBuffer {
     /// Example on how to create a `PacketBuffer` with a single packet for a MIDI note on for C-5:
     ///
     /// ```
-    /// let note_on = coremidi::PacketBuffer::new(0, &[0x90, 0x3c, 0x7f]);
+    /// let buffer = coremidi::PacketBuffer::new(0, &[0x90, 0x3c, 0x7f]);
+    /// assert_eq!(buffer.len(), 1)
     /// ```
     pub fn new(time: MIDITimeStamp, data: &[u8]) -> PacketBuffer {
-        let len = data.len() + PACKET_LIST_HEADER_SIZE + PACKET_HEADER_SIZE;
-        let mut storage = if len <= INLINE_PACKET_BUFFER_SIZE {
-            PacketBufferStorage::Inline([0; INLINE_PACKET_BUFFER_SIZE / 4])
-        } else {
-            PacketBufferStorage::External( unsafe {
-                let u32_len = ((len - 1) / 4) + 1;
-                let mut v = Vec::with_capacity(u32_len);
-                v.set_len(u32_len);
-                v
-            })
-        };
-
-        unsafe {
-            storage.assign_packet(PACKET_LIST_HEADER_SIZE, time, data);
-            storage.deref_mut().inner.num_packets = 1;
-        }
+        let capacity = data.len() + PACKET_LIST_HEADER_SIZE + PACKET_HEADER_SIZE;
+        let mut storage = PacketBufferStorage::with_capacity(capacity);
+        storage.deref_mut().inner.num_packets = 1;
+        let last_packet_offset = PACKET_LIST_HEADER_SIZE;
+        unsafe { storage.assign_packet(last_packet_offset, time, data); }
 
         PacketBuffer {
-            storage: storage,
-            last_written_pkt_offset: PACKET_LIST_HEADER_SIZE
+            storage,
+            last_packet_offset,
         }
+    }
+
+    /// Create an empty `PacketBuffer` with no packets.
+    ///
+    /// Example on how to create an empty `PacketBuffer`
+    /// with a capacity for 128 bytes in total (including headers):
+    ///
+    /// ```
+    /// let buffer = coremidi::PacketBuffer::with_capacity(128);
+    /// assert_eq!(buffer.len(), 0);
+    /// assert_eq!(buffer.capacity(), 128);
+    /// ```
+    pub fn with_capacity(capacity: usize) -> PacketBuffer {
+        let capacity = std::cmp::max(capacity, INLINE_PACKET_BUFFER_SIZE);
+        let mut storage = PacketBufferStorage::with_capacity(capacity);
+        storage.deref_mut().inner.num_packets = 0;
+
+        PacketBuffer {
+            storage,
+            last_packet_offset: PACKET_LIST_HEADER_SIZE,
+        }
+    }
+
+    /// Get underlying buffer capacity in bytes
+    pub fn capacity(&self) -> usize {
+        self.storage.capacity()
     }
 
     /// Add a new event containing the provided timestamp and data.
@@ -353,70 +394,111 @@ impl PacketBuffer {
     /// ```
     /// let mut chord = coremidi::PacketBuffer::new(0, &[0x90, 0x3c, 0x7f]);
     /// chord.push_data(0, &[0x90, 0x40, 0x7f]);
-    /// println!("{}", &chord as &coremidi::PacketList);
-    /// ```
-    ///
-    /// The previous example should print:
-    ///
-    /// ```text
-    /// PacketList(len=2)
-    ///   0000000000000000: 90 3c 7f
-    ///   0000000000000000: 90 40 7f
+    /// assert_eq!(chord.len(), 1);
+    /// let repr = format!("{}", &chord as &coremidi::PacketList);
+    /// assert_eq!(repr, "PacketList(len=1)\n  0000000000000000: 90 3c 7f 90 40 7f");
     /// ```
     pub fn push_data(&mut self, time: MIDITimeStamp, data: &[u8]) -> &mut Self {
-        let (can_merge, previous_data_len) = self.can_merge_into_previous(time, data);
+        let (can_merge, previous_data_len) = self.can_merge_into_last_packet(time, data);
 
         if can_merge {
-            // write the data into the previous packet
+            let new_packet_size = Self::packet_size(previous_data_len + data.len());
             unsafe {
-                self.storage.set_len(self.last_written_pkt_offset + PACKET_HEADER_SIZE + previous_data_len + data.len());
-                self.storage.extend_packet(self.last_written_pkt_offset, data);
+                self.storage.ensure_capacity(self.last_packet_offset + new_packet_size);
+                self.storage.extend_packet(self.last_packet_offset, data);
             }
         } else  {
-            let next_offset = self.get_next_offset();
+            let packet_size = Self::packet_size(data.len());
+            let next_offset = self.next_packet_offset();
             unsafe {
-                self.storage.set_len(next_offset + PACKET_HEADER_SIZE + data.len());
+                self.storage.ensure_capacity(next_offset + packet_size);
                 self.storage.assign_packet(next_offset, time, data);
-                self.storage.deref_mut().inner.num_packets += 1;
             }
-            self.last_written_pkt_offset = next_offset;
+            self.packet_list_mut().num_packets += 1;
+            self.last_packet_offset = next_offset;
         }
 
         self
     }
 
+    /// Clears the buffer, removing all packets.
+    /// Note that this method has no effect on the allocated capacity of the buffer.
+    pub fn clear(&mut self) {
+        self.packet_list_mut().num_packets = 0;
+        self.last_packet_offset = PACKET_LIST_HEADER_SIZE;
+    }
+
     /// Checks whether the given tiemstamped data can be merged into the previous packet
-    fn can_merge_into_previous(&self, time: MIDITimeStamp, data: &[u8]) -> (bool, usize) {
-        let previous_packet = self.last_written_packet();
-        let previous_data_len = previous_packet.data().len();
-        let can_merge =
-            previous_packet.timestamp() == time && // timestamps match
-            data[0] != 0xF0 && // not a sysex
-            data[0] & 0b10000000 != 0 && // but first byte is a status byte
-            previous_packet.data()[0] != 0xF0 && // previous packet not a sysex
-            previous_packet.data()[0] & 0b10000000 != 0 && // but first byte is a status byte
-            previous_data_len + data.len() < MAX_PACKET_DATA_LENGTH; // enough space left in the packet
-        (can_merge, previous_data_len)
+    fn can_merge_into_last_packet(&self, time: MIDITimeStamp, data: &[u8]) -> (bool, usize) {
+        if self.packet_list_is_empty() {
+            (false, 0)
+        } else {
+            let previous_packet = self.last_packet();
+            let previous_packet_data = previous_packet.data();
+            let previous_data_len = previous_packet_data.len();
+            let can_merge =
+                previous_packet.timestamp() == time &&
+                Self::not_sysex(data) &&
+                Self::has_status_byte(data) &&
+                Self::not_sysex(previous_packet_data) &&
+                Self::has_status_byte(previous_packet_data) &&
+                previous_data_len + data.len() < MAX_PACKET_DATA_LENGTH;
+
+            (can_merge, previous_data_len)
+        }
     }
 
     #[inline]
-    fn last_written_packet(&self) -> &Packet {
-        // NOTE: This requires that there always is at least one packet in the buffer
-        //       (which is okay because we do not provide an empty constructor)
+    fn last_packet(&self) -> &Packet {
+        assert!(self.packet_list().num_packets > 0);
         let packets_slice = self.storage.get_slice();
-        let packet_slot = &packets_slice[self.last_written_pkt_offset..];
+        let packet_slot = &packets_slice[self.last_packet_offset..];
         unsafe { &*(packet_slot.as_ptr() as *const Packet) }
     }
 
     #[inline]
-    fn get_next_offset(&self) -> usize {
-        let length = self.last_written_packet().inner.length as usize;
-        let next_unadjusted = self.last_written_pkt_offset + PACKET_HEADER_SIZE + length;
-        if alignment::NEEDS_ALIGNMENT {
-            (next_unadjusted + 3) & !(3usize)
+    fn next_packet_offset(&self) -> usize {
+        if self.packet_list_is_empty() {
+            self.last_packet_offset
         } else {
-            next_unadjusted
+            let data_len = self.last_packet().inner.length as usize;
+            let next_offset = self.last_packet_offset + Self::packet_size(data_len);
+            if alignment::NEEDS_ALIGNMENT {
+                (next_offset + 3) & !(3usize)
+            } else {
+                next_offset
+            }
         }
+    }
+
+    #[inline]
+    fn not_sysex(data: &[u8]) -> bool {
+        data[0] != 0xF0
+    }
+
+    #[inline]
+    fn has_status_byte(data: &[u8]) -> bool {
+        data[0] & 0b10000000 != 0
+    }
+
+    #[inline]
+    fn packet_size(data_len: usize) -> usize {
+        PACKET_HEADER_SIZE + data_len
+    }
+
+    #[inline]
+    fn packet_list(&self) -> &PacketListInner {
+        &self.storage.deref().inner
+    }
+
+    #[inline]
+    fn packet_list_is_empty(&self) -> bool {
+        self.packet_list().num_packets == 0
+    }
+
+    #[inline]
+    fn packet_list_mut(&mut self) -> &mut PacketListInner {
+        &mut self.storage.deref_mut().inner
     }
 }
 
@@ -427,7 +509,7 @@ mod tests {
     use PacketList;
     use PacketBuffer;
     use Packet;
-    use super::{PACKET_HEADER_SIZE, PACKET_LIST_HEADER_SIZE, PacketBufferStorage};
+    use super::{PACKET_HEADER_SIZE, PACKET_LIST_HEADER_SIZE, INLINE_PACKET_BUFFER_SIZE, PacketBufferStorage};
 
     #[test]
     pub fn packet_struct_layout() {
@@ -466,6 +548,41 @@ mod tests {
         packet_buf.push_data(44, &[0x80u8, 0x40, 0x7f]);
         packet_buf.push_data(45, &[0x81u8, 0x40, 0x7f]);
         assert_eq!(packet_buf.len(), 4);
+    }
+
+    #[test]
+    fn packet_buffer_empty_with_capacity() {
+        let packet_buf = PacketBuffer::with_capacity(128);
+        assert_eq!(packet_buf.capacity(), 128);
+        assert_eq!(packet_buf.len(), 0);
+    }
+
+    #[test]
+    fn packet_buffer_with_capacity_zero() {
+        let packet_buf = PacketBuffer::with_capacity(0);
+        assert_eq!(packet_buf.capacity(), INLINE_PACKET_BUFFER_SIZE);
+        assert_eq!(packet_buf.len(), 0);
+    }
+
+    #[test]
+    fn packet_buffer_with_capacity() {
+        let mut packet_buf = PacketBuffer::with_capacity(128);
+        packet_buf.push_data(43, &[0x91u8, 0x40, 0x7f]);
+        packet_buf.push_data(44, &[0x80u8, 0x40, 0x7f]);
+        packet_buf.push_data(45, &[0x81u8, 0x40, 0x7f]);
+        assert_eq!(packet_buf.capacity(), 128);
+        assert_eq!(packet_buf.len(), 3);
+    }
+
+    #[test]
+    fn packet_buffer_clear() {
+        let mut packet_buf = PacketBuffer::new(42, &[0x90u8, 0x40, 0x7f]);
+        packet_buf.push_data(43, &[0x91u8, 0x40, 0x7f]);
+        packet_buf.push_data(44, &[0x80u8, 0x40, 0x7f]);
+        packet_buf.push_data(45, &[0x81u8, 0x40, 0x7f]);
+        assert_eq!(packet_buf.len(), 4);
+        packet_buf.clear();
+        assert_eq!(packet_buf.len(), 0);
     }
 
     #[test]
