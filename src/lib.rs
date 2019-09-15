@@ -93,6 +93,8 @@ impl<T> BoxedCallback<T> {
     }
 }
 
+unsafe impl<T> Send for BoxedCallback<T> {}
+
 impl<T> Drop for BoxedCallback<T> {
     fn drop(&mut self) {
         unsafe {
