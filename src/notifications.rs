@@ -99,7 +99,7 @@ impl Notification {
             Ok(object_type) => {
                 let property_name = {
                     let name_ref: CFStringRef = property_changed_notification.propertyName;
-                    let name: CFString = unsafe { TCFType::wrap_under_create_rule(name_ref) };
+                    let name: CFString = unsafe { TCFType::wrap_under_get_rule(name_ref) };
                     name.to_string()
                 };
                 let property_changed_info = PropertyChangedInfo {
