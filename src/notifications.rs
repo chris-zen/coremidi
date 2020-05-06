@@ -104,8 +104,8 @@ impl Notification {
                 };
                 let property_changed_info = PropertyChangedInfo {
                     object: Object(property_changed_notification.object),
-                    object_type: object_type,
-                    property_name: property_name
+                    object_type,
+                    property_name
                 };
                 Ok(Notification::PropertyChanged(property_changed_info))
             },
