@@ -286,12 +286,13 @@ mod tests {
 
     #[test]
     fn notification_from_property_changed_error() {
+        let name = CFString::new("name");
         let notification_raw = MIDIObjectPropertyChangeNotification {
             messageID: kMIDIMsgPropertyChanged as MIDINotificationMessageID,
             messageSize: 24,
             object: 1 as MIDIObjectRef,
             objectType: 0xffff,
-            propertyName: CFString::new("name").as_concrete_TypeRef()
+            propertyName: name.as_concrete_TypeRef()
         };
 
         let notification = Notification::from(
