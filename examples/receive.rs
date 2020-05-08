@@ -9,17 +9,17 @@ fn main() {
     let source = coremidi::Source::from_index(source_index).unwrap();
     println!("Source display name: {}", source.display_name().unwrap());
 
-    let client = coremidi::Client::new("example-client").unwrap();
+    let client = coremidi::Client::new("Example Client").unwrap();
 
     let callback = |packet_list: &coremidi::PacketList| {
         println!("{}", packet_list);
     };
 
-    let input_port = client.input_port("example-port", callback).unwrap();
+    let input_port = client.input_port("Example Port", callback).unwrap();
     input_port.connect_source(&source).unwrap();
 
     let mut input_line = String::new();
-    println!("Press [Intro] to finish ...");
+    println!("Press Enter to Finish");
     std::io::stdin().read_line(&mut input_line).ok().expect("Failed to read line");
 
     input_port.disconnect_source(&source).unwrap();

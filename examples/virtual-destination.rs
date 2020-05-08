@@ -1,7 +1,7 @@
 extern crate coremidi;
 
 fn main() {
-    let client = coremidi::Client::new("CoreMidi Example Client").unwrap();
+    let client = coremidi::Client::new("Example Client").unwrap();
 
     let callback = |packet_list: &coremidi::PacketList| {
         println!("{}", packet_list);
@@ -11,6 +11,6 @@ fn main() {
 
     let mut input_line = String::new();
     println!("Created Virtual Destination \"Example Destination\"");
-    println!("Press Enter to Exit");
+    println!("Press Enter to Finish");
     std::io::stdin().read_line(&mut input_line).ok().expect("Failed to read line");
 }
