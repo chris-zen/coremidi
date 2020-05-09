@@ -1,5 +1,6 @@
 use core_foundation::string::{CFString, CFStringRef};
 use core_foundation::base::{TCFType, OSStatus};
+use core_foundation::base::{CFGetRetainCount, CFTypeRef, CFIndex};
 
 use coremidi_sys::*;
 
@@ -15,13 +16,46 @@ pub trait PropertySetter<T> {
     fn set_value(&self, object: &Object, value: T) -> Result<(), OSStatus>;
 }
 
+/// Because Property structs can be constructed from strings that have been
+/// passed in from the user or are constants CFStringRefs from CoreMidi, we 
+/// need to abstract over how we store their keys.
+enum PropertyKeyStorage {
+    Owned(CFString),
+    Constant(CFStringRef)
+}
+
+impl PropertyKeyStorage {
+    /// Return a raw CFStringRef pointing to this property key
+    fn as_string_ref(&self) -> CFStringRef {
+        match self {
+            PropertyKeyStorage::Owned(owned) => owned.as_concrete_TypeRef(),
+            PropertyKeyStorage::Constant(constant) => *constant,
+        }
+    }
+
+    /// For checking the retain count when debugging
+    #[allow(dead_code)]
+    fn retain_count(&self) -> CFIndex {
+        match self {
+            PropertyKeyStorage::Owned(owned) => owned.retain_count(),
+            PropertyKeyStorage::Constant(constant) => unsafe { CFGetRetainCount(*constant as CFTypeRef) },
+        }
+    }
+}
+
 /// A MIDI object property which value is an String
 ///
-pub struct StringProperty(CFStringRef);
+pub struct StringProperty(PropertyKeyStorage);
 
 impl StringProperty {
     pub fn new(name: &str) -> Self {
-        StringProperty(CFString::new(name).as_concrete_TypeRef())
+        StringProperty(PropertyKeyStorage::Owned(CFString::new(name)))
+    }
+
+    /// Note: Should only be used internally with predefined CoreMidi constants,
+    /// since it does not bump the retain count of the CFStringRef.
+    fn from_constant_string_ref(string_ref: CFStringRef) -> Self {
+        StringProperty(PropertyKeyStorage::Constant(string_ref))
     }
 }
 
@@ -29,7 +63,8 @@ impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
         unsafe {
             let mut string_ref: CFStringRef = mem::uninitialized();
-            let status = MIDIObjectGetStringProperty(object.0, self.0, &mut string_ref);
+            let property_key = self.0.as_string_ref();
+            let status = MIDIObjectGetStringProperty(object.0, property_key, &mut string_ref);
             if status == 0 {
                 let string: CFString = TCFType::wrap_under_create_rule(string_ref);
                 Ok(From::<String>::from(format!("{}", string)))
@@ -45,7 +80,8 @@ impl<'a, T> PropertySetter<T> for StringProperty where T: Into<String> {
             let value: String = value.into();
             let string = CFString::new(&value);
             let string_ref = string.as_concrete_TypeRef();
-            let status = MIDIObjectSetStringProperty(object.0, self.0, string_ref);
+            let property_key = self.0.as_string_ref();
+            let status = MIDIObjectSetStringProperty(object.0, property_key, string_ref);
             if status == 0 { Ok(()) } else { Err(status) }
         }
     }
@@ -116,11 +152,20 @@ pub struct Properties;
 
 impl Properties {
     /// See [kMIDIPropertyName](https://developer.apple.com/reference/coremidi/kmidipropertyname)
-    pub fn name()               -> StringProperty { unsafe { StringProperty(kMIDIPropertyName) } }
+    pub fn name() -> StringProperty {
+        StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyName })
+    }
+    
     /// See [kMIDIPropertyManufacturer](https://developer.apple.com/reference/coremidi/kmidipropertymanufacturer)
-    pub fn manufacturer()       -> StringProperty { unsafe { StringProperty(kMIDIPropertyManufacturer) } }
+    pub fn manufacturer() -> StringProperty {
+        StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyManufacturer }) 
+    }
+    
     /// See [kMIDIPropertyModel](https://developer.apple.com/reference/coremidi/kmidipropertymodel)
-    pub fn model()              -> StringProperty { unsafe { StringProperty(kMIDIPropertyModel) } }
+    pub fn model() -> StringProperty {
+        StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyModel })
+    }
+    
     /// See [kMIDIPropertyUniqueID](https://developer.apple.com/reference/coremidi/kmidipropertyuniqueid)
     pub fn unique_id()          -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyUniqueID) } }
     /// See [kMIDIPropertyDeviceID](https://developer.apple.com/reference/coremidi/kmidipropertydeviceid)
@@ -146,7 +191,10 @@ impl Properties {
     /// See [kMIDIPropertyPrivate](https://developer.apple.com/reference/coremidi/kMIDIPropertyPrivate)
     pub fn private()            -> BooleanProperty { unsafe { BooleanProperty(kMIDIPropertyPrivate) } }
     /// See [kMIDIPropertyDriverOwner](https://developer.apple.com/reference/coremidi/kMIDIPropertyDriverOwner)
-    pub fn driver_owner()       -> StringProperty { unsafe { StringProperty(kMIDIPropertyDriverOwner) } }
+    pub fn driver_owner() -> StringProperty {
+        StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyDriverOwner })
+    }
+    
     // /// See [kMIDIPropertyNameConfiguration](https://developer.apple.com/reference/coremidi/kMIDIPropertyNameConfiguration)
     // pub fn name_configuration() -> Property { unsafe { Property(kMIDIPropertyNameConfiguration) } }
     // /// See [kMIDIPropertyImage](https://developer.apple.com/reference/coremidi/kMIDIPropertyImage)
@@ -198,9 +246,14 @@ impl Properties {
     /// See [kMIDIPropertyMaxTransmitChannels](https://developer.apple.com/reference/coremidi/kMIDIPropertyMaxTransmitChannels)
     pub fn max_transmit_channels() -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyMaxTransmitChannels) } }
     /// See [kMIDIPropertyDriverDeviceEditorApp](https://developer.apple.com/reference/coremidi/kMIDIPropertyDriverDeviceEditorApp)
-    pub fn driver_device_editor_app() -> StringProperty { unsafe { StringProperty(kMIDIPropertyDriverDeviceEditorApp) } }
+    pub fn driver_device_editor_app() -> StringProperty {
+        StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyDriverDeviceEditorApp })
+    }
+
     /// See [kMIDIPropertySupportsShowControl](https://developer.apple.com/reference/coremidi/kMIDIPropertySupportsShowControl)
     pub fn supports_show_control() -> BooleanProperty { unsafe { BooleanProperty(kMIDIPropertySupportsShowControl) } }
     /// See [kMIDIPropertyDisplayName](https://developer.apple.com/reference/coremidi/kMIDIPropertyDisplayName)
-    pub fn display_name()        -> StringProperty { unsafe { StringProperty(kMIDIPropertyDisplayName) } }
+    pub fn display_name() -> StringProperty {
+        StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyDisplayName })
+    }
 }
