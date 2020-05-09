@@ -96,30 +96,41 @@ impl<'a, T> PropertySetter<T> for StringProperty where T: Into<String> {
 
 /// A MIDI object property which value is an Integer
 ///
-pub struct IntegerProperty(CFStringRef);
+pub struct IntegerProperty(PropertyKeyStorage);
 
 impl IntegerProperty {
     pub fn new(name: &str) -> Self {
-        IntegerProperty(CFString::new(name).as_concrete_TypeRef())
+        IntegerProperty(PropertyKeyStorage::Owned(CFString::new(name)))
+    }
+
+    /// Note: Should only be used internally with predefined CoreMidi constants,
+    /// since it does not bump the retain count of the CFStringRef.
+    fn from_constant_string_ref(string_ref: CFStringRef) -> Self {
+        IntegerProperty(PropertyKeyStorage::Constant(string_ref))
     }
 }
 
 impl<T> PropertyGetter<T> for IntegerProperty where T: From<SInt32> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
-        unsafe {
-            let mut value: SInt32 = mem::uninitialized();
-            let status = MIDIObjectGetIntegerProperty(object.0, self.0, &mut value);
-            if status == 0 { Ok(From::from(value)) } else { Err(status) }
-        }
+        let property_key = self.0.as_string_ref();
+        let mut value: SInt32 = unsafe {
+            mem::uninitialized()
+        };
+        let status = unsafe {
+            MIDIObjectGetIntegerProperty(object.0, property_key, &mut value)
+        };
+        result_from_status(status, || value.into())
+        // if status == 0 { Ok(From::from(value)) } else { Err(status) }
     }
 }
 
 impl <T> PropertySetter<T> for IntegerProperty where T: Into<SInt32> {
     fn set_value(&self, object: &Object, value: T) -> Result<(), OSStatus> {
-        unsafe {
-            let status = MIDIObjectSetIntegerProperty(object.0, self.0, value.into());
-            if status == 0 { Ok(()) } else { Err(status) }
-        }
+        let property_key = self.0.as_string_ref();
+        let status = unsafe {
+            MIDIObjectSetIntegerProperty(object.0, property_key, value.into())
+        };
+        unit_result_from_status(status)
     }
 }
 
@@ -174,25 +185,49 @@ impl Properties {
     }
     
     /// See [kMIDIPropertyUniqueID](https://developer.apple.com/reference/coremidi/kmidipropertyuniqueid)
-    pub fn unique_id()          -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyUniqueID) } }
+    pub fn unique_id() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyUniqueID })
+    }
+    
     /// See [kMIDIPropertyDeviceID](https://developer.apple.com/reference/coremidi/kmidipropertydeviceid)
-    pub fn device_id()          -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyDeviceID) } }
+    pub fn device_id() -> IntegerProperty { 
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyDeviceID })
+    }
+    
     /// See [kMIDIPropertyReceiveChannels](https://developer.apple.com/reference/coremidi/kmidipropertyreceivechannels)
-    pub fn receive_channels()   -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyReceiveChannels) } }
+    pub fn receive_channels() -> IntegerProperty { 
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyReceiveChannels })
+    }
+    
     /// See [kMIDIPropertyTransmitChannels](https://developer.apple.com/reference/coremidi/kmidipropertytransmitchannels)
-    pub fn transmit_channels()  -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyTransmitChannels) } }
+    pub fn transmit_channels() -> IntegerProperty { 
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyTransmitChannels })
+    }
+    
     /// See [kMIDIPropertyMaxSysExSpeed](https://developer.apple.com/reference/coremidi/kmidipropertymaxsysexspeed)
-    pub fn max_sysex_speed()    -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyMaxSysExSpeed) } }
+    pub fn max_sysex_speed() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyMaxSysExSpeed })
+    }
+    
     /// See [kMIDIPropertyAdvanceScheduleTimeMuSec](https://developer.apple.com/reference/coremidi/kMIDIPropertyAdvanceScheduleTimeMuSec)
-    pub fn advance_schedule_time_musec() -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyAdvanceScheduleTimeMuSec) } }
+    pub fn advance_schedule_time_musec() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyAdvanceScheduleTimeMuSec })
+    }
+    
     /// See [kMIDIPropertyIsEmbeddedEntity](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsEmbeddedEntity)
     pub fn is_embedded_entity() -> BooleanProperty { unsafe { BooleanProperty(kMIDIPropertyIsEmbeddedEntity) } }
     /// See [kMIDIPropertyIsBroadcast](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsBroadcast)
     pub fn is_broadcast()       -> BooleanProperty { unsafe { BooleanProperty(kMIDIPropertyIsBroadcast) } }
     /// See [kMIDIPropertySingleRealtimeEntity](https://developer.apple.com/reference/coremidi/kMIDIPropertySingleRealtimeEntity)
-    pub fn single_realtime_entity() -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertySingleRealtimeEntity) } }
+    pub fn single_realtime_entity() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertySingleRealtimeEntity })
+    }
+    
     /// See [kMIDIPropertyConnectionUniqueID](https://developer.apple.com/reference/coremidi/kMIDIPropertyConnectionUniqueID)
-    pub fn connection_unique_id() -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyConnectionUniqueID) } }
+    pub fn connection_unique_id() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyConnectionUniqueID })
+    }
+    
     /// See [kMIDIPropertyOffline](https://developer.apple.com/reference/coremidi/kMIDIPropertyOffline)
     pub fn offline()            -> BooleanProperty { unsafe { BooleanProperty(kMIDIPropertyOffline) } }
     /// See [kMIDIPropertyPrivate](https://developer.apple.com/reference/coremidi/kMIDIPropertyPrivate)
@@ -204,10 +239,15 @@ impl Properties {
     
     // /// See [kMIDIPropertyNameConfiguration](https://developer.apple.com/reference/coremidi/kMIDIPropertyNameConfiguration)
     // pub fn name_configuration() -> Property { unsafe { Property(kMIDIPropertyNameConfiguration) } }
+    
     // /// See [kMIDIPropertyImage](https://developer.apple.com/reference/coremidi/kMIDIPropertyImage)
     // pub fn image() -> Property { unsafe { Property(kMIDIPropertyImage) } }
+    
     /// See [kMIDIPropertyDriverVersion](https://developer.apple.com/reference/coremidi/kMIDIPropertyDriverVersion)
-    pub fn driver_version()     -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyDriverVersion) } }
+    pub fn driver_version() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyDriverVersion })
+    }
+    
     /// See [kMIDIPropertySupportsGeneralMIDI](https://developer.apple.com/reference/coremidi/kMIDIPropertySupportsGeneralMIDI)
     pub fn supports_general_midi() -> BooleanProperty { unsafe { BooleanProperty(kMIDIPropertySupportsGeneralMIDI) } }
     /// See [kMIDIPropertySupportsMMC](https://developer.apple.com/reference/coremidi/kMIDIPropertySupportsMMC)
@@ -249,9 +289,15 @@ impl Properties {
     /// See [kMIDIPropertyIsEffectUnit](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsEffectUnit)
     pub fn is_effect_unit()      -> BooleanProperty { unsafe { BooleanProperty(kMIDIPropertyIsEffectUnit) } }
     /// See [kMIDIPropertyMaxReceiveChannels](https://developer.apple.com/reference/coremidi/kMIDIPropertyMaxReceiveChannels)
-    pub fn max_receive_channels() -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyMaxReceiveChannels) } }
+    pub fn max_receive_channels() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyMaxReceiveChannels })
+    }
+
     /// See [kMIDIPropertyMaxTransmitChannels](https://developer.apple.com/reference/coremidi/kMIDIPropertyMaxTransmitChannels)
-    pub fn max_transmit_channels() -> IntegerProperty { unsafe { IntegerProperty(kMIDIPropertyMaxTransmitChannels) } }
+    pub fn max_transmit_channels() -> IntegerProperty {
+        IntegerProperty::from_constant_string_ref(unsafe { kMIDIPropertyMaxTransmitChannels })
+    }
+
     /// See [kMIDIPropertyDriverDeviceEditorApp](https://developer.apple.com/reference/coremidi/kMIDIPropertyDriverDeviceEditorApp)
     pub fn driver_device_editor_app() -> StringProperty {
         StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyDriverDeviceEditorApp })
