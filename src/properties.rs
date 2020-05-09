@@ -420,7 +420,6 @@ mod tests {
         #[test]
         fn test_from_constant() {
             let (_client, dest) = setup();
-
             let property = Properties::name();
 
             check_get_original(&property, &dest);
@@ -430,7 +429,6 @@ mod tests {
         #[test]
         fn test_new() {
             let (_client, dest) = setup();
-
             // "name" is the value of the CoreMidi constant kMIDIPropertyName
             let property = StringProperty::new("name");
 
@@ -447,9 +445,9 @@ mod tests {
         #[test]
         fn test_not_set() {
             let (_client, dest) = setup();
-
             // Is not set by default for Virtual Destinations
             let property = Properties::advance_schedule_time_musec();
+
             let value: Result<i32, _> = property.value_from(&dest);
 
             assert!(value.is_err())
@@ -464,6 +462,32 @@ mod tests {
             let num: i32 = property.value_from(&dest).unwrap();
 
             assert_eq!(num, ADVANCED_SCHEDULE_TIME);
+        }
+    }
+
+    mod boolean {
+        use super::*;
+
+        #[test]
+        fn test_not_set() {
+            let (_client, dest) = setup();
+            // Not set by default on Virtual Destinations
+            let property = Properties::transmits_program_changes();
+
+            let value: Result<bool, _> = property.value_from(&dest);
+
+            assert!(value.is_err())
+        }
+
+        #[test]
+        fn test_roundtrip() {
+            let (_client, dest) = setup();
+            let property = Properties::private();
+            
+            property.set_value(&dest, true).unwrap();
+            let value: bool = property.value_from(&dest).unwrap();
+
+            assert!(value, true)
         }
     }
 }
