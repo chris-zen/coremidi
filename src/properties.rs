@@ -120,7 +120,6 @@ impl<T> PropertyGetter<T> for IntegerProperty where T: From<SInt32> {
             MIDIObjectGetIntegerProperty(object.0, property_key, &mut value)
         };
         result_from_status(status, || value.into())
-        // if status == 0 { Ok(From::from(value)) } else { Err(status) }
     }
 }
 
