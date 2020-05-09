@@ -389,27 +389,32 @@ mod tests {
         VirtualDestination,
     };
 
-    const DEST_NAME_ORIG: &str = "A";
-    const DEST_NAME_MODIFIED: &str = "B";
+    const NAME_ORIG: &str = "A";
 
     fn setup() -> (Client, VirtualDestination) {
         let client = Client::new("Test Client").unwrap();
-        let destination = client.virtual_destination(DEST_NAME_ORIG, |_|()).unwrap();
-        (client, destination)
+        let dest = client.virtual_destination(NAME_ORIG, |_|()).unwrap();
+        (client, dest)
     }
 
     mod string {
         use super::*;
 
-        fn check_roundtrip(property: StringProperty, destination: &VirtualDestination) {
-            // Test getting the original name
-            let name: String = property.value_from(destination).unwrap();
-            assert_eq!(name, DEST_NAME_ORIG);
+        const NAME_MODIFIED: &str = "B";
 
-            // Test setting then getting the name
-            property.set_value(destination, DEST_NAME_MODIFIED).unwrap();
-            let name: String = property.value_from(destination).unwrap();
-            assert_eq!(name, DEST_NAME_MODIFIED);
+        // Test getting the original value of the "name" property
+        fn check_get_original(property: &StringProperty, dest: &VirtualDestination) {
+            let name: String = property.value_from(dest).unwrap();
+
+            assert_eq!(name, NAME_ORIG);
+        }
+
+        // Test setting then getting the "name" property
+        fn check_roundtrip(property: &StringProperty, dest: &VirtualDestination) {
+            property.set_value(dest, NAME_MODIFIED).unwrap();
+            let name: String = property.value_from(dest).unwrap();
+
+            assert_eq!(name, NAME_MODIFIED);
         }
 
         #[test]
@@ -418,7 +423,8 @@ mod tests {
 
             let property = Properties::name();
 
-            check_roundtrip(property, &dest);
+            check_get_original(&property, &dest);
+            check_roundtrip(&property, &dest);
         }
 
         #[test]
@@ -428,7 +434,36 @@ mod tests {
             // "name" is the value of the CoreMidi constant kMIDIPropertyName
             let property = StringProperty::new("name");
 
-            check_roundtrip(property, &dest);
+            check_get_original(&property, &dest);
+            check_roundtrip(&property, &dest);
+        }
+    }
+
+    mod integer {
+        use super::*;
+
+        const ADVANCED_SCHEDULE_TIME: i32 = 44;
+
+        #[test]
+        fn test_not_set() {
+            let (_client, dest) = setup();
+
+            // Is not set by default for Virtual Destinations
+            let property = Properties::advance_schedule_time_musec();
+            let value: Result<i32, _> = property.value_from(&dest);
+
+            assert!(value.is_err())
+        }
+
+        #[test]
+        fn test_roundtrip() {
+            let (_client, dest) = setup();
+            let property = Properties::advance_schedule_time_musec();
+
+            property.set_value(&dest, ADVANCED_SCHEDULE_TIME).unwrap();
+            let num: i32 = property.value_from(&dest).unwrap();
+
+            assert_eq!(num, ADVANCED_SCHEDULE_TIME);
         }
     }
 }
