@@ -61,29 +61,32 @@ impl StringProperty {
 
 impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
-        unsafe {
-            let mut string_ref: CFStringRef = mem::uninitialized();
-            let property_key = self.0.as_string_ref();
-            let status = MIDIObjectGetStringProperty(object.0, property_key, &mut string_ref);
-            if status == 0 {
-                let string: CFString = TCFType::wrap_under_create_rule(string_ref);
-                Ok(From::<String>::from(format!("{}", string)))
-            }
-            else { Err(status) }
-        }
+        let property_key = self.0.as_string_ref();
+        let mut string_ref: CFStringRef = unsafe { 
+            mem::uninitialized()
+        };
+        let status = unsafe {
+            MIDIObjectGetStringProperty(object.0, property_key, &mut string_ref)
+        };
+        if status == 0 {
+            let string: CFString = unsafe {
+                TCFType::wrap_under_create_rule(string_ref)
+            };
+            Ok(From::<String>::from(format!("{}", string)))
+        } else { Err(status) }
     }
 }
 
 impl<'a, T> PropertySetter<T> for StringProperty where T: Into<String> {
     fn set_value(&self, object: &Object, value: T) -> Result<(), OSStatus> {
-        unsafe {
-            let value: String = value.into();
-            let string = CFString::new(&value);
-            let string_ref = string.as_concrete_TypeRef();
-            let property_key = self.0.as_string_ref();
-            let status = MIDIObjectSetStringProperty(object.0, property_key, string_ref);
-            if status == 0 { Ok(()) } else { Err(status) }
-        }
+        let property_key = self.0.as_string_ref();
+        let value: String = value.into();
+        let string = CFString::new(&value);
+        let string_ref = string.as_concrete_TypeRef();
+        let status = unsafe {
+            MIDIObjectSetStringProperty(object.0, property_key, string_ref)
+        };
+        if status == 0 { Ok(()) } else { Err(status) }
     }
 }
 
