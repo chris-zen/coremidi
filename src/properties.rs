@@ -72,7 +72,7 @@ impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
             let string: CFString = unsafe {
                 TCFType::wrap_under_create_rule(string_ref)
             };
-            Ok(From::<String>::from(format!("{}", string)))
+            Ok(string.to_string().into())
         } else { Err(status) }
     }
 }
