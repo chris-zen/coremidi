@@ -256,7 +256,7 @@ pub use notifications::Notification;
 ///
 pub fn flush() -> Result<(), OSStatus> {
     let status = unsafe { MIDIFlushOutput(0) };
-    if status == 0 { Ok(()) } else { Err(status) }
+    unit_result_from_status(status)
 }
 
 /// Stops and restarts MIDI I/O.
@@ -264,5 +264,18 @@ pub fn flush() -> Result<(), OSStatus> {
 ///
 pub fn restart() -> Result<(), OSStatus> {
     let status = unsafe { MIDIRestart() };
-    if status == 0 { Ok(()) } else { Err(status) }
+    unit_result_from_status(status)
+}
+
+/// Convert an OSStatus into a Result<T, OSStatus> given a mapping closure
+fn result_from_status<T, F: FnOnce() -> T>(status: OSStatus, f: F) -> Result<T, OSStatus> {
+    match status {
+        0 => Ok(f()),
+        _ => Err(status),
+    }
+}
+
+/// Convert an OSSStatus into a Result<(), OSStatus>
+fn unit_result_from_status(status: OSStatus) -> Result<(), OSStatus> {
+    result_from_status(status, || ())
 }

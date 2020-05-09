@@ -6,7 +6,11 @@ use coremidi_sys::*;
 
 use std::mem;
 
-use Object;
+use {
+    Object,
+    result_from_status,
+    unit_result_from_status,
+};
 
 pub trait PropertyGetter<T> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus>;
@@ -68,12 +72,12 @@ impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
         let status = unsafe {
             MIDIObjectGetStringProperty(object.0, property_key, &mut string_ref)
         };
-        if status == 0 {
+        result_from_status(status, || {
             let string: CFString = unsafe {
                 TCFType::wrap_under_create_rule(string_ref)
             };
-            Ok(string.to_string().into())
-        } else { Err(status) }
+            string.to_string().into()
+        })
     }
 }
 
@@ -86,7 +90,7 @@ impl<'a, T> PropertySetter<T> for StringProperty where T: Into<String> {
         let status = unsafe {
             MIDIObjectSetStringProperty(object.0, property_key, string_ref)
         };
-        if status == 0 { Ok(()) } else { Err(status) }
+        unit_result_from_status(status)
     }
 }
 
