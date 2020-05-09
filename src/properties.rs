@@ -379,3 +379,56 @@ impl Properties {
         StringProperty::from_constant_string_ref(unsafe { kMIDIPropertyDisplayName })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use ::{
+        Client,
+        VirtualDestination,
+    };
+
+    const DEST_NAME_ORIG: &str = "A";
+    const DEST_NAME_MODIFIED: &str = "B";
+
+    fn setup() -> (Client, VirtualDestination) {
+        let client = Client::new("Test Client").unwrap();
+        let destination = client.virtual_destination(DEST_NAME_ORIG, |_|()).unwrap();
+        (client, destination)
+    }
+
+    mod string {
+        use super::*;
+
+        fn check_roundtrip(property: StringProperty, destination: &VirtualDestination) {
+            // Test getting the original name
+            let name: String = property.value_from(destination).unwrap();
+            assert_eq!(name, DEST_NAME_ORIG);
+
+            // Test setting then getting the name
+            property.set_value(destination, DEST_NAME_MODIFIED).unwrap();
+            let name: String = property.value_from(destination).unwrap();
+            assert_eq!(name, DEST_NAME_MODIFIED);
+        }
+
+        #[test]
+        fn test_from_constant() {
+            let (_client, dest) = setup();
+
+            let property = Properties::name();
+
+            check_roundtrip(property, &dest);
+        }
+
+        #[test]
+        fn test_new() {
+            let (_client, dest) = setup();
+
+            // "name" is the value of the CoreMidi constant kMIDIPropertyName
+            let property = StringProperty::new("name");
+
+            check_roundtrip(property, &dest);
+        }
+    }
+}
