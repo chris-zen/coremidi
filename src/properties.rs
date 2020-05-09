@@ -66,9 +66,7 @@ impl StringProperty {
 impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
         let property_key = self.0.as_string_ref();
-        let mut string_ref: CFStringRef = unsafe { 
-            mem::uninitialized()
-        };
+        let mut string_ref: CFStringRef = unsafe { mem::uninitialized() };
         let status = unsafe {
             MIDIObjectGetStringProperty(object.0, property_key, &mut string_ref)
         };
@@ -113,9 +111,7 @@ impl IntegerProperty {
 impl<T> PropertyGetter<T> for IntegerProperty where T: From<SInt32> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
         let property_key = self.0.as_string_ref();
-        let mut value: SInt32 = unsafe {
-            mem::uninitialized()
-        };
+        let mut value: SInt32 = unsafe { mem::uninitialized() };
         let status = unsafe {
             MIDIObjectGetIntegerProperty(object.0, property_key, &mut value)
         };
