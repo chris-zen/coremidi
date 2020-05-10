@@ -1,14 +1,17 @@
 extern crate coremidi;
 
 use coremidi::{
+    Client,
+    PacketList,
+    Properties,
     PropertyGetter,
     PropertySetter, 
 };
 
 fn main() {
-    let client = coremidi::Client::new("Example Client").unwrap();
+    let client = Client::new("Example Client").unwrap();
 
-    let callback = |packet_list: &coremidi::PacketList| {
+    let callback = |packet_list: &PacketList| {
         println!("{}", packet_list);
     };
 
@@ -16,6 +19,11 @@ fn main() {
     let destination = client.virtual_destination("Example Destination", callback).unwrap();
 
     println!("Created Virtual Destination...");
-    let name: String = coremidi::Properties::name().value_from(&destination).unwrap();
+
+    // How to get a property
+    let name: String = Properties::name().value_from(&destination).unwrap();
     println!("With Name: {}", name);
+
+    // How to set a property
+    Properties::private().set_value(&destination, true).unwrap();
 }
