@@ -8,7 +8,10 @@ use coremidi_sys::{
 };
 
 use std::ops::Deref;
-use std::mem;
+use std::mem::{
+    self,
+    MaybeUninit,
+};
 use std::ptr;
 
 use Object;
@@ -51,13 +54,17 @@ impl Client {
     ///
     pub fn new(name: &str) -> Result<Client, OSStatus> {
         let client_name = CFString::new(name);
-        let mut client_ref: MIDIClientRef = unsafe { mem::uninitialized() };
-        let status = unsafe { MIDIClientCreate(
-            client_name.as_concrete_TypeRef(),
-            None, ptr::null_mut(),
-            &mut client_ref)
+        let mut client_ref = MaybeUninit::uninit();
+        let status = unsafe {
+            MIDIClientCreate(
+                client_name.as_concrete_TypeRef(),
+                None,
+                ptr::null_mut(),
+                client_ref.as_mut_ptr()
+            )
         };
         if status == 0 {
+            let client_ref = unsafe { client_ref.assume_init() };
             Ok(Client { object: Object(client_ref), callback: BoxedCallback::null() })
         } else {
             Err(status)
