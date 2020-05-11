@@ -25,6 +25,7 @@ use VirtualDestination;
 use PacketList;
 use BoxedCallback;
 use notifications::Notification;
+use result_from_status;
 
 impl Client {
     /// Creates a new CoreMIDI client with support for notifications.
@@ -63,12 +64,10 @@ impl Client {
                 client_ref.as_mut_ptr()
             )
         };
-        if status == 0 {
+        result_from_status(status, || {
             let client_ref = unsafe { client_ref.assume_init() };
-            Ok(Client { object: Object(client_ref), callback: BoxedCallback::null() })
-        } else {
-            Err(status)
-        }
+            Client { object: Object(client_ref), callback: BoxedCallback::null() }
+        })
     }
 
     /// Creates an output port through which the client may send outgoing MIDI messages to any MIDI destination.
