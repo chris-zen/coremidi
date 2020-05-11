@@ -81,11 +81,10 @@ impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
             MIDIObjectGetStringProperty(object.0, property_key, string_ref.as_mut_ptr())
         };
         result_from_status(status, || {
-            let string: CFString = unsafe {
-                let string_ref = string_ref.assume_init();
-                TCFType::wrap_under_create_rule(string_ref)
-            };
-            string.to_string().into()
+            let string_ref = unsafe { string_ref.assume_init() };
+            if string_ref.is_null() { return "".to_string().into() };
+            let cf_string: CFString = unsafe { TCFType::wrap_under_create_rule(string_ref) };
+            cf_string.to_string().into()
         })
     }
 }
