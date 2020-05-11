@@ -1,6 +1,16 @@
-use core_foundation::string::{CFString, CFStringRef};
-use core_foundation::base::{TCFType, OSStatus};
-use core_foundation::base::{CFGetRetainCount, CFTypeRef, CFIndex};
+use core_foundation::{
+    string::{
+        CFString, 
+        CFStringRef,
+    },
+    base::{
+        CFGetRetainCount,
+        CFTypeRef,
+        CFIndex, 
+        OSStatus,
+        TCFType,
+    }
+};
 
 use coremidi_sys::*;
 
