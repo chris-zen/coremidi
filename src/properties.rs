@@ -14,10 +14,7 @@ use core_foundation::{
 
 use coremidi_sys::*;
 
-use std::mem::{
-    self,
-    MaybeUninit,
-};
+use std::mem::MaybeUninit;
 
 use {
     Object,
@@ -79,12 +76,13 @@ impl StringProperty {
 impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
         let property_key = self.0.as_string_ref();
-        let mut string_ref: CFStringRef = unsafe { mem::uninitialized() };
+        let mut string_ref = MaybeUninit::uninit();
         let status = unsafe {
-            MIDIObjectGetStringProperty(object.0, property_key, &mut string_ref)
+            MIDIObjectGetStringProperty(object.0, property_key, string_ref.as_mut_ptr())
         };
         result_from_status(status, || {
             let string: CFString = unsafe {
+                let string_ref = string_ref.assume_init();
                 TCFType::wrap_under_create_rule(string_ref)
             };
             string.to_string().into()
