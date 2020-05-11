@@ -45,12 +45,10 @@ impl Client {
                 client_ref.as_mut_ptr()
             )
         };
-        if status == 0 {
+        result_from_status(status, || {
             let client_ref = unsafe { client_ref.assume_init() };
-            Ok(Client { object: Object(client_ref), callback: boxed_callback })
-        } else {
-            Err(status)
-        }
+            Client { object: Object(client_ref), callback: boxed_callback }
+        })
     }
 
     /// Creates a new CoreMIDI client.
