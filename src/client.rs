@@ -20,6 +20,8 @@ use coremidi_sys::{
 use std::{
     mem::MaybeUninit,
     ops::Deref, 
+    os::raw::c_void,
+    panic::catch_unwind,
     ptr, 
 };
 
@@ -176,9 +178,9 @@ impl Client {
 
     extern "C" fn notify_proc(
             notification_ptr: *const MIDINotification,
-            ref_con: *mut ::std::os::raw::c_void) {
+            ref_con: *mut c_void) {
 
-        let _ = ::std::panic::catch_unwind(|| unsafe {
+        let _ = catch_unwind(|| unsafe {
             match Notification::from(&*notification_ptr) {
                 Ok(notification) => {
                     BoxedCallback::call_from_raw_ptr(ref_con, &notification);
@@ -190,10 +192,10 @@ impl Client {
 
     extern "C" fn read_proc(
             pktlist: *const MIDIPacketList,
-            read_proc_ref_con: *mut ::std::os::raw::c_void,
-            _: *mut ::std::os::raw::c_void) { //srcConnRefCon
+            read_proc_ref_con: *mut c_void,
+            _: *mut c_void) { //srcConnRefCon
 
-        let _ = ::std::panic::catch_unwind(|| unsafe {
+        let _ = catch_unwind(|| unsafe {
             let packet_list = &*(pktlist as *const PacketList);
             BoxedCallback::call_from_raw_ptr(read_proc_ref_con, packet_list);
         });
