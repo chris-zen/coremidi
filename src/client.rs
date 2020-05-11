@@ -179,9 +179,7 @@ impl Client {
     extern "C" fn notify_proc(notification_ptr: *const MIDINotification, ref_con: *mut c_void) {
         let _ = catch_unwind(|| unsafe {
             match Notification::from(&*notification_ptr) {
-                Ok(notification) => {
-                    BoxedCallback::call_from_raw_ptr(ref_con, &notification);
-                },
+                Ok(notification) => BoxedCallback::call_from_raw_ptr(ref_con, &notification),
                 Err(_) => {} // Skip unknown notifications
             }
         });
