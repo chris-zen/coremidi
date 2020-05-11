@@ -1,18 +1,27 @@
-use core_foundation::string::CFString;
-use core_foundation::base::{OSStatus, TCFType};
+use core_foundation::{
+    base::{
+        OSStatus,
+        TCFType
+    },
+    string::CFString,
+};
 
 use coremidi_sys::{
-    MIDIClientCreate, MIDIClientDispose, MIDINotification,
-    MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate,
-    MIDIPacketList, MIDIInputPortCreate, MIDIDestinationCreate
+    MIDIClientCreate, 
+    MIDIClientDispose,
+    MIDIDestinationCreate,
+    MIDIInputPortCreate,
+    MIDINotification,
+    MIDIOutputPortCreate,
+    MIDIPacketList,
+    MIDISourceCreate,
 };
 
-use std::ops::Deref;
-use std::mem::{
-    self,
-    MaybeUninit,
+use std::{
+    mem::MaybeUninit,
+    ops::Deref, 
+    ptr, 
 };
-use std::ptr;
 
 use Object;
 use Client;
@@ -94,8 +103,8 @@ impl Client {
     /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
     ///
     pub fn input_port<F>(&self, name: &str, callback: F) -> Result<InputPort, OSStatus>
-            where F: FnMut(&PacketList) + Send + 'static {
-
+        where F: FnMut(&PacketList) + Send + 'static
+    {
         let port_name = CFString::new(name);
         let mut port_ref = MaybeUninit::uninit();
         let mut box_callback = BoxedCallback::new(callback);
@@ -122,41 +131,47 @@ impl Client {
     ///
     pub fn virtual_source(&self, name: &str) -> Result<VirtualSource, OSStatus> {
         let virtual_source_name = CFString::new(name);
-        let mut virtual_source: MIDIEndpointRef = unsafe { mem::uninitialized() };
-        let status = unsafe { MIDISourceCreate(
-            self.object.0,
-            virtual_source_name.as_concrete_TypeRef(),
-            &mut virtual_source)
+        let mut virtual_source = MaybeUninit::uninit();
+        let status = unsafe { 
+            MIDISourceCreate(
+                self.object.0,
+                virtual_source_name.as_concrete_TypeRef(),
+                virtual_source.as_mut_ptr()
+            )
         };
-        if status == 0 { Ok(VirtualSource { endpoint: Endpoint { object: Object(virtual_source) } }) } else { Err(status) }
+        result_from_status(status, || {
+            let virtual_source = unsafe { virtual_source.assume_init() };
+            VirtualSource { endpoint: Endpoint { object: Object(virtual_source) } }
+        })
     }
 
     /// Creates a virtual destination in the client.
     /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
     ///
     pub fn virtual_destination<F>(&self, name: &str, callback: F) -> Result<VirtualDestination, OSStatus>
-            where F: FnMut(&PacketList) + Send + 'static {
-
+        where F: FnMut(&PacketList) + Send + 'static 
+    {
         let virtual_destination_name = CFString::new(name);
-        let mut virtual_destination: MIDIEndpointRef = unsafe { mem::uninitialized() };
+        let mut virtual_destination = MaybeUninit::uninit();
         let mut boxed_callback = BoxedCallback::new(callback);
-        let status = unsafe { MIDIDestinationCreate(
-            self.object.0,
-            virtual_destination_name.as_concrete_TypeRef(),
-            Some(Self::read_proc as extern "C" fn(_, _, _)),
-            boxed_callback.raw_ptr(),
-            &mut virtual_destination)
+        let status = unsafe { 
+            MIDIDestinationCreate(
+                self.object.0,
+                virtual_destination_name.as_concrete_TypeRef(),
+                Some(Self::read_proc as extern "C" fn(_, _, _)),
+                boxed_callback.raw_ptr(),
+                virtual_destination.as_mut_ptr()
+            )
         };
-        if status == 0 {
-            Ok(VirtualDestination {
+        result_from_status(status, || {
+            let virtual_destination = unsafe { virtual_destination.assume_init() };
+            VirtualDestination {
                 endpoint: Endpoint {
                     object: Object(virtual_destination),
                 },
                 callback: boxed_callback,
-            })
-        } else {
-            Err(status)
-        }
+            }
+        })
     }
 
     extern "C" fn notify_proc(
