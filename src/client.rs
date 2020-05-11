@@ -25,18 +25,20 @@ use std::{
     ptr, 
 };
 
-use Object;
-use Client;
-use Port;
-use OutputPort;
-use InputPort;
-use Endpoint;
-use VirtualSource;
-use VirtualDestination;
-use PacketList;
-use BoxedCallback;
-use notifications::Notification;
-use result_from_status;
+use {
+    BoxedCallback,
+    Client,
+    Endpoint,
+    InputPort,
+    notifications::Notification,
+    Object,
+    OutputPort,
+    PacketList,
+    Port,
+    result_from_status,
+    VirtualSource,
+    VirtualDestination,
+};
 
 impl Client {
     /// Creates a new CoreMIDI client with support for notifications.
