@@ -3,7 +3,7 @@ use core_foundation::base::{OSStatus, TCFType};
 
 use coremidi_sys::{
     MIDIClientCreate, MIDIClientDispose, MIDINotification,
-    MIDIPortRef, MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate,
+    MIDIOutputPortCreate, MIDIEndpointRef, MIDISourceCreate,
     MIDIPacketList, MIDIInputPortCreate, MIDIDestinationCreate
 };
 
@@ -76,13 +76,18 @@ impl Client {
     ///
     pub fn output_port(&self, name: &str) -> Result<OutputPort, OSStatus> {
         let port_name = CFString::new(name);
-        let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
-        let status = unsafe { MIDIOutputPortCreate(
-            self.object.0,
-            port_name.as_concrete_TypeRef(),
-            &mut port_ref)
+        let mut port_ref = MaybeUninit::uninit();
+        let status = unsafe {
+            MIDIOutputPortCreate(
+                self.object.0,
+                port_name.as_concrete_TypeRef(),
+                port_ref.as_mut_ptr()
+            )
         };
-        if status == 0 { Ok(OutputPort { port: Port { object: Object(port_ref) } }) } else { Err(status) }
+        result_from_status(status, || {
+            let port_ref = unsafe { port_ref.assume_init() };
+            OutputPort { port: Port { object: Object(port_ref) } }
+        })
     }
 
     /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
@@ -92,23 +97,24 @@ impl Client {
             where F: FnMut(&PacketList) + Send + 'static {
 
         let port_name = CFString::new(name);
-        let mut port_ref: MIDIPortRef = unsafe { mem::uninitialized() };
+        let mut port_ref = MaybeUninit::uninit();
         let mut box_callback = BoxedCallback::new(callback);
-        let status = unsafe { MIDIInputPortCreate(
-            self.object.0,
-            port_name.as_concrete_TypeRef(),
-            Some(Self::read_proc as extern "C" fn(_, _, _)),
-            box_callback.raw_ptr(),
-            &mut port_ref)
+        let status = unsafe {
+            MIDIInputPortCreate(
+                self.object.0,
+                port_name.as_concrete_TypeRef(),
+                Some(Self::read_proc as extern "C" fn(_, _, _)),
+                box_callback.raw_ptr(),
+                port_ref.as_mut_ptr()
+            )
         };
-        if status == 0 {
-            Ok(InputPort {
+        result_from_status(status, || {
+            let port_ref = unsafe { port_ref.assume_init() };
+            InputPort {
                 port: Port { object: Object(port_ref) },
                 callback: box_callback,
-            })
-        } else {
-            Err(status)
-        }
+            }
+        })
     }
 
     /// Creates a virtual source in the client.
