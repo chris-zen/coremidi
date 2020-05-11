@@ -14,7 +14,10 @@ use core_foundation::{
 
 use coremidi_sys::*;
 
-use std::mem;
+use std::mem::{
+    self,
+    MaybeUninit,
+};
 
 use {
     Object,
@@ -121,11 +124,14 @@ impl IntegerProperty {
 impl<T> PropertyGetter<T> for IntegerProperty where T: From<SInt32> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
         let property_key = self.0.as_string_ref();
-        let mut value: SInt32 = unsafe { mem::uninitialized() };
+        let mut value = MaybeUninit::uninit();
         let status = unsafe {
-            MIDIObjectGetIntegerProperty(object.0, property_key, &mut value)
+            MIDIObjectGetIntegerProperty(object.0, property_key, value.as_mut_ptr())
         };
-        result_from_status(status, || value.into())
+        result_from_status(status, || {
+            let value = unsafe { value.assume_init() };
+            value.into()
+        })
     }
 }
 
