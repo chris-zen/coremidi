@@ -176,10 +176,7 @@ impl Client {
         })
     }
 
-    extern "C" fn notify_proc(
-            notification_ptr: *const MIDINotification,
-            ref_con: *mut c_void) {
-
+    extern "C" fn notify_proc(notification_ptr: *const MIDINotification, ref_con: *mut c_void) {
         let _ = catch_unwind(|| unsafe {
             match Notification::from(&*notification_ptr) {
                 Ok(notification) => {
@@ -190,11 +187,7 @@ impl Client {
         });
     }
 
-    extern "C" fn read_proc(
-            pktlist: *const MIDIPacketList,
-            read_proc_ref_con: *mut c_void,
-            _: *mut c_void) { //srcConnRefCon
-
+    extern "C" fn read_proc(pktlist: *const MIDIPacketList, read_proc_ref_con: *mut c_void, _src_conn_ref_con: *mut c_void) {
         let _ = catch_unwind(|| unsafe {
             let packet_list = &*(pktlist as *const PacketList);
             BoxedCallback::call_from_raw_ptr(read_proc_ref_con, packet_list);
