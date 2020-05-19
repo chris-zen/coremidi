@@ -249,7 +249,13 @@ pub use endpoints::destinations::Destinations;
 pub use endpoints::sources::Sources;
 pub use packets::{PacketListIterator, Packet, PacketBuffer};
 pub use properties::{Properties, PropertyGetter, PropertySetter};
-pub use notifications::Notification;
+pub use notifications::{
+    AddedRemovedInfo,
+    IOErrorInfo,
+    Notification,
+    PropertyChangedInfo,
+};
+pub use object::ObjectType;
 
 /// Unschedules previously-sent packets for all the endpoints.
 /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).
