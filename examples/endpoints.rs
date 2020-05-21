@@ -8,7 +8,8 @@ fn main() {
         println!("[{}] {}", i, display_name);
     }
 
-    println!("\nSystem sources:");
+    println!("");
+    println!("System sources:");
 
     for (i, source) in coremidi::Sources.into_iter().enumerate() {
         let display_name = get_display_name(&source);

@@ -4,14 +4,14 @@ use std::time::Duration;
 use std::thread;
 
 fn main() {
-    let client = coremidi::Client::new("example-client").unwrap();
-    let source = client.virtual_source("example-source").unwrap();
+    let client = coremidi::Client::new("Example Client").unwrap();
+    let source = client.virtual_source("Example Source").unwrap();
 
     let note_on = create_note_on(0, 64, 127);
     let note_off = create_note_off(0, 64, 127);
 
     for i in 0..10 {
-        println!("[{}] Received note ...", i);
+        println!("[{}] Sending note...", i);
 
         source.received(&note_on).unwrap();
 

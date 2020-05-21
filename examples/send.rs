@@ -11,8 +11,8 @@ fn main() {
     let destination = coremidi::Destination::from_index(destination_index).unwrap();
     println!("Destination display name: {}", destination.display_name().unwrap());
 
-    let client = coremidi::Client::new("example-client").unwrap();
-    let output_port = client.output_port("example-port").unwrap();
+    let client = coremidi::Client::new("Example Client").unwrap();
+    let output_port = client.output_port("Example Port").unwrap();
 
     let note_on = create_note_on(0, 64, 127);
     let note_off = create_note_off(0, 64, 127);
