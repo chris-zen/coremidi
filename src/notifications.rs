@@ -99,13 +99,13 @@ impl Notification {
             Ok(object_type) => {
                 let property_name = {
                     let name_ref: CFStringRef = property_changed_notification.propertyName;
-                    let name: CFString = unsafe { TCFType::wrap_under_create_rule(name_ref) };
-                    format!("{}", name)
+                    let name: CFString = unsafe { TCFType::wrap_under_get_rule(name_ref) };
+                    name.to_string()
                 };
                 let property_changed_info = PropertyChangedInfo {
                     object: Object(property_changed_notification.object),
-                    object_type: object_type,
-                    property_name: property_name
+                    object_type,
+                    property_name
                 };
                 Ok(Notification::PropertyChanged(property_changed_info))
             },
@@ -261,12 +261,13 @@ mod tests {
 
     #[test]
     fn notification_from_property_changed() {
+        let name = CFString::new("name");
         let notification_raw = MIDIObjectPropertyChangeNotification {
             messageID: kMIDIMsgPropertyChanged as MIDINotificationMessageID,
             messageSize: 24,
             object: 1 as MIDIObjectRef,
             objectType: kMIDIObjectType_Device,
-            propertyName: CFString::new("name").as_concrete_TypeRef()
+            propertyName: name.as_concrete_TypeRef()
         };
 
         let notification = Notification::from(
@@ -285,12 +286,13 @@ mod tests {
 
     #[test]
     fn notification_from_property_changed_error() {
+        let name = CFString::new("name");
         let notification_raw = MIDIObjectPropertyChangeNotification {
             messageID: kMIDIMsgPropertyChanged as MIDINotificationMessageID,
             messageSize: 24,
             object: 1 as MIDIObjectRef,
             objectType: 0xffff,
-            propertyName: CFString::new("name").as_concrete_TypeRef()
+            propertyName: name.as_concrete_TypeRef()
         };
 
         let notification = Notification::from(

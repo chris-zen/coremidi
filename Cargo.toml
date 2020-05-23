@@ -15,4 +15,3 @@ keywords = ["CoreMIDI", "MIDI", "OSX", "macOS", "music"]
 core-foundation-sys = "0.2"
 core-foundation = "0.2"
 coremidi-sys = "2.0"
-time = "0.1"
