@@ -666,7 +666,7 @@ mod tests {
     /// Compares the results of building a PacketList using our PacketBuffer API
     /// and the native API (MIDIPacketListAdd, etc).
     unsafe fn compare_packet_list(packets: Vec<(MIDITimeStamp, Vec<u8>)>) {
-        use coremidi_sys::{MIDIPacketList, MIDIPacketListInit, MIDIPacketListAdd};
+        use coremidi_sys::{MIDIPacketListInit, MIDIPacketListAdd};
 
         // allocate a buffer on the stack for building the list using native methods
         const BUFFER_SIZE: usize = 65536; // maximum allowed size
