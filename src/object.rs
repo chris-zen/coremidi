@@ -23,8 +23,7 @@ use properties::{
     StringProperty, IntegerProperty, BooleanProperty
 };
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
 pub enum ObjectType {
     Other,
     Device,
