@@ -1,10 +1,20 @@
-use core_foundation::string::{CFString, CFStringRef};
-use core_foundation::base::{TCFType, OSStatus};
-use core_foundation::base::{CFGetRetainCount, CFTypeRef, CFIndex};
+use core_foundation::{
+    string::{
+        CFString, 
+        CFStringRef,
+    },
+    base::{
+        CFGetRetainCount,
+        CFTypeRef,
+        CFIndex, 
+        OSStatus,
+        TCFType,
+    }
+};
 
 use coremidi_sys::*;
 
-use std::mem;
+use std::mem::MaybeUninit;
 
 use {
     Object,
@@ -66,15 +76,15 @@ impl StringProperty {
 impl<T> PropertyGetter<T> for StringProperty where T: From<String> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
         let property_key = self.0.as_string_ref();
-        let mut string_ref: CFStringRef = unsafe { mem::uninitialized() };
+        let mut string_ref = MaybeUninit::uninit();
         let status = unsafe {
-            MIDIObjectGetStringProperty(object.0, property_key, &mut string_ref)
+            MIDIObjectGetStringProperty(object.0, property_key, string_ref.as_mut_ptr())
         };
         result_from_status(status, || {
-            let string: CFString = unsafe {
-                TCFType::wrap_under_create_rule(string_ref)
-            };
-            string.to_string().into()
+            let string_ref = unsafe { string_ref.assume_init() };
+            if string_ref.is_null() { return "".to_string().into() };
+            let cf_string: CFString = unsafe { TCFType::wrap_under_create_rule(string_ref) };
+            cf_string.to_string().into()
         })
     }
 }
@@ -111,11 +121,14 @@ impl IntegerProperty {
 impl<T> PropertyGetter<T> for IntegerProperty where T: From<SInt32> {
     fn value_from(&self, object: &Object) -> Result<T, OSStatus> {
         let property_key = self.0.as_string_ref();
-        let mut value: SInt32 = unsafe { mem::uninitialized() };
+        let mut value = MaybeUninit::uninit();
         let status = unsafe {
-            MIDIObjectGetIntegerProperty(object.0, property_key, &mut value)
+            MIDIObjectGetIntegerProperty(object.0, property_key, value.as_mut_ptr())
         };
-        result_from_status(status, || value.into())
+        result_from_status(status, || {
+            let value = unsafe { value.assume_init() };
+            value.into()
+        })
     }
 }
 
