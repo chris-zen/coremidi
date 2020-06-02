@@ -44,6 +44,12 @@ impl Client {
     /// Creates a new CoreMIDI client with support for notifications.
     /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
     ///
+    /// The notification callback will be called on the [run loop](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html) 
+    /// that was current when this associated function is called.
+    ///
+    /// It follows that this particular run loop needs to be running in order to 
+    /// actually receive notifications. The run loop can be started after the 
+    /// client has been created if need be.
     pub fn new_with_notifications<F>(name: &str, callback: F) -> Result<Client, OSStatus>
         where F: FnMut(&Notification) + Send + 'static
     {

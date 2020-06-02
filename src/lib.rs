@@ -97,8 +97,8 @@ unsafe impl<T> Send for BoxedCallback<T> {}
 
 impl<T> Drop for BoxedCallback<T> {
     fn drop(&mut self) {
-        unsafe {
-            if !self.0.is_null() {
+        if !self.0.is_null() {
+            unsafe {
                 let _ = Box::from_raw(self.0);
             }
         }

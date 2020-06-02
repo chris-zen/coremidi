@@ -82,6 +82,8 @@ These are the provided examples:
 - [receive](examples/receive.rs): how to create an input port and receive MIDI messages.
 - [virtual-source](examples/virtual-source.rs): how to create a virtual source and generate MIDI messages.
 - [virtual-destination](examples/virtual-destination.rs): how to create a virtual destination and receive MIDI messages.
+- [properties](examples/properties.rs): how to set and get properties on MIDI objects.
+- [notifications](examples/notifications.rs): how to receive MIDI client notifications.
 
 # Roadmap
 
