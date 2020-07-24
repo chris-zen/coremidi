@@ -40,7 +40,7 @@ use {
     VirtualDestination,
 };
 
-impl Client {
+impl<'a> Client<'a> {
     /// Creates a new CoreMIDI client with support for notifications.
     /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
     ///
@@ -73,7 +73,7 @@ impl Client {
     /// Creates a new CoreMIDI client.
     /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
     ///
-    pub fn new(name: &str) -> Result<Client, OSStatus> {
+    pub fn new(name: &str) -> Result<Client<'static>, OSStatus> {
         let client_name = CFString::new(name);
         let mut client_ref = MaybeUninit::uninit();
         let status = unsafe {
@@ -112,8 +112,8 @@ impl Client {
     /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
     /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
     ///
-    pub fn input_port<F>(&self, name: &str, callback: F) -> Result<InputPort, OSStatus>
-        where F: FnMut(&PacketList) + Send + 'static
+    pub fn input_port<'b, F>(&self, name: &str, callback: F) -> Result<InputPort<'b>, OSStatus>
+        where F: FnMut(&PacketList) + Send + 'b
     {
         let port_name = CFString::new(name);
         let mut port_ref = MaybeUninit::uninit();
@@ -158,8 +158,8 @@ impl Client {
     /// Creates a virtual destination in the client.
     /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
     ///
-    pub fn virtual_destination<F>(&self, name: &str, callback: F) -> Result<VirtualDestination, OSStatus>
-        where F: FnMut(&PacketList) + Send + 'static 
+    pub fn virtual_destination<'b, F>(&self, name: &str, callback: F) -> Result<VirtualDestination<'b>, OSStatus>
+        where F: FnMut(&PacketList) + Send + 'b
     {
         let virtual_destination_name = CFString::new(name);
         let mut virtual_destination = MaybeUninit::uninit();
@@ -201,7 +201,7 @@ impl Client {
     }
 }
 
-impl Deref for Client {
+impl<'a> Deref for Client<'a> {
     type Target = Object;
 
     fn deref(&self) -> &Object {
@@ -209,7 +209,7 @@ impl Deref for Client {
     }
 }
 
-impl Drop for Client {
+impl<'a> Drop for Client<'a> {
     fn drop(&mut self) {
         unsafe { MIDIClientDispose(self.object.0) };
     }

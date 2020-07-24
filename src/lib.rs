@@ -63,22 +63,22 @@ pub struct Object(MIDIObjectRef);
 /// let client = coremidi::Client::new("example-client").unwrap();
 /// ```
 #[derive(Debug)]
-pub struct Client {
+pub struct Client<'a> {
     // Order is important, object needs to be dropped first
     object: Object,
-    callback: BoxedCallback<Notification>,
+    callback: BoxedCallback<'a, Notification>,
 }
 
 // A lifetime-managed wrapper for callback functions
 #[derive(Debug, PartialEq)]
-struct BoxedCallback<T>(*mut Box<FnMut(&T)>);
+struct BoxedCallback<'a, T>(*mut Box<FnMut(&T) + 'a>);
 
-impl<T> BoxedCallback<T> {
-    fn new<F: FnMut(&T) + Send + 'static>(f: F) -> BoxedCallback<T> {
+impl<'a, T> BoxedCallback<'a, T> {
+    fn new<F: FnMut(&T) + Send + 'a>(f: F) -> BoxedCallback<'a, T> {
         BoxedCallback(Box::into_raw(Box::new(Box::new(f))))
     }
 
-    fn null() -> BoxedCallback<T> {
+    fn null() -> BoxedCallback<'static, T> {
         BoxedCallback(::std::ptr::null_mut())
     }
 
@@ -93,9 +93,9 @@ impl<T> BoxedCallback<T> {
     }
 }
 
-unsafe impl<T> Send for BoxedCallback<T> {}
+unsafe impl<'a, T> Send for BoxedCallback<'a, T> {}
 
-impl<T> Drop for BoxedCallback<T> {
+impl<'a, T> Drop for BoxedCallback<'a, T> {
     fn drop(&mut self) {
         if !self.0.is_null() {
             unsafe {
@@ -138,10 +138,10 @@ pub struct OutputPort { port: Port }
 /// input_port.connect_source(&source);
 /// ```
 #[derive(Debug)]
-pub struct InputPort {
+pub struct InputPort<'a> {
     // Note: the order is important here, port needs to be dropped first
     port: Port,
-    callback: BoxedCallback<PacketList>,
+    callback: BoxedCallback<'a, PacketList>,
 }
 
 /// A MIDI source or source, owned by an entity.
@@ -198,10 +198,10 @@ pub struct VirtualSource { endpoint: Endpoint }
 /// ```
 ///
 #[derive(Debug)]
-pub struct VirtualDestination {
+pub struct VirtualDestination<'a> {
     // Note: the order is important here, endpoint needs to be dropped first
     endpoint: Endpoint,
-    callback: BoxedCallback<PacketList>,
+    callback: BoxedCallback<'a, PacketList>,
 }
 
 /// A [MIDI object](https://developer.apple.com/reference/coremidi/midideviceref).

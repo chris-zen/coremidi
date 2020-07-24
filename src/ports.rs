@@ -51,7 +51,7 @@ impl Deref for OutputPort {
     }
 }
 
-impl InputPort {
+impl<'a> InputPort<'a> {
 
     pub fn connect_source(&self, source: &Source) -> Result<(), OSStatus> {
         let status = unsafe { MIDIPortConnectSource(
@@ -71,7 +71,7 @@ impl InputPort {
     }
 }
 
-impl Deref for InputPort {
+impl<'a> Deref for InputPort<'a> {
     type Target = Port;
 
     fn deref(&self) -> &Port {

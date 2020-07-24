@@ -86,11 +86,11 @@ impl Iterator for DestinationsIterator {
     }
 }
 
-impl VirtualDestination {
+impl<'a> VirtualDestination<'a> {
 
 }
 
-impl Deref for VirtualDestination {
+impl<'a> Deref for VirtualDestination<'a> {
     type Target = Endpoint;
 
     fn deref(&self) -> &Endpoint {
@@ -98,7 +98,7 @@ impl Deref for VirtualDestination {
     }
 }
 
-impl Drop for VirtualDestination {
+impl<'a> Drop for VirtualDestination<'a> {
     fn drop(&mut self) {
         unsafe { MIDIEndpointDispose(self.endpoint.object.0) };
     }
