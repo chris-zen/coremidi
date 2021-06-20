@@ -8,7 +8,7 @@ fn main() {
         println!("[{}] {}", i, display_name);
     }
 
-    println!("");
+    println!();
     println!("System sources:");
 
     for (i, source) in coremidi::Sources.into_iter().enumerate() {
@@ -18,5 +18,7 @@ fn main() {
 }
 
 fn get_display_name(endpoint: &coremidi::Endpoint) -> String {
-    endpoint.display_name().unwrap_or("[Unknown Display Name]".to_string())
+    endpoint
+        .display_name()
+        .unwrap_or_else(|| "[Unknown Display Name]".to_string())
 }

@@ -1,12 +1,9 @@
-use coremidi_sys::{
-    MIDITimeStamp, MIDIPacket, MIDIPacketNext
-};
+use coremidi_sys::MIDIPacketList;
+use coremidi_sys::{MIDIPacket, MIDIPacketNext, MIDITimeStamp};
 
 use std::fmt;
-use std::slice;
 use std::ops::{Deref, DerefMut};
-
-use {PacketList, PacketListInner};
+use std::slice;
 
 pub type Timestamp = u64;
 
@@ -34,7 +31,7 @@ pub struct Packet {
     //       This type must NOT implement `Copy`!
     //       On ARM, this must be 4-byte aligned.
     inner: PacketInner,
-    _alignment_marker: alignment::Marker
+    _alignment_marker: alignment::Marker,
 }
 
 #[repr(packed)]
@@ -80,17 +77,23 @@ impl Packet {
 
 impl fmt::Debug for Packet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let result = write!(f, "Packet(ptr={:x}, ts={:016x}, data=[",
-                            self as *const _ as usize, self.timestamp() as u64);
-        let result = self.data().iter().enumerate().fold(result, |prev_result, (i, b)| {
-            match prev_result {
+        let result = write!(
+            f,
+            "Packet(ptr={:x}, ts={:016x}, data=[",
+            self as *const _ as usize,
+            self.timestamp() as u64
+        );
+        let result = self
+            .data()
+            .iter()
+            .enumerate()
+            .fold(result, |prev_result, (i, b)| match prev_result {
                 Err(err) => Err(err),
                 Ok(()) => {
                     let sep = if i > 0 { ", " } else { "" };
                     write!(f, "{}{:02x}", sep, b)
                 }
-            }
-        });
+            });
         result.and_then(|_| write!(f, "])"))
     }
 }
@@ -98,16 +101,46 @@ impl fmt::Debug for Packet {
 impl fmt::Display for Packet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let result = write!(f, "{:016x}:", self.timestamp());
-        self.data().iter().fold(result, |prev_result, b| {
-            match prev_result {
+        self.data()
+            .iter()
+            .fold(result, |prev_result, b| match prev_result {
                 Err(err) => Err(err),
-                Ok(()) => write!(f, " {:02x}", b)
-            }
-        })
+                Ok(()) => write!(f, " {:02x}", b),
+            })
+    }
+}
+
+/// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
+///
+#[repr(C)]
+pub struct PacketList {
+    // NOTE: This type must only exist in the form of immutable references
+    //       pointing to valid instances of MIDIPacketList.
+    //       This type must NOT implement `Copy`!
+    inner: PacketListInner,
+    _do_not_construct: alignment::Marker,
+}
+
+#[repr(packed)]
+struct PacketListInner {
+    num_packets: u32,
+    data: [MIDIPacket; 0],
+}
+
+impl PacketList {
+    /// For internal usage only.
+    /// Requires this instance to actually point to a valid MIDIPacketList
+    pub(crate) unsafe fn as_ptr(&self) -> *mut MIDIPacketList {
+        self as *const PacketList as *mut PacketList as *mut MIDIPacketList
     }
 }
 
 impl PacketList {
+    /// Check if the packet list is empty.
+    ///
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 
     /// Get the number of packets in the list.
     ///
@@ -117,10 +150,10 @@ impl PacketList {
 
     /// Get an iterator for the packets in the list.
     ///
-    pub fn iter<'a>(&'a self) -> PacketListIterator<'a> {
+    pub fn iter(&self) -> PacketListIterator {
         PacketListIterator {
             count: self.len(),
-            packet_ptr: self.inner.data.as_ptr(),
+            packet_ptr: std::ptr::addr_of!(self.inner.data) as *const MIDIPacket,
             _phantom: ::std::marker::PhantomData::default(),
         }
     }
@@ -128,16 +161,19 @@ impl PacketList {
 
 impl fmt::Debug for PacketList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let result = write!(f, "PacketList(ptr={:x}, packets=[", unsafe { self.as_ptr() as usize });
-        self.iter().enumerate().fold(result, |prev_result, (i, packet)| {
-            match prev_result {
+        let result = write!(f, "PacketList(ptr={:x}, packets=[", unsafe {
+            self.as_ptr() as usize
+        });
+        self.iter()
+            .enumerate()
+            .fold(result, |prev_result, (i, packet)| match prev_result {
                 Err(err) => Err(err),
                 Ok(()) => {
                     let sep = if i != 0 { ", " } else { "" };
                     write!(f, "{}{:?}", sep, packet)
                 }
-            }
-        }).and_then(|_| write!(f, "])"))
+            })
+            .and_then(|_| write!(f, "])"))
     }
 }
 
@@ -145,12 +181,11 @@ impl fmt::Display for PacketList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let num_packets = self.inner.num_packets;
         let result = write!(f, "PacketList(len={})", num_packets);
-        self.iter().fold(result, |prev_result, packet| {
-            match prev_result {
+        self.iter()
+            .fold(result, |prev_result, packet| match prev_result {
                 Err(err) => Err(err),
-                Ok(()) => write!(f, "\n  {}", packet)
-            }
-        })
+                Ok(()) => write!(f, "\n  {}", packet),
+            })
     }
 }
 
@@ -169,16 +204,15 @@ impl<'a> Iterator for PacketListIterator<'a> {
             self.count -= 1;
             self.packet_ptr = unsafe { MIDIPacketNext(self.packet_ptr) };
             Some(packet)
-        }
-        else {
+        } else {
             None
         }
     }
 }
 
-const PACKET_LIST_HEADER_SIZE: usize = 4;  // MIDIPacketList::numPackets: UInt32
+const PACKET_LIST_HEADER_SIZE: usize = 4; // MIDIPacketList::numPackets: UInt32
 const PACKET_HEADER_SIZE: usize = 8 +      // MIDIPacket::timeStamp: MIDITimeStamp/UInt64
-                                  2;       // MIDIPacket::length: UInt16
+                                  2; // MIDIPacket::length: UInt16
 
 const INLINE_PACKET_BUFFER_SIZE: usize = 28; // must be divisible by 4
 
@@ -188,11 +222,10 @@ enum PacketBufferStorage {
     Inline([u32; INLINE_PACKET_BUFFER_SIZE / 4]),
     /// External is used whenever the size of the data exceeds INLINE_PACKET_BUFFER_SIZE.
     /// This means that the size of the contained vector is always greater than INLINE_PACKET_BUFFER_SIZE.
-    External(Vec<u32>)
+    External(Vec<u32>),
 }
 
 impl PacketBufferStorage {
-
     #[inline]
     pub fn with_capacity(capacity: usize) -> PacketBufferStorage {
         if capacity <= INLINE_PACKET_BUFFER_SIZE {
@@ -200,7 +233,9 @@ impl PacketBufferStorage {
         } else {
             let u32_len = ((capacity - 1) / 4) + 1;
             let mut buffer = Vec::with_capacity(u32_len);
-            unsafe { buffer.set_len(u32_len); }
+            unsafe {
+                buffer.set_len(u32_len);
+            }
             PacketBufferStorage::External(buffer)
         }
     }
@@ -209,7 +244,7 @@ impl PacketBufferStorage {
     fn capacity(&self) -> usize {
         match *self {
             PacketBufferStorage::Inline(ref inline) => inline.len() * 4,
-            PacketBufferStorage::External(ref vec) => vec.len() * 4
+            PacketBufferStorage::External(ref vec) => vec.len() * 4,
         }
     }
 
@@ -217,10 +252,12 @@ impl PacketBufferStorage {
     fn get_slice(&self) -> &[u8] {
         unsafe {
             match *self {
-                PacketBufferStorage::Inline(ref inline) =>
-                    slice::from_raw_parts(inline.as_ptr() as *const u8, inline.len() * 4),
-                PacketBufferStorage::External(ref vec) =>
+                PacketBufferStorage::Inline(ref inline) => {
+                    slice::from_raw_parts(inline.as_ptr() as *const u8, inline.len() * 4)
+                }
+                PacketBufferStorage::External(ref vec) => {
                     slice::from_raw_parts(vec.as_ptr() as *const u8, vec.len() * 4)
+                }
             }
         }
     }
@@ -229,10 +266,12 @@ impl PacketBufferStorage {
     fn get_slice_mut(&mut self) -> &mut [u8] {
         unsafe {
             match *self {
-                PacketBufferStorage::Inline(ref mut inline) =>
-                    slice::from_raw_parts_mut(inline.as_mut_ptr() as *mut u8, inline.len() * 4),
-                PacketBufferStorage::External(ref mut vec) =>
+                PacketBufferStorage::Inline(ref mut inline) => {
+                    slice::from_raw_parts_mut(inline.as_mut_ptr() as *mut u8, inline.len() * 4)
+                }
+                PacketBufferStorage::External(ref mut vec) => {
                     slice::from_raw_parts_mut(vec.as_mut_ptr() as *mut u8, vec.len() * 4)
+                }
             }
         }
     }
@@ -274,7 +313,7 @@ impl PacketBufferStorage {
                 v.extend_from_slice(inline);
                 v.set_len(vec_capacity);
                 Some(v)
-            },
+            }
             PacketBufferStorage::External(ref mut vec) => {
                 let current_len = vec.len();
                 vec.reserve(vec_capacity - current_len);
@@ -316,7 +355,7 @@ impl DerefMut for PacketBufferStorage {
 ///
 pub struct PacketBuffer {
     storage: PacketBufferStorage,
-    last_packet_offset: usize
+    last_packet_offset: usize,
 }
 
 impl Deref for PacketBuffer {
@@ -346,7 +385,9 @@ impl PacketBuffer {
         let mut storage = PacketBufferStorage::with_capacity(capacity);
         storage.deref_mut().inner.num_packets = 1;
         let last_packet_offset = PACKET_LIST_HEADER_SIZE;
-        unsafe { storage.assign_packet(last_packet_offset, time, data); }
+        unsafe {
+            storage.assign_packet(last_packet_offset, time, data);
+        }
 
         PacketBuffer {
             storage,
@@ -404,10 +445,11 @@ impl PacketBuffer {
         if can_merge {
             let new_packet_size = Self::packet_size(previous_data_len + data.len());
             unsafe {
-                self.storage.ensure_capacity(self.last_packet_offset + new_packet_size);
+                self.storage
+                    .ensure_capacity(self.last_packet_offset + new_packet_size);
                 self.storage.extend_packet(self.last_packet_offset, data);
             }
-        } else  {
+        } else {
             let packet_size = Self::packet_size(data.len());
             let next_offset = self.next_packet_offset();
             unsafe {
@@ -436,13 +478,12 @@ impl PacketBuffer {
             let previous_packet = self.last_packet();
             let previous_packet_data = previous_packet.data();
             let previous_data_len = previous_packet_data.len();
-            let can_merge =
-                previous_packet.timestamp() == time &&
-                Self::not_sysex(data) &&
-                Self::has_status_byte(data) &&
-                Self::not_sysex(previous_packet_data) &&
-                Self::has_status_byte(previous_packet_data) &&
-                previous_data_len + data.len() < MAX_PACKET_DATA_LENGTH;
+            let can_merge = previous_packet.timestamp() == time
+                && Self::not_sysex(data)
+                && Self::has_status_byte(data)
+                && Self::not_sysex(previous_packet_data)
+                && Self::has_status_byte(previous_packet_data)
+                && previous_data_len + data.len() < MAX_PACKET_DATA_LENGTH;
 
             (can_merge, previous_data_len)
         }
@@ -504,33 +545,40 @@ impl PacketBuffer {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use coremidi_sys::{MIDIPacketList, MIDITimeStamp};
     use std::mem;
-    use coremidi_sys::{MIDITimeStamp, MIDIPacketList};
-    use PacketList;
-    use PacketBuffer;
-    use Packet;
-    use super::{PACKET_HEADER_SIZE, PACKET_LIST_HEADER_SIZE, INLINE_PACKET_BUFFER_SIZE, PacketBufferStorage};
 
     #[test]
     pub fn packet_struct_layout() {
-        let expected_align = if super::alignment::NEEDS_ALIGNMENT { 4 } else { 1 };
+        let expected_align = if super::alignment::NEEDS_ALIGNMENT {
+            4
+        } else {
+            1
+        };
         assert_eq!(expected_align, mem::align_of::<Packet>());
         assert_eq!(expected_align, mem::align_of::<PacketList>());
 
         let dummy_packet: Packet = unsafe { mem::zeroed() };
         let ptr = &dummy_packet as *const _ as *const u8;
-        assert_eq!(PACKET_HEADER_SIZE, dummy_packet.inner.data.as_ptr() as usize - ptr as usize);
+        assert_eq!(
+            PACKET_HEADER_SIZE,
+            dummy_packet.inner.data.as_ptr() as usize - ptr as usize
+        );
 
         let dummy_packet_list: PacketList = unsafe { mem::zeroed() };
         let ptr = &dummy_packet_list as *const _ as *const u8;
-        assert_eq!(PACKET_LIST_HEADER_SIZE, dummy_packet_list.inner.data.as_ptr() as usize - ptr as usize);
+        assert_eq!(
+            PACKET_LIST_HEADER_SIZE,
+            std::ptr::addr_of!(dummy_packet_list.inner.data) as usize - ptr as usize
+        );
     }
 
     #[test]
     pub fn single_packet_alloc_inline() {
         let packet_buf = PacketBuffer::new(42, &[0x90u8, 0x40, 0x7f]);
         if let PacketBufferStorage::External(_) = packet_buf.storage {
-            assert!(false, "A single 3-byte message must not be allocated externally")
+            panic!("A single 3-byte message must not be allocated externally")
         }
     }
 
@@ -538,7 +586,10 @@ mod tests {
     fn packet_buffer_deref() {
         let packet_buf = PacketBuffer::new(42, &[0x90u8, 0x40, 0x7f]);
         let packet_list: &PacketList = &packet_buf;
-        assert_eq!(unsafe { packet_list.as_ptr() as *const MIDIPacketList }, packet_buf.storage.get_slice().as_ptr() as *const _ as *const MIDIPacketList);
+        assert_eq!(
+            unsafe { packet_list.as_ptr() as *const MIDIPacketList },
+            packet_buf.storage.get_slice().as_ptr() as *const _ as *const MIDIPacketList
+        );
     }
 
     #[test]
@@ -588,85 +639,97 @@ mod tests {
     #[test]
     fn compare_equal_timestamps() {
         // these messages should be merged into a single packet
-        unsafe { compare_packet_list(vec![
-            (42, vec![0x90, 0x40, 0x7f]),
-            (42, vec![0x90, 0x41, 0x7f]),
-            (42, vec![0x90, 0x42, 0x7f])
-        ]) }
+        unsafe {
+            compare_packet_list(vec![
+                (42, vec![0x90, 0x40, 0x7f]),
+                (42, vec![0x90, 0x41, 0x7f]),
+                (42, vec![0x90, 0x42, 0x7f]),
+            ])
+        }
     }
 
     #[test]
     fn compare_unequal_timestamps() {
-        unsafe { compare_packet_list(vec![
-            (42, vec![0x90, 0x40, 0x7f]),
-            (43, vec![0x90, 0x40, 0x7f]),
-            (44, vec![0x90, 0x40, 0x7f])
-        ]) }
+        unsafe {
+            compare_packet_list(vec![
+                (42, vec![0x90, 0x40, 0x7f]),
+                (43, vec![0x90, 0x40, 0x7f]),
+                (44, vec![0x90, 0x40, 0x7f]),
+            ])
+        }
     }
 
     #[test]
     fn compare_sysex() {
         // the sysex must not be merged with the surrounding packets
-        unsafe { compare_packet_list(vec![
-            (42, vec![0x90, 0x40, 0x7f]),
-            (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01, 0x01, 0xF7]), // sysex
-            (42, vec![0x90, 0x41, 0x7f])
-        ]) }
+        unsafe {
+            compare_packet_list(vec![
+                (42, vec![0x90, 0x40, 0x7f]),
+                (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01, 0x01, 0xF7]), // sysex
+                (42, vec![0x90, 0x41, 0x7f]),
+            ])
+        }
     }
 
     #[test]
     fn compare_sysex_split() {
         // the sysex must not be merged with the surrounding packets
-        unsafe { compare_packet_list(vec![
-            (42, vec![0x90, 0x40, 0x7f]),
-            (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01]), // sysex part 1
-            (42, vec![0x01, 0xF7]), // sysex part 2
-            (42, vec![0x90, 0x41, 0x7f])
-        ]) }
+        unsafe {
+            compare_packet_list(vec![
+                (42, vec![0x90, 0x40, 0x7f]),
+                (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01]), // sysex part 1
+                (42, vec![0x01, 0xF7]),                   // sysex part 2
+                (42, vec![0x90, 0x41, 0x7f]),
+            ])
+        }
     }
 
     #[test]
     fn compare_sysex_split2() {
         // the sysex must not be merged with the surrounding packets
-        unsafe { compare_packet_list(vec![
-            (42, vec![0x90, 0x40, 0x7f]),
-            (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01]), // sysex part 1
-            (42, vec![0x01, 0x01, 0x01]), // sysex part 2
-            (42, vec![0x01, 0xF7]), // sysex part 3
-            (42, vec![0x90, 0x41, 0x7f])
-        ]) }
+        unsafe {
+            compare_packet_list(vec![
+                (42, vec![0x90, 0x40, 0x7f]),
+                (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01]), // sysex part 1
+                (42, vec![0x01, 0x01, 0x01]),             // sysex part 2
+                (42, vec![0x01, 0xF7]),                   // sysex part 3
+                (42, vec![0x90, 0x41, 0x7f]),
+            ])
+        }
     }
 
     #[test]
     fn compare_sysex_malformed() {
         // the sysex must not be merged with the surrounding packets
-        unsafe { compare_packet_list(vec![
-            (42, vec![0x90, 0x40, 0x7f]),
-            (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01]), // sysex part 1
-            (42, vec![0x01, 0x01, 0x01]), // sysex part 2
-            //(42, vec![0x01, 0xF7]), // sysex part 3 (missing)
-            (42, vec![0x90, 0x41, 0x7f])
-        ]) }
+        unsafe {
+            compare_packet_list(vec![
+                (42, vec![0x90, 0x40, 0x7f]),
+                (42, vec![0xF0, 0x01, 0x01, 0x01, 0x01]), // sysex part 1
+                (42, vec![0x01, 0x01, 0x01]),             // sysex part 2
+                //(42, vec![0x01, 0xF7]), // sysex part 3 (missing)
+                (42, vec![0x90, 0x41, 0x7f]),
+            ])
+        }
     }
 
     #[test]
     fn compare_sysex_long() {
         let mut sysex = vec![0xF0];
-        for _ in 0..300 {
-            sysex.push(0x01);
-        }
+        sysex.resize(301, 0x01);
         sysex.push(0xF7);
-        unsafe { compare_packet_list(vec![
-            (42, vec![0x90, 0x40, 0x7f]),
-            (43, vec![0x90, 0x41, 0x7f]),
-            (43, sysex)
-        ]) }
+        unsafe {
+            compare_packet_list(vec![
+                (42, vec![0x90, 0x40, 0x7f]),
+                (43, vec![0x90, 0x41, 0x7f]),
+                (43, sysex),
+            ])
+        }
     }
 
     /// Compares the results of building a PacketList using our PacketBuffer API
     /// and the native API (MIDIPacketListAdd, etc).
     unsafe fn compare_packet_list(packets: Vec<(MIDITimeStamp, Vec<u8>)>) {
-        use coremidi_sys::{MIDIPacketListInit, MIDIPacketListAdd};
+        use coremidi_sys::{MIDIPacketListAdd, MIDIPacketListInit};
 
         // allocate a buffer on the stack for building the list using native methods
         const BUFFER_SIZE: usize = 65536; // maximum allowed size
@@ -676,7 +739,14 @@ mod tests {
         // build the list
         let mut pkt_ptr = MIDIPacketListInit(pkt_list_ptr);
         for pkt in &packets {
-            pkt_ptr = MIDIPacketListAdd(pkt_list_ptr, BUFFER_SIZE as u64, pkt_ptr, pkt.0, pkt.1.len() as u64, pkt.1.as_ptr());
+            pkt_ptr = MIDIPacketListAdd(
+                pkt_list_ptr,
+                BUFFER_SIZE as u64,
+                pkt_ptr,
+                pkt.0,
+                pkt.1.len() as u64,
+                pkt.1.as_ptr(),
+            );
             assert!(!pkt_ptr.is_null());
         }
         let list_native = &*(pkt_list_ptr as *const _ as *const PacketList);
@@ -689,13 +759,31 @@ mod tests {
 
         // print buffer contents for debugging purposes
         let packet_buf_slice = packet_buf.storage.get_slice();
-        println!("\nbuffer: {:?}", packet_buf_slice);
-        println!("\nnative: {:?}", &buffer[0..packet_buf_slice.len()]);
+        println!(
+            "\nbuffer: {:?}",
+            packet_buf_slice
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<Vec<String>>()
+                .join(" ")
+        );
+        println!(
+            "\nnative: {:?}",
+            buffer[0..packet_buf_slice.len()]
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<Vec<String>>()
+                .join(" ")
+        );
 
         let list: &PacketList = &packet_buf;
 
         // check if the contents match
-        assert_eq!(list_native.len(), list.len(), "PacketList lengths must match");
+        assert_eq!(
+            list_native.len(),
+            list.len(),
+            "PacketList lengths must match"
+        );
         for (n, p) in list_native.iter().zip(list.iter()) {
             assert_eq!(n.data(), p.data());
         }

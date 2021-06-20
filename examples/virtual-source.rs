@@ -1,7 +1,7 @@
 extern crate coremidi;
 
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 fn main() {
     let client = coremidi::Client::new("Example Client").unwrap();
@@ -22,17 +22,11 @@ fn main() {
 }
 
 fn create_note_on(channel: u8, note: u8, velocity: u8) -> coremidi::PacketBuffer {
-    let data = &[
-        0x90 | (channel & 0x0f),
-        note & 0x7f,
-        velocity & 0x7f];
+    let data = &[0x90 | (channel & 0x0f), note & 0x7f, velocity & 0x7f];
     coremidi::PacketBuffer::new(0, data)
 }
 
 fn create_note_off(channel: u8, note: u8, velocity: u8) -> coremidi::PacketBuffer {
-    let data = &[
-        0x80 | (channel & 0x0f),
-        note & 0x7f,
-        velocity & 0x7f];
+    let data = &[0x80 | (channel & 0x0f), note & 0x7f, velocity & 0x7f];
     coremidi::PacketBuffer::new(0, data)
 }
