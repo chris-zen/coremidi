@@ -15,5 +15,4 @@ edition = "2018"
 [dependencies]
 core-foundation-sys = "0.8.2"
 core-foundation = "0.9.1"
-# coremidi-sys = "3.0.1"
-coremidi-sys = { git = "https://github.com/chris-zen/coremidi-sys.git", branch = "patch-1" }
+coremidi-sys = "3.0.1"
