@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  push:
+    tags: [ "*" ]
+
+jobs:
+  docs:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+      - uses: Swatinem/rust-cache@v1
+
+      - name: Run cargo doc
+        uses: actions-rs/cargo@v1
+        with:
+          command: doc
+
+      - name: Override index.html
+        run: |
+          REPO_NAME=$(echo ${{ github.repository }} | cut -d '/' -f 2)
+          echo "<meta http-equiv=refresh content=0;url=${REPO_NAME}/index.html>" > target/doc/index.html
+
+      - name: Publish into Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/doc
+      
+      - name: Login into crates.io
+        run: cargo login ${CRATES_TOKEN}
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_TOKEN }}
+      - name: Publish into crates.io
+        run: cargo publish
+
