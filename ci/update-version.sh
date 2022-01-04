@@ -4,4 +4,4 @@ set -ex
 
 VERSION=${TRAVIS_TAG:-$(git describe --tags)}
 
-sed -i '' "s/version = \"0.0.0\"/version = \"$VERSION\"/g" Cargo.toml
+sed -i '' "s/version = \".*\"/version = \"$VERSION\"/g" Cargo.toml

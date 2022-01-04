@@ -1,12 +1,6 @@
 extern crate coremidi;
 
-use coremidi::{
-    Client,
-    PacketList,
-    Properties,
-    PropertyGetter,
-    PropertySetter, 
-};
+use coremidi::{Client, PacketList, Properties, PropertyGetter, PropertySetter};
 
 fn main() {
     let client = Client::new("Example Client").unwrap();
@@ -16,7 +10,9 @@ fn main() {
     };
 
     // Creates a virtual destination, then gets its properties
-    let destination = client.virtual_destination("Example Destination", callback).unwrap();
+    let destination = client
+        .virtual_destination("Example Destination", callback)
+        .unwrap();
 
     println!("Created Virtual Destination...");
 
