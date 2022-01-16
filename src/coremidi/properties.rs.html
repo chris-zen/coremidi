@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/properties.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>properties.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../coremidi/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;properties.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>properties.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../coremidi/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -504,62 +505,52 @@
 <span id="504">504</span>
 <span id="505">505</span>
 <span id="506">506</span>
-</pre><div class="example-wrap"><pre class="rust ">
+<span id="507">507</span>
+<span id="508">508</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
+
 <span class="kw">use</span> <span class="ident">core_foundation</span>::{
-    <span class="ident">string</span>::{
-        <span class="ident">CFString</span>, 
-        <span class="ident">CFStringRef</span>,
-    },
-    <span class="ident">base</span>::{
-        <span class="ident">CFGetRetainCount</span>,
-        <span class="ident">CFTypeRef</span>,
-        <span class="ident">CFIndex</span>, 
-        <span class="ident">OSStatus</span>,
-        <span class="ident">TCFType</span>,
-    }
+    <span class="ident">base</span>::{<span class="ident">CFGetRetainCount</span>, <span class="ident">CFIndex</span>, <span class="ident">CFTypeRef</span>, <span class="ident">OSStatus</span>, <span class="ident">TCFType</span>},
+    <span class="ident">string</span>::{<span class="ident">CFString</span>, <span class="ident">CFStringRef</span>},
 };
 
 <span class="kw">use</span> <span class="ident">coremidi_sys</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>;
-
-<span class="kw">use</span> {
-    <span class="ident">Object</span>,
-    <span class="ident">result_from_status</span>,
-    <span class="ident">unit_result_from_status</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">object::Object</span>, <span class="ident">result_from_status</span>, <span class="ident">unit_result_from_status</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PropertyGetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PropertySetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Because Property structs can be constructed from strings that have been</span>
-<span class="doccomment">/// passed in from the user or are constants CFStringRefs from CoreMidi, we </span>
+<span class="doccomment">/// passed in from the user or are constants CFStringRefs from CoreMidi, we</span>
 <span class="doccomment">/// need to abstract over how we store their keys.</span>
 <span class="kw">enum</span> <span class="ident">PropertyKeyStorage</span> {
     <span class="ident">Owned</span>(<span class="ident">CFString</span>),
-    <span class="ident">Constant</span>(<span class="ident">CFStringRef</span>)
+    <span class="ident">Constant</span>(<span class="ident">CFStringRef</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">PropertyKeyStorage</span> {
     <span class="doccomment">/// Return a raw CFStringRef pointing to this property key</span>
-    <span class="kw">fn</span> <span class="ident">as_string_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">CFStringRef</span> {
+    <span class="kw">fn</span> <span class="ident">as_string_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFStringRef</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PropertyKeyStorage</span>::<span class="ident">Owned</span>(<span class="ident">owned</span>) <span class="op">=&gt;</span> <span class="ident">owned</span>.<span class="ident">as_concrete_TypeRef</span>(),
-            <span class="ident">PropertyKeyStorage</span>::<span class="ident">Constant</span>(<span class="ident">constant</span>) <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">constant</span>,
+            <span class="ident">PropertyKeyStorage::Owned</span>(<span class="ident">owned</span>) =&gt; <span class="ident">owned</span>.<span class="ident">as_concrete_TypeRef</span>(),
+            <span class="ident">PropertyKeyStorage::Constant</span>(<span class="ident">constant</span>) =&gt; <span class="kw-2">*</span><span class="ident">constant</span>,
         }
     }
 
     <span class="doccomment">/// For checking the retain count when debugging</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">retain_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">CFIndex</span> {
+    <span class="kw">fn</span> <span class="ident">retain_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFIndex</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PropertyKeyStorage</span>::<span class="ident">Owned</span>(<span class="ident">owned</span>) <span class="op">=&gt;</span> <span class="ident">owned</span>.<span class="ident">retain_count</span>(),
-            <span class="ident">PropertyKeyStorage</span>::<span class="ident">Constant</span>(<span class="ident">constant</span>) <span class="op">=&gt;</span> <span class="kw">unsafe</span> { <span class="ident">CFGetRetainCount</span>(<span class="kw-2">*</span><span class="ident">constant</span> <span class="kw">as</span> <span class="ident">CFTypeRef</span>) },
+            <span class="ident">PropertyKeyStorage::Owned</span>(<span class="ident">owned</span>) =&gt; <span class="ident">owned</span>.<span class="ident">retain_count</span>(),
+            <span class="ident">PropertyKeyStorage::Constant</span>(<span class="ident">constant</span>) =&gt; <span class="kw">unsafe</span> {
+                <span class="ident">CFGetRetainCount</span>(<span class="kw-2">*</span><span class="ident">constant</span> <span class="kw">as</span> <span class="ident">CFTypeRef</span>)
+            },
         }
     }
 }
@@ -569,42 +560,47 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StringProperty</span>(<span class="ident">PropertyKeyStorage</span>);
 
 <span class="kw">impl</span> <span class="ident">StringProperty</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">StringProperty</span>(<span class="ident">PropertyKeyStorage</span>::<span class="ident">Owned</span>(<span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>)))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">StringProperty</span>(<span class="ident">PropertyKeyStorage::Owned</span>(<span class="ident">CFString::new</span>(<span class="ident">name</span>)))
     }
 
     <span class="doccomment">/// Note: Should only be used internally with predefined CoreMidi constants,</span>
     <span class="doccomment">/// since it does not bump the retain count of the CFStringRef.</span>
-    <span class="kw">fn</span> <span class="ident">from_constant_string_ref</span>(<span class="ident">string_ref</span>: <span class="ident">CFStringRef</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">StringProperty</span>(<span class="ident">PropertyKeyStorage</span>::<span class="ident">Constant</span>(<span class="ident">string_ref</span>))
+    <span class="kw">fn</span> <span class="ident">from_constant_string_ref</span>(<span class="ident">string_ref</span>: <span class="ident">CFStringRef</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">StringProperty</span>(<span class="ident">PropertyKeyStorage::Constant</span>(<span class="ident">string_ref</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertyGetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringProperty</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertyGetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringProperty</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+{
+    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">property_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_string_ref</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">MIDIObjectGetStringProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">string_ref</span>.<span class="ident">as_mut_ptr</span>())
-        };
-        <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">||</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span>
+            <span class="kw">unsafe</span> { <span class="ident">MIDIObjectGetStringProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">string_ref</span>.<span class="ident">as_mut_ptr</span>()) };
+        <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">string_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">string_ref</span>.<span class="ident">assume_init</span>() };
-            <span class="kw">if</span> <span class="ident">string_ref</span>.<span class="ident">is_null</span>() { <span class="kw">return</span> <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>().<span class="ident">into</span>() };
-            <span class="kw">let</span> <span class="ident">cf_string</span>: <span class="ident">CFString</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">TCFType</span>::<span class="ident">wrap_under_create_rule</span>(<span class="ident">string_ref</span>) };
+            <span class="kw">if</span> <span class="ident">string_ref</span>.<span class="ident">is_null</span>() {
+                <span class="kw">return</span> <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>().<span class="ident">into</span>();
+            };
+            <span class="kw">let</span> <span class="ident">cf_string</span>: <span class="ident">CFString</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">TCFType::wrap_under_create_rule</span>(<span class="ident">string_ref</span>) };
             <span class="ident">cf_string</span>.<span class="ident">to_string</span>().<span class="ident">into</span>()
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertySetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringProperty</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertySetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringProperty</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+{
+    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">property_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_string_ref</span>();
         <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>);
+        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>);
         <span class="kw">let</span> <span class="ident">string_ref</span> <span class="op">=</span> <span class="ident">string</span>.<span class="ident">as_concrete_TypeRef</span>();
-        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">MIDIObjectSetStringProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">string_ref</span>)
-        };
+        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MIDIObjectSetStringProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">string_ref</span>) };
         <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>)
     }
 }
@@ -614,37 +610,40 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntegerProperty</span>(<span class="ident">PropertyKeyStorage</span>);
 
 <span class="kw">impl</span> <span class="ident">IntegerProperty</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">IntegerProperty</span>(<span class="ident">PropertyKeyStorage</span>::<span class="ident">Owned</span>(<span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>)))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">IntegerProperty</span>(<span class="ident">PropertyKeyStorage::Owned</span>(<span class="ident">CFString::new</span>(<span class="ident">name</span>)))
     }
 
     <span class="doccomment">/// Note: Should only be used internally with predefined CoreMidi constants,</span>
     <span class="doccomment">/// since it does not bump the retain count of the CFStringRef.</span>
-    <span class="kw">fn</span> <span class="ident">from_constant_string_ref</span>(<span class="ident">string_ref</span>: <span class="ident">CFStringRef</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">IntegerProperty</span>(<span class="ident">PropertyKeyStorage</span>::<span class="ident">Constant</span>(<span class="ident">string_ref</span>))
+    <span class="kw">fn</span> <span class="ident">from_constant_string_ref</span>(<span class="ident">string_ref</span>: <span class="ident">CFStringRef</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">IntegerProperty</span>(<span class="ident">PropertyKeyStorage::Constant</span>(<span class="ident">string_ref</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertyGetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegerProperty</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SInt32</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertyGetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegerProperty</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SInt32</span><span class="op">&gt;</span>,
+{
+    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">property_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_string_ref</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">MIDIObjectGetIntegerProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">value</span>.<span class="ident">as_mut_ptr</span>())
-        };
-        <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">||</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span>
+            <span class="kw">unsafe</span> { <span class="ident">MIDIObjectGetIntegerProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">value</span>.<span class="ident">as_mut_ptr</span>()) };
+        <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">value</span>.<span class="ident">assume_init</span>() };
             <span class="ident">value</span>.<span class="ident">into</span>()
         })
     }
 }
 
-<span class="kw">impl</span> <span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertySetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegerProperty</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SInt32</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertySetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegerProperty</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SInt32</span><span class="op">&gt;</span>,
+{
+    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">property_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_string_ref</span>();
-        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">MIDIObjectSetIntegerProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">value</span>.<span class="ident">into</span>())
-        };
+        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MIDIObjectSetIntegerProperty</span>(<span class="ident">object</span>.<span class="number">0</span>, <span class="ident">property_key</span>, <span class="ident">value</span>.<span class="ident">into</span>()) };
         <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>)
     }
 }
@@ -654,25 +653,33 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BooleanProperty</span>(<span class="ident">IntegerProperty</span>);
 
 <span class="kw">impl</span> <span class="ident">BooleanProperty</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">BooleanProperty</span>(<span class="ident">IntegerProperty</span>::<span class="ident">new</span>(<span class="ident">name</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">BooleanProperty</span>(<span class="ident">IntegerProperty::new</span>(<span class="ident">name</span>))
     }
 
     <span class="doccomment">/// Note: Should only be used internally with predefined CoreMidi constants,</span>
     <span class="doccomment">/// since it does not bump the retain count of the CFStringRef.</span>
-    <span class="kw">fn</span> <span class="ident">from_constant_string_ref</span>(<span class="ident">string_ref</span>: <span class="ident">CFStringRef</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">BooleanProperty</span>(<span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="ident">string_ref</span>))
+    <span class="kw">fn</span> <span class="ident">from_constant_string_ref</span>(<span class="ident">string_ref</span>: <span class="ident">CFStringRef</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">BooleanProperty</span>(<span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="ident">string_ref</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertyGetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BooleanProperty</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value_from</span>(<span class="ident">object</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span>: <span class="ident">SInt32</span><span class="op">|</span> (<span class="ident">value</span> <span class="op">==</span> <span class="number">1</span>).<span class="ident">into</span>())
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertyGetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BooleanProperty</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+{
+    <span class="kw">fn</span> <span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>
+            .<span class="ident">value_from</span>(<span class="ident">object</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span>: <span class="ident">SInt32</span><span class="op">|</span> (<span class="ident">value</span> <span class="op">==</span> <span class="number">1</span>).<span class="ident">into</span>())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertySetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BooleanProperty</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PropertySetter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BooleanProperty</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+{
+    <span class="kw">fn</span> <span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object</span>: <span class="kw-2">&amp;</span><span class="ident">Object</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">SInt32</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">into</span>() { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> };
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set_value</span>(<span class="ident">object</span>, <span class="ident">value</span>)
     }
@@ -684,219 +691,219 @@
 
 <span class="kw">impl</span> <span class="ident">Properties</span> {
     <span class="doccomment">/// See [kMIDIPropertyName](https://developer.apple.com/reference/coremidi/kmidipropertyname)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>() <span class="op">-&gt;</span> <span class="ident">StringProperty</span> {
-        <span class="ident">StringProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyName</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>() -&gt; <span class="ident">StringProperty</span> {
+        <span class="ident">StringProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyName</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyManufacturer](https://developer.apple.com/reference/coremidi/kmidipropertymanufacturer)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manufacturer</span>() <span class="op">-&gt;</span> <span class="ident">StringProperty</span> {
-        <span class="ident">StringProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyManufacturer</span> }) 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manufacturer</span>() -&gt; <span class="ident">StringProperty</span> {
+        <span class="ident">StringProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyManufacturer</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyModel](https://developer.apple.com/reference/coremidi/kmidipropertymodel)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>() <span class="op">-&gt;</span> <span class="ident">StringProperty</span> {
-        <span class="ident">StringProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyModel</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>() -&gt; <span class="ident">StringProperty</span> {
+        <span class="ident">StringProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyModel</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyUniqueID](https://developer.apple.com/reference/coremidi/kmidipropertyuniqueid)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_id</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyUniqueID</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_id</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyUniqueID</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyDeviceID](https://developer.apple.com/reference/coremidi/kmidipropertydeviceid)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> { 
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDeviceID</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDeviceID</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyReceiveChannels](https://developer.apple.com/reference/coremidi/kmidipropertyreceivechannels)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receive_channels</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> { 
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceiveChannels</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receive_channels</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceiveChannels</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyTransmitChannels](https://developer.apple.com/reference/coremidi/kmidipropertytransmitchannels)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmit_channels</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> { 
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitChannels</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmit_channels</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitChannels</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyMaxSysExSpeed](https://developer.apple.com/reference/coremidi/kmidipropertymaxsysexspeed)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_sysex_speed</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyMaxSysExSpeed</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_sysex_speed</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyMaxSysExSpeed</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyAdvanceScheduleTimeMuSec](https://developer.apple.com/reference/coremidi/kMIDIPropertyAdvanceScheduleTimeMuSec)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_schedule_time_musec</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyAdvanceScheduleTimeMuSec</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_schedule_time_musec</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyAdvanceScheduleTimeMuSec</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyIsEmbeddedEntity](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsEmbeddedEntity)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_embedded_entity</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsEmbeddedEntity</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_embedded_entity</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsEmbeddedEntity</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyIsBroadcast](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsBroadcast)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_broadcast</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsBroadcast</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_broadcast</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsBroadcast</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertySingleRealtimeEntity](https://developer.apple.com/reference/coremidi/kMIDIPropertySingleRealtimeEntity)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_realtime_entity</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySingleRealtimeEntity</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_realtime_entity</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySingleRealtimeEntity</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyConnectionUniqueID](https://developer.apple.com/reference/coremidi/kMIDIPropertyConnectionUniqueID)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_unique_id</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyConnectionUniqueID</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_unique_id</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyConnectionUniqueID</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyOffline](https://developer.apple.com/reference/coremidi/kMIDIPropertyOffline)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offline</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyOffline</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offline</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyOffline</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyPrivate](https://developer.apple.com/reference/coremidi/kMIDIPropertyPrivate)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyPrivate</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyPrivate</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyDriverOwner](https://developer.apple.com/reference/coremidi/kMIDIPropertyDriverOwner)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">driver_owner</span>() <span class="op">-&gt;</span> <span class="ident">StringProperty</span> {
-        <span class="ident">StringProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDriverOwner</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">driver_owner</span>() -&gt; <span class="ident">StringProperty</span> {
+        <span class="ident">StringProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDriverOwner</span> })
     }
-    
+
     <span class="comment">// /// See [kMIDIPropertyNameConfiguration](https://developer.apple.com/reference/coremidi/kMIDIPropertyNameConfiguration)</span>
     <span class="comment">// pub fn name_configuration() -&gt; Property { unsafe { Property(kMIDIPropertyNameConfiguration) } }</span>
-    
+
     <span class="comment">// /// See [kMIDIPropertyImage](https://developer.apple.com/reference/coremidi/kMIDIPropertyImage)</span>
     <span class="comment">// pub fn image() -&gt; Property { unsafe { Property(kMIDIPropertyImage) } }</span>
-    
+
     <span class="doccomment">/// See [kMIDIPropertyDriverVersion](https://developer.apple.com/reference/coremidi/kMIDIPropertyDriverVersion)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">driver_version</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDriverVersion</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">driver_version</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDriverVersion</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertySupportsGeneralMIDI](https://developer.apple.com/reference/coremidi/kMIDIPropertySupportsGeneralMIDI)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_general_midi</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySupportsGeneralMIDI</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_general_midi</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySupportsGeneralMIDI</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertySupportsMMC](https://developer.apple.com/reference/coremidi/kMIDIPropertySupportsMMC)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_mmc</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySupportsMMC</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_mmc</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySupportsMMC</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyCanRoute](https://developer.apple.com/reference/coremidi/kMIDIPropertyCanRoute)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_route</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyCanRoute</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_route</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyCanRoute</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyReceivesClock](https://developer.apple.com/reference/coremidi/kMIDIPropertyReceivesClock)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_clock</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesClock</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_clock</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesClock</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyReceivesMTC](https://developer.apple.com/reference/coremidi/kMIDIPropertyReceivesMTC)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_mtc</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesMTC</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_mtc</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesMTC</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyReceivesNotes](https://developer.apple.com/reference/coremidi/kMIDIPropertyReceivesNotes)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_notes</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesNotes</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_notes</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesNotes</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyReceivesProgramChanges](https://developer.apple.com/reference/coremidi/kMIDIPropertyReceivesProgramChanges)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_program_changes</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesProgramChanges</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_program_changes</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesProgramChanges</span> })
     }
-    
+
     <span class="doccomment">/// See [kMIDIPropertyReceivesBankSelectMSB](https://developer.apple.com/reference/coremidi/kMIDIPropertyReceivesBankSelectMSB)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_bank_select_msb</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesBankSelectMSB</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_bank_select_msb</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesBankSelectMSB</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyReceivesBankSelectLSB](https://developer.apple.com/reference/coremidi/kMIDIPropertyReceivesBankSelectLSB)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_bank_select_lsb</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesBankSelectLSB</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receives_bank_select_lsb</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyReceivesBankSelectLSB</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyTransmitsBankSelectMSB](https://developer.apple.com/reference/coremidi/kMIDIPropertyTransmitsBankSelectMSB)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_bank_select_msb</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsBankSelectMSB</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_bank_select_msb</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsBankSelectMSB</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyTransmitsBankSelectLSB](https://developer.apple.com/reference/coremidi/kMIDIPropertyTransmitsBankSelectLSB)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_bank_select_lsb</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsBankSelectLSB</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_bank_select_lsb</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsBankSelectLSB</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyTransmitsClock](https://developer.apple.com/reference/coremidi/kMIDIPropertyTransmitsClock)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_clock</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsClock</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_clock</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsClock</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyTransmitsMTC](https://developer.apple.com/reference/coremidi/kMIDIPropertyTransmitsMTC)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_mtc</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsMTC</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_mtc</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsMTC</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyTransmitsNotes](https://developer.apple.com/reference/coremidi/kMIDIPropertyTransmitsNotes)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_notes</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsNotes</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_notes</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsNotes</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyTransmitsProgramChanges](https://developer.apple.com/reference/coremidi/kMIDIPropertyTransmitsProgramChanges)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_program_changes</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsProgramChanges</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transmits_program_changes</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyTransmitsProgramChanges</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyPanDisruptsStereo](https://developer.apple.com/reference/coremidi/kMIDIPropertyPanDisruptsStereo)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pan_disrupts_stereo</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyPanDisruptsStereo</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pan_disrupts_stereo</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyPanDisruptsStereo</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyIsSampler](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsSampler)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sampler</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsSampler</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sampler</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsSampler</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyIsDrumMachine](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsDrumMachine)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_drum_machine</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsDrumMachine</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_drum_machine</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsDrumMachine</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyIsMixer](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsMixer)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mixer</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> { 
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsMixer</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mixer</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsMixer</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyIsEffectUnit](https://developer.apple.com/reference/coremidi/kMIDIPropertyIsEffectUnit)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_effect_unit</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsEffectUnit</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_effect_unit</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyIsEffectUnit</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyMaxReceiveChannels](https://developer.apple.com/reference/coremidi/kMIDIPropertyMaxReceiveChannels)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_receive_channels</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyMaxReceiveChannels</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_receive_channels</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyMaxReceiveChannels</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyMaxTransmitChannels](https://developer.apple.com/reference/coremidi/kMIDIPropertyMaxTransmitChannels)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_transmit_channels</span>() <span class="op">-&gt;</span> <span class="ident">IntegerProperty</span> {
-        <span class="ident">IntegerProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyMaxTransmitChannels</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_transmit_channels</span>() -&gt; <span class="ident">IntegerProperty</span> {
+        <span class="ident">IntegerProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyMaxTransmitChannels</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyDriverDeviceEditorApp](https://developer.apple.com/reference/coremidi/kMIDIPropertyDriverDeviceEditorApp)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">driver_device_editor_app</span>() <span class="op">-&gt;</span> <span class="ident">StringProperty</span> {
-        <span class="ident">StringProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDriverDeviceEditorApp</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">driver_device_editor_app</span>() -&gt; <span class="ident">StringProperty</span> {
+        <span class="ident">StringProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDriverDeviceEditorApp</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertySupportsShowControl](https://developer.apple.com/reference/coremidi/kMIDIPropertySupportsShowControl)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_show_control</span>() <span class="op">-&gt;</span> <span class="ident">BooleanProperty</span> {
-        <span class="ident">BooleanProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySupportsShowControl</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_show_control</span>() -&gt; <span class="ident">BooleanProperty</span> {
+        <span class="ident">BooleanProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertySupportsShowControl</span> })
     }
 
     <span class="doccomment">/// See [kMIDIPropertyDisplayName](https://developer.apple.com/reference/coremidi/kMIDIPropertyDisplayName)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_name</span>() <span class="op">-&gt;</span> <span class="ident">StringProperty</span> {
-        <span class="ident">StringProperty</span>::<span class="ident">from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDisplayName</span> })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_name</span>() -&gt; <span class="ident">StringProperty</span> {
+        <span class="ident">StringProperty::from_constant_string_ref</span>(<span class="kw">unsafe</span> { <span class="ident">kMIDIPropertyDisplayName</span> })
     }
 }
 
@@ -904,16 +911,13 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> ::{
-        <span class="ident">Client</span>,
-        <span class="ident">VirtualDestination</span>,
-    };
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">endpoints::destinations::VirtualDestination</span>, <span class="ident">Client</span>};
 
     <span class="kw">const</span> <span class="ident">NAME_ORIG</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;A&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">setup</span>() <span class="op">-&gt;</span> (<span class="ident">Client</span>, <span class="ident">VirtualDestination</span>) {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">new</span>(<span class="string">&quot;Test Client&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">dest</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">virtual_destination</span>(<span class="ident">NAME_ORIG</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">fn</span> <span class="ident">setup</span>() -&gt; (<span class="ident">Client</span>, <span class="ident">VirtualDestination</span>) {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="string">&quot;Test Client&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">dest</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">virtual_destination</span>(<span class="ident">NAME_ORIG</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()).<span class="ident">unwrap</span>();
         (<span class="ident">client</span>, <span class="ident">dest</span>)
     }
 
@@ -926,7 +930,7 @@
         <span class="kw">fn</span> <span class="ident">check_get_original</span>(<span class="ident">property</span>: <span class="kw-2">&amp;</span><span class="ident">StringProperty</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="ident">VirtualDestination</span>) {
             <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">value_from</span>(<span class="ident">dest</span>).<span class="ident">unwrap</span>();
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">name</span>, <span class="ident">NAME_ORIG</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">name</span>, <span class="ident">NAME_ORIG</span>);
         }
 
         <span class="comment">// Test setting then getting the &quot;name&quot; property</span>
@@ -934,13 +938,13 @@
             <span class="ident">property</span>.<span class="ident">set_value</span>(<span class="ident">dest</span>, <span class="ident">NAME_MODIFIED</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">value_from</span>(<span class="ident">dest</span>).<span class="ident">unwrap</span>();
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">name</span>, <span class="ident">NAME_MODIFIED</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">name</span>, <span class="ident">NAME_MODIFIED</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">test_from_constant</span>() {
             <span class="kw">let</span> (<span class="ident">_client</span>, <span class="ident">dest</span>) <span class="op">=</span> <span class="ident">setup</span>();
-            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties</span>::<span class="ident">name</span>();
+            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties::name</span>();
 
             <span class="ident">check_get_original</span>(<span class="kw-2">&amp;</span><span class="ident">property</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>);
             <span class="ident">check_roundtrip</span>(<span class="kw-2">&amp;</span><span class="ident">property</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>);
@@ -950,7 +954,7 @@
         <span class="kw">fn</span> <span class="ident">test_new</span>() {
             <span class="kw">let</span> (<span class="ident">_client</span>, <span class="ident">dest</span>) <span class="op">=</span> <span class="ident">setup</span>();
             <span class="comment">// &quot;name&quot; is the value of the CoreMidi constant kMIDIPropertyName</span>
-            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">StringProperty</span>::<span class="ident">new</span>(<span class="string">&quot;name&quot;</span>);
+            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">StringProperty::new</span>(<span class="string">&quot;name&quot;</span>);
 
             <span class="ident">check_get_original</span>(<span class="kw-2">&amp;</span><span class="ident">property</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>);
             <span class="ident">check_roundtrip</span>(<span class="kw-2">&amp;</span><span class="ident">property</span>, <span class="kw-2">&amp;</span><span class="ident">dest</span>);
@@ -966,22 +970,22 @@
         <span class="kw">fn</span> <span class="ident">test_not_set</span>() {
             <span class="kw">let</span> (<span class="ident">_client</span>, <span class="ident">dest</span>) <span class="op">=</span> <span class="ident">setup</span>();
             <span class="comment">// Is not set by default for Virtual Destinations</span>
-            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties</span>::<span class="ident">advance_schedule_time_musec</span>();
+            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties::advance_schedule_time_musec</span>();
 
             <span class="kw">let</span> <span class="ident">value</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>);
 
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">value</span>.<span class="ident">is_err</span>())
+            <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">is_err</span>())
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">test_roundtrip</span>() {
             <span class="kw">let</span> (<span class="ident">_client</span>, <span class="ident">dest</span>) <span class="op">=</span> <span class="ident">setup</span>();
-            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties</span>::<span class="ident">advance_schedule_time_musec</span>();
+            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties::advance_schedule_time_musec</span>();
 
             <span class="ident">property</span>.<span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>, <span class="ident">ADVANCED_SCHEDULE_TIME</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">num</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>).<span class="ident">unwrap</span>();
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">num</span>, <span class="ident">ADVANCED_SCHEDULE_TIME</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">num</span>, <span class="ident">ADVANCED_SCHEDULE_TIME</span>);
         }
     }
 
@@ -992,24 +996,25 @@
         <span class="kw">fn</span> <span class="ident">test_not_set</span>() {
             <span class="kw">let</span> (<span class="ident">_client</span>, <span class="ident">dest</span>) <span class="op">=</span> <span class="ident">setup</span>();
             <span class="comment">// Not set by default on Virtual Destinations</span>
-            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties</span>::<span class="ident">transmits_program_changes</span>();
+            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties::transmits_program_changes</span>();
 
             <span class="kw">let</span> <span class="ident">value</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>);
 
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">value</span>.<span class="ident">is_err</span>())
+            <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">is_err</span>())
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">test_roundtrip</span>() {
             <span class="kw">let</span> (<span class="ident">_client</span>, <span class="ident">dest</span>) <span class="op">=</span> <span class="ident">setup</span>();
-            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties</span>::<span class="ident">private</span>();
-            
+            <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">Properties::private</span>();
+
             <span class="ident">property</span>.<span class="ident">set_value</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">value_from</span>(<span class="kw-2">&amp;</span><span class="ident">dest</span>).<span class="ident">unwrap</span>();
 
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">value</span>, <span class="bool-val">true</span>)
+            <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="bool-val">true</span>);
         }
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "coremidi";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</body></html>
