@@ -33,9 +33,7 @@ jobs:
           publish_dir: target/doc
       
       - name: Login into crates.io
-        run: cargo login ${CRATES_TOKEN}
-        env:
-          CRATES_IO_TOKEN: ${{ secrets.CRATES_TOKEN }}
+        run: cargo login ${{ secrets.CRATES_TOKEN }}
       - name: Publish into crates.io
         run: cargo publish
 
