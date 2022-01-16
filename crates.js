@@ -1,1 +1,0 @@
-window.ALL_CRATES = ["core_foundation","core_foundation_sys","coremidi","coremidi_sys","libc"];

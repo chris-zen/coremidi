@@ -1,5 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;Users&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;coremidi-sys-3.0.1&#x2F;src&#x2F;generated.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>generated.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../coremidi_sys/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/Users/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/coremidi-sys-3.0.1/src/generated.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>generated.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../coremidi_sys/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -943,17 +945,18 @@
 <span id="942">942</span>
 <span id="943">943</span>
 <span id="944">944</span>
-</pre><pre class="rust"><code><span class="comment">/* automatically generated by rust-bindgen */</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">/* automatically generated by rust-bindgen */</span>
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt8</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_uchar</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt16</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_ushort</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt32</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_uint</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SInt32</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_int</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt64</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_ulonglong</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt8</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_uchar</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt16</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_ushort</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt32</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_uint</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SInt32</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_int</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UInt64</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_ulonglong</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OSStatus</span> <span class="op">=</span> <span class="ident">SInt32</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ByteCount</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_ulong</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ItemCount</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_ulong</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Boolean</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_uchar</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ByteCount</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_ulong</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ItemCount</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_ulong</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Boolean</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_uchar</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Byte</span> <span class="op">=</span> <span class="ident">UInt8</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kMIDIInvalidClient</span>: <span class="ident">_bindgen_ty_65</span> <span class="op">=</span> <span class="op">-</span><span class="number">10830</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kMIDIInvalidPort</span>: <span class="ident">_bindgen_ty_65</span> <span class="op">=</span> <span class="op">-</span><span class="number">10831</span>;
@@ -994,20 +997,20 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDIUniqueID</span> <span class="op">=</span> <span class="ident">SInt32</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kMIDIInvalidUniqueID</span>: <span class="ident">_bindgen_ty_67</span> <span class="op">=</span> <span class="number">0</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">_bindgen_ty_67</span> <span class="op">=</span> <span class="ident">u32</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDINotifyProc</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
-    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">message</span>: <span class="kw-2">*const</span> <span class="ident">MIDINotification</span>, <span class="ident">refCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>),
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDINotifyProc</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span>
+    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">message</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">MIDINotification</span>, <span class="ident">refCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>),
 <span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDINotifyBlock</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDIReadProc</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDINotifyBlock</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDIReadProc</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">pktlist</span>: <span class="kw-2">*const</span> <span class="ident">MIDIPacketList</span>,
-        <span class="ident">readProcRefCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>,
-        <span class="ident">srcConnRefCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>,
+        <span class="ident">pktlist</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">MIDIPacketList</span>,
+        <span class="ident">readProcRefCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>,
+        <span class="ident">srcConnRefCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>,
     ),
 <span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDIReadBlock</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDIReadBlock</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MIDICompletionProc</span> <span class="op">=</span>
-    <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">request</span>: <span class="kw-2">*mut</span> <span class="ident">MIDISysexSendRequest</span>)<span class="op">&gt;</span>;
+    ::<span class="ident">std</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">request</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDISysexSendRequest</span>)<span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">packed</span>(<span class="number">4</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MIDIPacket</span> {
     <span class="kw">pub</span> <span class="ident">timeStamp</span>: <span class="ident">MIDITimeStamp</span>,
@@ -1016,44 +1019,44 @@
 }
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">bindgen_test_layout_MIDIPacket</span>() {
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>(),
         <span class="number">268usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIPacket</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacket</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>(),
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIPacket</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacket</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>())).<span class="ident">timeStamp</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>())).<span class="ident">timeStamp</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">0usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIPacket</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacket</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">timeStamp</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">timeStamp</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>())).<span class="ident">length</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>())).<span class="ident">length</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIPacket</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacket</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">length</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">length</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>())).<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacket</span><span class="op">&gt;</span>())).<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">10usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIPacket</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacket</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">data</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">data</span>)
         )
     );
 }
@@ -1064,34 +1067,34 @@
 }
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">bindgen_test_layout_MIDIPacketList</span>() {
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>(),
         <span class="number">272usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIPacketList</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacketList</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>(),
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIPacketList</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacketList</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>())).<span class="ident">numPackets</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>())).<span class="ident">numPackets</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">0usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIPacketList</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacketList</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">numPackets</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">numPackets</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>())).<span class="ident">packet</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIPacketList</span><span class="op">&gt;</span>())).<span class="ident">packet</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIPacketList</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIPacketList</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">packet</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">packet</span>)
         )
     );
 }
@@ -1099,101 +1102,101 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MIDISysexSendRequest</span> {
     <span class="kw">pub</span> <span class="ident">destination</span>: <span class="ident">MIDIEndpointRef</span>,
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">Byte</span>,
+    <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Byte</span>,
     <span class="kw">pub</span> <span class="ident">bytesToSend</span>: <span class="ident">UInt32</span>,
     <span class="kw">pub</span> <span class="ident">complete</span>: <span class="ident">Boolean</span>,
     <span class="kw">pub</span> <span class="ident">reserved</span>: [<span class="ident">Byte</span>; <span class="number">3usize</span>],
     <span class="kw">pub</span> <span class="ident">completionProc</span>: <span class="ident">MIDICompletionProc</span>,
-    <span class="kw">pub</span> <span class="ident">completionRefCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>,
+    <span class="kw">pub</span> <span class="ident">completionRefCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>,
 }
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">bindgen_test_layout_MIDISysexSendRequest</span>() {
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>(),
         <span class="number">40usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>(),
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>))
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">destination</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">destination</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">0usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">destination</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">destination</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">data</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">data</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">bytesToSend</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">bytesToSend</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">16usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">bytesToSend</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">bytesToSend</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">complete</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">complete</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">20usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">complete</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">complete</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">reserved</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">reserved</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">21usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">reserved</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">reserved</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">completionProc</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">completionProc</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">24usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">completionProc</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">completionProc</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">completionRefCon</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDISysexSendRequest</span><span class="op">&gt;</span>())).<span class="ident">completionRefCon</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">32usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDISysexSendRequest</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDISysexSendRequest</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">completionRefCon</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">completionRefCon</span>)
         )
     );
 }
@@ -1214,34 +1217,34 @@
 }
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">bindgen_test_layout_MIDINotification</span>() {
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>(),
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDINotification</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDINotification</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>(),
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDINotification</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDINotification</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">0usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDINotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDINotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageID</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageID</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDINotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> },
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDINotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDINotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageSize</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageSize</span>)
         )
     );
 }
@@ -1257,90 +1260,90 @@
 }
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">bindgen_test_layout_MIDIObjectAddRemoveNotification</span>() {
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>(),
         <span class="number">24usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>(),
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>))
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">0usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageID</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageID</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageSize</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageSize</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">parent</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">parent</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">parent</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">parent</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">parentType</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">parentType</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">12usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">parentType</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">parentType</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">child</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">child</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">16usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">child</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">child</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">childType</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectAddRemoveNotification</span><span class="op">&gt;</span>())).<span class="ident">childType</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">20usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectAddRemoveNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">childType</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">childType</span>)
         )
     );
 }
@@ -1354,85 +1357,85 @@
 }
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">bindgen_test_layout_MIDIObjectPropertyChangeNotification</span>() {
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>(),
         <span class="number">24usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Size of: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>(),
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Alignment of &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">0usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageID</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageID</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageSize</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageSize</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">object</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">object</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">object</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">object</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">objectType</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">objectType</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>
                 <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">12usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">objectType</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">objectType</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">propertyName</span>
-                <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIObjectPropertyChangeNotification</span><span class="op">&gt;</span>())).<span class="ident">propertyName</span>
+                <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">16usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIObjectPropertyChangeNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">propertyName</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">propertyName</span>)
         )
     );
 }
@@ -1446,62 +1449,62 @@
 }
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">bindgen_test_layout_MIDIIOErrorNotification</span>() {
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>(),
         <span class="number">16usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIIOErrorNotification</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Size of: &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIIOErrorNotification</span>))
     );
-    <span class="macro">assert_eq!</span>(
-        <span class="ident">::std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>(),
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
+        ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>(),
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify!</span>(<span class="ident">MIDIIOErrorNotification</span>))
+        <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;Alignment of &quot;</span>, <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIIOErrorNotification</span>))
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">messageID</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">0usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIIOErrorNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIIOErrorNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageID</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageID</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">messageSize</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">4usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIIOErrorNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIIOErrorNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">messageSize</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">messageSize</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">driverDevice</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">driverDevice</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">8usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIIOErrorNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIIOErrorNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">driverDevice</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">driverDevice</span>)
         )
     );
-    <span class="macro">assert_eq!</span>(
+    <span class="macro">assert_eq</span><span class="macro">!</span>(
         <span class="kw">unsafe</span> {
-            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">::std::ptr::null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">errorCode</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(::<span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null</span>::<span class="op">&lt;</span><span class="ident">MIDIIOErrorNotification</span><span class="op">&gt;</span>())).<span class="ident">errorCode</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
         },
         <span class="number">12usize</span>,
-        <span class="macro">concat!</span>(
+        <span class="macro">concat</span><span class="macro">!</span>(
             <span class="string">&quot;Offset of field: &quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">MIDIIOErrorNotification</span>),
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">MIDIIOErrorNotification</span>),
             <span class="string">&quot;::&quot;</span>,
-            <span class="macro">stringify!</span>(<span class="ident">errorCode</span>)
+            <span class="macro">stringify</span><span class="macro">!</span>(<span class="ident">errorCode</span>)
         )
     );
 }
@@ -1650,243 +1653,243 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIClientCreate</span>(
         <span class="ident">name</span>: <span class="ident">CFStringRef</span>,
         <span class="ident">notifyProc</span>: <span class="ident">MIDINotifyProc</span>,
-        <span class="ident">notifyRefCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>,
-        <span class="ident">outClient</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIClientRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">notifyRefCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>,
+        <span class="ident">outClient</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIClientRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIClientCreateWithBlock</span>(
         <span class="ident">name</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outClient</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIClientRef</span>,
+        <span class="ident">outClient</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIClientRef</span>,
         <span class="ident">notifyBlock</span>: <span class="ident">MIDINotifyBlock</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIClientDispose</span>(<span class="ident">client</span>: <span class="ident">MIDIClientRef</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIClientDispose</span>(<span class="ident">client</span>: <span class="ident">MIDIClientRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIInputPortCreate</span>(
         <span class="ident">client</span>: <span class="ident">MIDIClientRef</span>,
         <span class="ident">portName</span>: <span class="ident">CFStringRef</span>,
         <span class="ident">readProc</span>: <span class="ident">MIDIReadProc</span>,
-        <span class="ident">refCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>,
-        <span class="ident">outPort</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIPortRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">refCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>,
+        <span class="ident">outPort</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPortRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIInputPortCreateWithBlock</span>(
         <span class="ident">client</span>: <span class="ident">MIDIClientRef</span>,
         <span class="ident">portName</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outPort</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIPortRef</span>,
+        <span class="ident">outPort</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPortRef</span>,
         <span class="ident">readBlock</span>: <span class="ident">MIDIReadBlock</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIOutputPortCreate</span>(
         <span class="ident">client</span>: <span class="ident">MIDIClientRef</span>,
         <span class="ident">portName</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outPort</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIPortRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">outPort</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPortRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPortDispose</span>(<span class="ident">port</span>: <span class="ident">MIDIPortRef</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPortDispose</span>(<span class="ident">port</span>: <span class="ident">MIDIPortRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPortConnectSource</span>(
         <span class="ident">port</span>: <span class="ident">MIDIPortRef</span>,
         <span class="ident">source</span>: <span class="ident">MIDIEndpointRef</span>,
-        <span class="ident">connRefCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">connRefCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPortDisconnectSource</span>(<span class="ident">port</span>: <span class="ident">MIDIPortRef</span>, <span class="ident">source</span>: <span class="ident">MIDIEndpointRef</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPortDisconnectSource</span>(<span class="ident">port</span>: <span class="ident">MIDIPortRef</span>, <span class="ident">source</span>: <span class="ident">MIDIEndpointRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfDevices</span>() -&gt; <span class="ident">ItemCount</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfDevices</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ItemCount</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetDevice</span>(<span class="ident">deviceIndex0</span>: <span class="ident">ItemCount</span>) -&gt; <span class="ident">MIDIDeviceRef</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetDevice</span>(<span class="ident">deviceIndex0</span>: <span class="ident">ItemCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MIDIDeviceRef</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIDeviceGetNumberOfEntities</span>(<span class="ident">device</span>: <span class="ident">MIDIDeviceRef</span>) -&gt; <span class="ident">ItemCount</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIDeviceGetNumberOfEntities</span>(<span class="ident">device</span>: <span class="ident">MIDIDeviceRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ItemCount</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIDeviceGetEntity</span>(<span class="ident">device</span>: <span class="ident">MIDIDeviceRef</span>, <span class="ident">entityIndex0</span>: <span class="ident">ItemCount</span>) -&gt; <span class="ident">MIDIEntityRef</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIDeviceGetEntity</span>(<span class="ident">device</span>: <span class="ident">MIDIDeviceRef</span>, <span class="ident">entityIndex0</span>: <span class="ident">ItemCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MIDIEntityRef</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetNumberOfSources</span>(<span class="ident">entity</span>: <span class="ident">MIDIEntityRef</span>) -&gt; <span class="ident">ItemCount</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetNumberOfSources</span>(<span class="ident">entity</span>: <span class="ident">MIDIEntityRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ItemCount</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetSource</span>(<span class="ident">entity</span>: <span class="ident">MIDIEntityRef</span>, <span class="ident">sourceIndex0</span>: <span class="ident">ItemCount</span>) -&gt; <span class="ident">MIDIEndpointRef</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetSource</span>(<span class="ident">entity</span>: <span class="ident">MIDIEntityRef</span>, <span class="ident">sourceIndex0</span>: <span class="ident">ItemCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MIDIEndpointRef</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetNumberOfDestinations</span>(<span class="ident">entity</span>: <span class="ident">MIDIEntityRef</span>) -&gt; <span class="ident">ItemCount</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetNumberOfDestinations</span>(<span class="ident">entity</span>: <span class="ident">MIDIEntityRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ItemCount</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetDestination</span>(
         <span class="ident">entity</span>: <span class="ident">MIDIEntityRef</span>,
         <span class="ident">destIndex0</span>: <span class="ident">ItemCount</span>,
-    ) -&gt; <span class="ident">MIDIEndpointRef</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MIDIEndpointRef</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetDevice</span>(<span class="ident">inEntity</span>: <span class="ident">MIDIEntityRef</span>, <span class="ident">outDevice</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIDeviceRef</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEntityGetDevice</span>(<span class="ident">inEntity</span>: <span class="ident">MIDIEntityRef</span>, <span class="ident">outDevice</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIDeviceRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfSources</span>() -&gt; <span class="ident">ItemCount</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfSources</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ItemCount</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetSource</span>(<span class="ident">sourceIndex0</span>: <span class="ident">ItemCount</span>) -&gt; <span class="ident">MIDIEndpointRef</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetSource</span>(<span class="ident">sourceIndex0</span>: <span class="ident">ItemCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MIDIEndpointRef</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfDestinations</span>() -&gt; <span class="ident">ItemCount</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfDestinations</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ItemCount</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetDestination</span>(<span class="ident">destIndex0</span>: <span class="ident">ItemCount</span>) -&gt; <span class="ident">MIDIEndpointRef</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetDestination</span>(<span class="ident">destIndex0</span>: <span class="ident">ItemCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MIDIEndpointRef</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEndpointGetEntity</span>(
         <span class="ident">inEndpoint</span>: <span class="ident">MIDIEndpointRef</span>,
-        <span class="ident">outEntity</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIEntityRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">outEntity</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIEntityRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIDestinationCreate</span>(
         <span class="ident">client</span>: <span class="ident">MIDIClientRef</span>,
         <span class="ident">name</span>: <span class="ident">CFStringRef</span>,
         <span class="ident">readProc</span>: <span class="ident">MIDIReadProc</span>,
-        <span class="ident">refCon</span>: <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>,
-        <span class="ident">outDest</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIEndpointRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">refCon</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>,
+        <span class="ident">outDest</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIEndpointRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIDestinationCreateWithBlock</span>(
         <span class="ident">client</span>: <span class="ident">MIDIClientRef</span>,
         <span class="ident">name</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outDest</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIEndpointRef</span>,
+        <span class="ident">outDest</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIEndpointRef</span>,
         <span class="ident">readBlock</span>: <span class="ident">MIDIReadBlock</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDISourceCreate</span>(
         <span class="ident">client</span>: <span class="ident">MIDIClientRef</span>,
         <span class="ident">name</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outSrc</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIEndpointRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">outSrc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIEndpointRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEndpointDispose</span>(<span class="ident">endpt</span>: <span class="ident">MIDIEndpointRef</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIEndpointDispose</span>(<span class="ident">endpt</span>: <span class="ident">MIDIEndpointRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfExternalDevices</span>() -&gt; <span class="ident">ItemCount</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetNumberOfExternalDevices</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ItemCount</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetExternalDevice</span>(<span class="ident">deviceIndex0</span>: <span class="ident">ItemCount</span>) -&gt; <span class="ident">MIDIDeviceRef</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIGetExternalDevice</span>(<span class="ident">deviceIndex0</span>: <span class="ident">ItemCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MIDIDeviceRef</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectGetIntegerProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outValue</span>: <span class="kw-2">*mut</span> <span class="ident">SInt32</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">outValue</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SInt32</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectSetIntegerProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
         <span class="ident">value</span>: <span class="ident">SInt32</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectGetStringProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">str</span>: <span class="kw-2">*mut</span> <span class="ident">CFStringRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">str</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">CFStringRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectSetStringProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
         <span class="ident">str</span>: <span class="ident">CFStringRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectGetDataProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outData</span>: <span class="kw-2">*mut</span> <span class="ident">CFDataRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">outData</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">CFDataRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectSetDataProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
         <span class="ident">data</span>: <span class="ident">CFDataRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectGetDictionaryProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
-        <span class="ident">outDict</span>: <span class="kw-2">*mut</span> <span class="ident">CFDictionaryRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">outDict</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">CFDictionaryRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectSetDictionaryProperty</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
         <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>,
         <span class="ident">dict</span>: <span class="ident">CFDictionaryRef</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectGetProperties</span>(
         <span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>,
-        <span class="ident">outProperties</span>: <span class="kw-2">*mut</span> <span class="ident">CFPropertyListRef</span>,
+        <span class="ident">outProperties</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">CFPropertyListRef</span>,
         <span class="ident">deep</span>: <span class="ident">Boolean</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectRemoveProperty</span>(<span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>, <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectRemoveProperty</span>(<span class="ident">obj</span>: <span class="ident">MIDIObjectRef</span>, <span class="ident">propertyID</span>: <span class="ident">CFStringRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIObjectFindByUniqueID</span>(
         <span class="ident">inUniqueID</span>: <span class="ident">MIDIUniqueID</span>,
-        <span class="ident">outObject</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIObjectRef</span>,
-        <span class="ident">outObjectType</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIObjectType</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">outObject</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIObjectRef</span>,
+        <span class="ident">outObjectType</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIObjectType</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDISend</span>(
         <span class="ident">port</span>: <span class="ident">MIDIPortRef</span>,
         <span class="ident">dest</span>: <span class="ident">MIDIEndpointRef</span>,
-        <span class="ident">pktlist</span>: <span class="kw-2">*const</span> <span class="ident">MIDIPacketList</span>,
-    ) -&gt; <span class="ident">OSStatus</span>;
+        <span class="ident">pktlist</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">MIDIPacketList</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDISendSysex</span>(<span class="ident">request</span>: <span class="kw-2">*mut</span> <span class="ident">MIDISysexSendRequest</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDISendSysex</span>(<span class="ident">request</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDISysexSendRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIReceived</span>(<span class="ident">src</span>: <span class="ident">MIDIEndpointRef</span>, <span class="ident">pktlist</span>: <span class="kw-2">*const</span> <span class="ident">MIDIPacketList</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIReceived</span>(<span class="ident">src</span>: <span class="ident">MIDIEndpointRef</span>, <span class="ident">pktlist</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">MIDIPacketList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIFlushOutput</span>(<span class="ident">dest</span>: <span class="ident">MIDIEndpointRef</span>) -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIFlushOutput</span>(<span class="ident">dest</span>: <span class="ident">MIDIEndpointRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIRestart</span>() -&gt; <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIRestart</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPacketListInit</span>(<span class="ident">pktlist</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIPacketList</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">MIDIPacket</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPacketListInit</span>(<span class="ident">pktlist</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPacketList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPacket</span>;
 }
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">MIDIPacketListAdd</span>(
-        <span class="ident">pktlist</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIPacketList</span>,
+        <span class="ident">pktlist</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPacketList</span>,
         <span class="ident">listSize</span>: <span class="ident">ByteCount</span>,
-        <span class="ident">curPacket</span>: <span class="kw-2">*mut</span> <span class="ident">MIDIPacket</span>,
+        <span class="ident">curPacket</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPacket</span>,
         <span class="ident">time</span>: <span class="ident">MIDITimeStamp</span>,
         <span class="ident">nData</span>: <span class="ident">ByteCount</span>,
-        <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">Byte</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">MIDIPacket</span>;
+        <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Byte</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MIDIPacket</span>;
 }
-</code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi_sys" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-</body></html>
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi_sys"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
