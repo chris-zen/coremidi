@@ -1,5 +1,5 @@
-use coremidi_sys::{MIDIPacketList, MIDIPacketListAdd, MIDIPacketListInit};
 use coremidi_sys::{MIDIPacket, MIDIPacketNext, MIDITimeStamp};
+use coremidi_sys::{MIDIPacketList, MIDIPacketListAdd, MIDIPacketListInit};
 
 use std::fmt;
 use std::mem::size_of;
@@ -211,7 +211,7 @@ impl<'a> Iterator for PacketListIterator<'a> {
 
 const PACKET_LIST_HEADER_SIZE: usize = 4; // MIDIPacketList::numPackets: UInt32
 const PACKET_HEADER_SIZE: usize = 8 +     // MIDIPacket::timeStamp: MIDITimeStamp/UInt64
-                                  2;      // MIDIPacket::length: UInt16
+                                  2; // MIDIPacket::length: UInt16
 
 const INLINE_PACKET_BUFFER_SIZE: usize = (size_of::<Vec<u32>>() + 3) & !(3usize); // must be divisible by 4
 
@@ -360,15 +360,18 @@ impl PacketBuffer {
         let storage = Storage::with_capacity(capacity);
         let packet_list_ptr = unsafe { storage.as_ptr() };
         let current_packet_ptr = unsafe { MIDIPacketListInit(packet_list_ptr) };
-        let current_packet_ptr = unsafe { MIDIPacketListAdd(
-            packet_list_ptr,
-            storage.capacity() as u64,
-            current_packet_ptr,
-            time,
-            data.len() as u64,
-            data.as_ptr()
-        ) };
-        let current_packet_offset = (current_packet_ptr as *const u8 as usize) - (packet_list_ptr as *const u8 as usize);
+        let current_packet_ptr = unsafe {
+            MIDIPacketListAdd(
+                packet_list_ptr,
+                storage.capacity() as u64,
+                current_packet_ptr,
+                time,
+                data.len() as u64,
+                data.as_ptr(),
+            )
+        };
+        let current_packet_offset =
+            (current_packet_ptr as *const u8 as usize) - (packet_list_ptr as *const u8 as usize);
         Self {
             storage,
             current_packet_offset,
@@ -390,7 +393,8 @@ impl PacketBuffer {
         let storage = Storage::with_capacity(capacity);
         let packet_list_ptr = unsafe { storage.as_ptr() };
         let current_packet_ptr = unsafe { MIDIPacketListInit(packet_list_ptr) };
-        let current_packet_offset = (current_packet_ptr as *const u8 as usize) - (packet_list_ptr as *const u8 as usize);
+        let current_packet_offset =
+            (current_packet_ptr as *const u8 as usize) - (packet_list_ptr as *const u8 as usize);
         Self {
             storage,
             current_packet_offset,
@@ -425,19 +429,25 @@ impl PacketBuffer {
         let next_packet_offset = self.next_packet_offset();
         unsafe {
             // We ensure capacity for the worst case as if there was no merge with the current packet
-            self.storage.ensure_capacity(next_packet_offset + packet_size);
+            self.storage
+                .ensure_capacity(next_packet_offset + packet_size);
         }
         let packet_list_ptr = unsafe { self.storage.as_ptr() };
-        let current_packet_ptr = unsafe { (packet_list_ptr as *const u8).add(self.current_packet_offset) as *mut MIDIPacket };
-        let current_packet_ptr = unsafe { MIDIPacketListAdd(
-            packet_list_ptr,
-            self.storage.capacity() as u64,
-            current_packet_ptr,
-            time,
-            data.len() as u64,
-            data.as_ptr()
-        ) };
-        self.current_packet_offset = (current_packet_ptr as *const u8 as usize) - (packet_list_ptr as *const u8 as usize);
+        let current_packet_ptr = unsafe {
+            (packet_list_ptr as *const u8).add(self.current_packet_offset) as *mut MIDIPacket
+        };
+        let current_packet_ptr = unsafe {
+            MIDIPacketListAdd(
+                packet_list_ptr,
+                self.storage.capacity() as u64,
+                current_packet_ptr,
+                time,
+                data.len() as u64,
+                data.as_ptr(),
+            )
+        };
+        self.current_packet_offset =
+            (current_packet_ptr as *const u8 as usize) - (packet_list_ptr as *const u8 as usize);
 
         self
     }
