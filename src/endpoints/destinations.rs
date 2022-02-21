@@ -118,7 +118,7 @@ impl Iterator for DestinationsIterator {
 pub struct VirtualDestination {
     // Note: the order is important here, endpoint needs to be dropped first
     pub(crate) endpoint: Endpoint,
-    pub(crate) callback: BoxedCallback<PacketList>,
+    pub(crate) _callback: BoxedCallback<PacketList>,
 }
 
 impl VirtualDestination {}

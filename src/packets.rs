@@ -3,7 +3,7 @@ use coremidi_sys::{MIDIPacketList, MIDIPacketListAdd, MIDIPacketListInit};
 
 use std::fmt;
 use std::mem::size_of;
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
 use std::slice;
 
 pub type Timestamp = u64;
@@ -209,119 +209,6 @@ impl<'a> Iterator for PacketListIterator<'a> {
     }
 }
 
-const PACKET_LIST_HEADER_SIZE: usize = 4; // MIDIPacketList::numPackets: UInt32
-const PACKET_HEADER_SIZE: usize = 8 +     // MIDIPacket::timeStamp: MIDITimeStamp/UInt64
-                                  2; // MIDIPacket::length: UInt16
-
-const INLINE_PACKET_BUFFER_SIZE: usize = (size_of::<Vec<u32>>() + 3) & !(3usize); // must be divisible by 4
-
-enum Storage {
-    /// Inline stores the data directy on the stack, if it is small enough.
-    /// NOTE: using u32 ensures correct alignment (required on ARM)
-    Inline([u32; INLINE_PACKET_BUFFER_SIZE / 4]),
-    /// External is used whenever the size of the data exceeds INLINE_PACKET_BUFFER_SIZE.
-    /// This means that the size of the contained vector is always greater than INLINE_PACKET_BUFFER_SIZE.
-    External(Vec<u32>),
-}
-
-impl Storage {
-    #[inline]
-    pub fn with_capacity(capacity: usize) -> Storage {
-        if capacity <= INLINE_PACKET_BUFFER_SIZE {
-            Storage::Inline([0; INLINE_PACKET_BUFFER_SIZE / 4])
-        } else {
-            let u32_len = ((capacity - 1) / 4) + 1;
-            let mut buffer = Vec::with_capacity(u32_len);
-            unsafe {
-                buffer.set_len(u32_len);
-            }
-            Storage::External(buffer)
-        }
-    }
-
-    #[inline]
-    fn capacity(&self) -> usize {
-        match *self {
-            Storage::Inline(ref inline) => inline.len() * 4,
-            Storage::External(ref vec) => vec.len() * 4,
-        }
-    }
-
-    #[inline]
-    fn get_slice(&self) -> &[u8] {
-        unsafe {
-            match *self {
-                Storage::Inline(ref inline) => {
-                    slice::from_raw_parts(inline.as_ptr() as *const u8, inline.len() * 4)
-                }
-                Storage::External(ref vec) => {
-                    slice::from_raw_parts(vec.as_ptr() as *const u8, vec.len() * 4)
-                }
-            }
-        }
-    }
-
-    #[inline]
-    fn get_slice_mut(&mut self) -> &mut [u8] {
-        unsafe {
-            match *self {
-                Storage::Inline(ref mut inline) => {
-                    slice::from_raw_parts_mut(inline.as_mut_ptr() as *mut u8, inline.len() * 4)
-                }
-                Storage::External(ref mut vec) => {
-                    slice::from_raw_parts_mut(vec.as_mut_ptr() as *mut u8, vec.len() * 4)
-                }
-            }
-        }
-    }
-
-    /// Call this only with larger length values (won't make the buffer smaller)
-    unsafe fn ensure_capacity(&mut self, capacity: usize) {
-        if capacity < INLINE_PACKET_BUFFER_SIZE || capacity < self.get_slice().len() {
-            return;
-        }
-
-        let vec_capacity = ((capacity - 1) / 4) + 1;
-        let vec: Option<Vec<u32>> = match *self {
-            Storage::Inline(ref inline) => {
-                let mut v = Vec::with_capacity(vec_capacity);
-                v.extend_from_slice(inline);
-                v.set_len(vec_capacity);
-                Some(v)
-            }
-            Storage::External(ref mut vec) => {
-                let current_len = vec.len();
-                vec.reserve(vec_capacity - current_len);
-                vec.set_len(vec_capacity);
-                None
-            }
-        };
-
-        // to prevent borrowcheck errors, this must come after the `match`
-        if let Some(v) = vec {
-            *self = Storage::External(v);
-        }
-    }
-}
-
-impl Deref for Storage {
-    type Target = PacketList;
-
-    #[inline]
-    fn deref(&self) -> &PacketList {
-        unsafe { &*(self.get_slice().as_ptr() as *const PacketList) }
-    }
-}
-
-impl DerefMut for Storage {
-    // NOTE: Mutable references `&mut PacketList` must not be exposed in the public API!
-    //       The user could use mem::swap to modify the header without modifying the packets that follow.
-    #[inline]
-    fn deref_mut(&mut self) -> &mut PacketList {
-        unsafe { &mut *(self.get_slice_mut().as_mut_ptr() as *mut PacketList) }
-    }
-}
-
 /// A mutable `PacketList` builder.
 ///
 /// A `PacketList` is an inmmutable reference to a [MIDIPacketList](https://developer.apple.com/reference/coremidi/midipacketlist) structure,
@@ -333,16 +220,11 @@ pub struct PacketBuffer {
     current_packet_offset: usize,
 }
 
-impl Deref for PacketBuffer {
-    type Target = PacketList;
-
-    #[inline]
-    fn deref(&self) -> &PacketList {
-        self.storage.deref()
-    }
-}
-
 impl PacketBuffer {
+    const PACKET_LIST_HEADER_SIZE: usize = 4; // MIDIPacketList::numPackets: UInt32
+    const PACKET_HEADER_SIZE: usize = 8 +     // MIDIPacket::timeStamp: MIDITimeStamp/UInt64
+            2; // MIDIPacket::length: UInt16
+
     /// Create a `PacketBuffer` with a single packet containing the provided timestamp and data.
     ///
     /// According to the official documentation for CoreMIDI, the timestamp represents
@@ -356,9 +238,9 @@ impl PacketBuffer {
     /// assert_eq!(buffer.len(), 1)
     /// ```
     pub fn new(time: MIDITimeStamp, data: &[u8]) -> Self {
-        let capacity = data.len() + PACKET_LIST_HEADER_SIZE + PACKET_HEADER_SIZE;
-        let storage = Storage::with_capacity(capacity);
-        let packet_list_ptr = unsafe { storage.as_ptr() };
+        let capacity = data.len() + Self::PACKET_LIST_HEADER_SIZE + Self::PACKET_HEADER_SIZE;
+        let mut storage = Storage::with_capacity(capacity);
+        let packet_list_ptr = unsafe { storage.as_mut_ptr::<MIDIPacketList>() };
         let current_packet_ptr = unsafe { MIDIPacketListInit(packet_list_ptr) };
         let current_packet_ptr = unsafe {
             MIDIPacketListAdd(
@@ -389,9 +271,9 @@ impl PacketBuffer {
     /// assert_eq!(buffer.capacity(), 128);
     /// ```
     pub fn with_capacity(capacity: usize) -> Self {
-        let capacity = std::cmp::max(capacity, INLINE_PACKET_BUFFER_SIZE);
-        let storage = Storage::with_capacity(capacity);
-        let packet_list_ptr = unsafe { storage.as_ptr() };
+        let capacity = std::cmp::max(capacity, Storage::INLINE_SIZE);
+        let mut storage = Storage::with_capacity(capacity);
+        let packet_list_ptr = unsafe { storage.as_mut_ptr() };
         let current_packet_ptr = unsafe { MIDIPacketListInit(packet_list_ptr) };
         let current_packet_offset =
             (current_packet_ptr as *const u8 as usize) - (packet_list_ptr as *const u8 as usize);
@@ -432,7 +314,7 @@ impl PacketBuffer {
             self.storage
                 .ensure_capacity(next_packet_offset + packet_size);
         }
-        let packet_list_ptr = unsafe { self.storage.as_ptr() };
+        let packet_list_ptr = unsafe { self.storage.as_mut_ptr::<MIDIPacketList>() };
         let current_packet_ptr = unsafe {
             (packet_list_ptr as *const u8).add(self.current_packet_offset) as *mut MIDIPacket
         };
@@ -455,13 +337,15 @@ impl PacketBuffer {
     /// Clears the buffer, removing all packets.
     /// Note that this method has no effect on the allocated capacity of the buffer.
     pub fn clear(&mut self) {
-        self.packet_list_mut().num_packets = 0;
-        self.current_packet_offset = PACKET_LIST_HEADER_SIZE;
+        unsafe {
+            self.as_mut_ref().inner.num_packets = 0;
+        }
+        self.current_packet_offset = Self::PACKET_LIST_HEADER_SIZE;
     }
 
     #[inline]
     fn last_packet(&self) -> &Packet {
-        assert!(self.packet_list().num_packets > 0);
+        assert!(!self.as_ref().is_empty());
         let packets_slice = self.storage.get_slice();
         let packet_slot = &packets_slice[self.current_packet_offset..];
         unsafe { &*(packet_slot.as_ptr() as *const Packet) }
@@ -469,7 +353,7 @@ impl PacketBuffer {
 
     #[inline]
     fn next_packet_offset(&self) -> usize {
-        if self.packet_list_is_empty() {
+        if self.as_ref().is_empty() {
             self.current_packet_offset
         } else {
             let data_len = self.last_packet().inner.length as usize;
@@ -484,22 +368,134 @@ impl PacketBuffer {
 
     #[inline]
     fn packet_size(data_len: usize) -> usize {
-        PACKET_HEADER_SIZE + data_len
+        Self::PACKET_HEADER_SIZE + data_len
     }
 
     #[inline]
-    fn packet_list(&self) -> &PacketListInner {
-        &self.storage.deref().inner
+    unsafe fn as_mut_ref(&mut self) -> &mut PacketList {
+        &mut *self.storage.as_mut_ptr::<PacketList>()
+    }
+}
+
+impl AsRef<PacketList> for PacketBuffer {
+    #[inline]
+    fn as_ref(&self) -> &PacketList {
+        unsafe { &*self.storage.as_ptr::<PacketList>() }
+    }
+}
+
+impl Deref for PacketBuffer {
+    type Target = PacketList;
+
+    #[inline]
+    fn deref(&self) -> &PacketList {
+        self.as_ref()
+    }
+}
+
+pub(crate) enum Storage {
+    /// Inline stores the data directly on the stack, if it is small enough.
+    /// NOTE: using u32 ensures correct alignment (required on ARM)
+    Inline([u32; Storage::INLINE_SIZE / 4]),
+    /// External is used whenever the size of the data exceeds INLINE_PACKET_BUFFER_SIZE.
+    /// This means that the size of the contained vector is always greater than INLINE_PACKET_BUFFER_SIZE.
+    External(Vec<u32>),
+}
+
+impl Storage {
+    pub(crate) const INLINE_SIZE: usize = (size_of::<Vec<u32>>() + 3) & !(3usize); // must be divisible by 4
+
+    #[inline]
+    #[allow(clippy::uninit_vec)]
+    pub(crate) fn with_capacity(capacity: usize) -> Storage {
+        if capacity <= Self::INLINE_SIZE {
+            Storage::Inline([0; Self::INLINE_SIZE / 4])
+        } else {
+            let u32_len = ((capacity - 1) / 4) + 1;
+            let mut buffer = Vec::with_capacity(u32_len);
+            unsafe {
+                buffer.set_len(u32_len);
+            }
+            Storage::External(buffer)
+        }
     }
 
     #[inline]
-    fn packet_list_is_empty(&self) -> bool {
-        self.packet_list().num_packets == 0
+    pub(crate) fn capacity(&self) -> usize {
+        match *self {
+            Storage::Inline(ref inline) => inline.len() * 4,
+            Storage::External(ref vec) => vec.len() * 4,
+        }
     }
 
     #[inline]
-    fn packet_list_mut(&mut self) -> &mut PacketListInner {
-        &mut self.storage.deref_mut().inner
+    pub(crate) fn get_slice<T>(&self) -> &[T] {
+        unsafe {
+            match *self {
+                Storage::Inline(ref inline) => slice::from_raw_parts(
+                    inline.as_ptr() as *const T,
+                    inline.len() * 4 / size_of::<T>(),
+                ),
+                Storage::External(ref vec) => {
+                    slice::from_raw_parts(vec.as_ptr() as *const T, vec.len() * 4 / size_of::<T>())
+                }
+            }
+        }
+    }
+
+    #[inline]
+    pub(crate) fn get_slice_mut<T>(&mut self) -> &mut [T] {
+        unsafe {
+            match *self {
+                Storage::Inline(ref mut inline) => slice::from_raw_parts_mut(
+                    inline.as_mut_ptr() as *mut T,
+                    inline.len() * 4 / size_of::<T>(),
+                ),
+                Storage::External(ref mut vec) => slice::from_raw_parts_mut(
+                    vec.as_mut_ptr() as *mut T,
+                    vec.len() * 4 / size_of::<T>(),
+                ),
+            }
+        }
+    }
+
+    /// Call this only with larger length values (won't make the buffer smaller)
+    #[allow(clippy::uninit_vec)]
+    pub(crate) unsafe fn ensure_capacity(&mut self, capacity: usize) {
+        if capacity < Self::INLINE_SIZE || capacity < self.get_slice::<u8>().len() {
+            return;
+        }
+
+        let vec_capacity = ((capacity - 1) / 4) + 1;
+        let vec: Option<Vec<u32>> = match *self {
+            Storage::Inline(ref inline) => {
+                let mut v = Vec::with_capacity(vec_capacity);
+                v.extend_from_slice(inline);
+                v.set_len(vec_capacity);
+                Some(v)
+            }
+            Storage::External(ref mut vec) => {
+                let current_len = vec.len();
+                vec.reserve(vec_capacity - current_len);
+                vec.set_len(vec_capacity);
+                None
+            }
+        };
+
+        // to prevent borrow-check errors, this must come after the `match`
+        if let Some(v) = vec {
+            *self = Storage::External(v);
+        }
+    }
+
+    #[inline]
+    pub(crate) unsafe fn as_ptr<T>(&self) -> *const T {
+        self.get_slice().as_ptr() as *const T
+    }
+
+    #[inline]
+    pub(crate) unsafe fn as_mut_ptr<T>(&mut self) -> *mut T {
+        self.get_slice_mut().as_ptr() as *const T as *mut T
     }
 }
 
@@ -522,14 +518,14 @@ mod tests {
         let dummy_packet: Packet = unsafe { mem::zeroed() };
         let ptr = &dummy_packet as *const _ as *const u8;
         assert_eq!(
-            PACKET_HEADER_SIZE,
+            PacketBuffer::PACKET_HEADER_SIZE,
             dummy_packet.inner.data.as_ptr() as usize - ptr as usize
         );
 
         let dummy_packet_list: PacketList = unsafe { mem::zeroed() };
         let ptr = &dummy_packet_list as *const _ as *const u8;
         assert_eq!(
-            PACKET_LIST_HEADER_SIZE,
+            PacketBuffer::PACKET_LIST_HEADER_SIZE,
             std::ptr::addr_of!(dummy_packet_list.inner.data) as usize - ptr as usize
         );
     }
@@ -571,7 +567,7 @@ mod tests {
     #[test]
     fn packet_buffer_with_capacity_zero() {
         let packet_buf = PacketBuffer::with_capacity(0);
-        assert_eq!(packet_buf.capacity(), INLINE_PACKET_BUFFER_SIZE);
+        assert_eq!(packet_buf.capacity(), Storage::INLINE_SIZE);
         assert_eq!(packet_buf.len(), 0);
     }
 
@@ -710,7 +706,7 @@ mod tests {
         }
 
         // print buffer contents for debugging purposes
-        let packet_buf_slice = packet_buf.storage.get_slice();
+        let packet_buf_slice = packet_buf.storage.get_slice::<u8>();
         println!(
             "native: {:?}",
             buffer[0..packet_buf_slice.len()]

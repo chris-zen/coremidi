@@ -40,11 +40,13 @@ mod callback;
 mod client;
 mod devices;
 mod endpoints;
+mod events;
 mod notifications;
 mod object;
 mod packets;
 mod ports;
 mod properties;
+mod protocol;
 
 use core_foundation_sys::base::OSStatus;
 
@@ -55,6 +57,7 @@ pub use crate::devices::Device;
 pub use crate::endpoints::destinations::{Destination, Destinations, VirtualDestination};
 pub use crate::endpoints::sources::{Source, Sources, VirtualSource};
 pub use crate::endpoints::Endpoint;
+pub use crate::events::{EventList, EventListIter, EventPacket};
 pub use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
 pub use crate::object::ObjectType;
 pub use crate::packets::{Packet, PacketBuffer, PacketList, PacketListIterator};

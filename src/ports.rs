@@ -97,7 +97,7 @@ impl Deref for OutputPort {
 pub struct InputPort {
     // Note: the order is important here, port needs to be dropped first
     pub(crate) port: Port,
-    pub(crate) callback: BoxedCallback<PacketList>,
+    pub(crate) _callback: BoxedCallback<PacketList>,
 }
 
 impl InputPort {

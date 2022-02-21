@@ -33,7 +33,7 @@ use crate::{
 pub struct Client {
     // Order is important, object needs to be dropped first
     object: Object,
-    callback: BoxedCallback<Notification>,
+    _callback: BoxedCallback<Notification>,
 }
 
 impl Client {
@@ -65,7 +65,7 @@ impl Client {
             let client_ref = unsafe { client_ref.assume_init() };
             Client {
                 object: Object(client_ref),
-                callback: boxed_callback,
+                _callback: boxed_callback,
             }
         })
     }
@@ -88,7 +88,7 @@ impl Client {
             let client_ref = unsafe { client_ref.assume_init() };
             Client {
                 object: Object(client_ref),
-                callback: BoxedCallback::null(),
+                _callback: BoxedCallback::null(),
             }
         })
     }
@@ -141,7 +141,7 @@ impl Client {
                 port: Port {
                     object: Object(port_ref),
                 },
-                callback: box_callback,
+                _callback: box_callback,
             }
         })
     }
@@ -198,7 +198,7 @@ impl Client {
                 endpoint: Endpoint {
                     object: Object(virtual_destination),
                 },
-                callback: boxed_callback,
+                _callback: boxed_callback,
             }
         })
     }
