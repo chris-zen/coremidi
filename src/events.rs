@@ -1,7 +1,13 @@
-use crate::protocol::Protocol;
-use coremidi_sys::{MIDIEventList, MIDIEventPacket, MIDIEventPacketNext};
+use coremidi_sys::{
+    MIDIEventList, MIDIEventListAdd, MIDIEventListInit, MIDIEventPacket, MIDIEventPacketNext,
+};
 use std::marker::PhantomData;
+use std::mem::size_of;
+use std::ops::Deref;
 use std::slice;
+
+use crate::packets::Storage;
+use crate::protocol::Protocol;
 
 pub type Timestamp = u64;
 
@@ -82,7 +88,163 @@ impl EventPacket {
 // TODO impl Debug for EventPacket
 // TODO impl Display for EventPacket
 
+pub struct EventBuffer {
+    storage: Storage,
+    current_packet_ptr: *const MIDIEventPacket,
+}
+
+impl EventBuffer {
+    const PACKET_HEADER_SIZE: usize = 8 +     // MIDIEventPacket::timestamp: MIDITimeStamp/UInt64
+                                      4; // MIDIEventPacket::wordCount: UInt32
+
+    /// Create an empty `EventBuffer` for a given [Protocol] without allocating.
+    ///
+    pub fn new(protocol: Protocol) -> Self {
+        Self::with_capacity(Storage::INLINE_SIZE, protocol)
+    }
+
+    /// Create an empty `EventBuffer` of a given capacity for a given [Protocol].
+    ///
+    pub fn with_capacity(capacity: usize, protocol: Protocol) -> Self {
+        let mut storage = Storage::with_capacity(capacity);
+        let event_list_ptr = unsafe { storage.as_mut_ptr::<MIDIEventList>() };
+        let current_packet_ptr = unsafe { MIDIEventListInit(event_list_ptr, protocol.into()) };
+        Self {
+            storage,
+            current_packet_ptr,
+        }
+    }
+
+    /// Get underlying buffer capacity in bytes
+    ///
+    pub fn capacity(&self) -> usize {
+        self.storage.capacity()
+    }
+
+    /// Add a new event containing the provided timestamp and data.
+    ///
+    /// According to the official documentation for CoreMIDI, the timestamp represents
+    /// the time at which the events are to be played, where zero means "now".
+    /// The timestamp applies to the first MIDI word in the packet.
+    ///
+    /// An event must not have a timestamp that is smaller than that of a previous event
+    /// in the same `EventBuffer`
+    ///
+    /// Example:
+    ///
+    //     ```
+    //     use coremidi::Protocol;
+    //     let mut buffer = coremidi::EventBuffer::new(Protocol::Midi20);
+    //     buffer.push(0, &[0x20903c00, 0xffff0000]); // Note On for Middle C
+    //     assert_eq!(buffer.len(), 1);
+    //     assert_eq!(buffer.iter().next().unwrap().data(), &[0x20903c00, 0xffff0000])
+    //     ```
+    pub fn push(&mut self, timestamp: Timestamp, data: &[u32]) -> &mut Self {
+        self.ensure_capacity(data.len());
+        let packet_list_ptr = unsafe { self.storage.as_mut_ptr::<MIDIEventList>() };
+
+        self.current_packet_ptr = unsafe {
+            MIDIEventListAdd(
+                packet_list_ptr,
+                self.storage.capacity() as u64,
+                self.current_packet_ptr as *mut MIDIEventPacket,
+                timestamp,
+                data.len() as u64,
+                data.as_ptr(),
+            )
+        };
+
+        self
+    }
+
+    fn ensure_capacity(&mut self, data_len: usize) {
+        let next_capacity =
+            self.current_bytes_len() + Self::PACKET_HEADER_SIZE + data_len * size_of::<u32>();
+        unsafe {
+            // We ensure capacity for the worst case as if there was no merge with the current packet
+            self.storage.ensure_capacity(next_capacity);
+        }
+    }
+
+    #[inline]
+    fn current_bytes_len(&self) -> usize {
+        let start_ptr = unsafe { self.storage.as_ptr::<u8>() };
+        if self.as_ref().is_empty() {
+            self.current_packet_ptr as *const u8 as usize - start_ptr as *const u8 as usize
+        } else {
+            let current_packet = unsafe { &*self.current_packet_ptr };
+            let packet_data_ptr = current_packet.words.as_ptr() as *const u8;
+            let data_bytes_len = current_packet.wordCount as usize * size_of::<u32>();
+            packet_data_ptr as *const u8 as usize - start_ptr as *const u8 as usize + data_bytes_len
+        }
+    }
+}
+
+impl AsRef<EventList> for EventBuffer {
+    #[inline]
+    fn as_ref(&self) -> &EventList {
+        unsafe { &*self.storage.as_ptr::<EventList>() }
+    }
+}
+
+impl Deref for EventBuffer {
+    type Target = EventList;
+
+    #[inline]
+    fn deref(&self) -> &EventList {
+        self.as_ref()
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    // TODO
+    use crate::protocol::Protocol;
+    use crate::EventList;
+    use coremidi_sys::{
+        kMIDIProtocol_2_0, ByteCount, MIDIEventList, MIDIEventListAdd, MIDIEventListInit,
+        MIDIProtocolID,
+    };
+
+    #[test]
+    fn event_list_accessors() {
+        const BUFFER_SIZE: usize = 256;
+        let buffer = [0u8; BUFFER_SIZE];
+        let event_list_ptr = buffer.as_ptr() as *const MIDIEventList as *mut MIDIEventList;
+        let event_packet_ptr =
+            unsafe { MIDIEventListInit(event_list_ptr, kMIDIProtocol_2_0 as MIDIProtocolID) };
+        let event_packet_ptr = unsafe {
+            MIDIEventListAdd(
+                event_list_ptr,
+                BUFFER_SIZE as ByteCount,
+                event_packet_ptr,
+                1,
+                2,
+                [1, 2].as_ptr(),
+            )
+        };
+        let _ = unsafe {
+            MIDIEventListAdd(
+                event_list_ptr,
+                BUFFER_SIZE as ByteCount,
+                event_packet_ptr,
+                2,
+                3,
+                [3, 4, 5].as_ptr(),
+            )
+        };
+        let event_list = unsafe { &*(event_list_ptr as *const EventList) };
+
+        assert_eq!(event_list.protocol(), Protocol::Midi20);
+        assert!(!event_list.is_empty());
+        assert_eq!(event_list.len(), 2);
+
+        let mut iter = event_list.iter();
+        let packet = iter.next().expect("packet");
+        assert_eq!(packet.timestamp(), 1);
+        assert_eq!(packet.data(), &[1, 2]);
+        let packet = iter.next().expect("packet");
+        assert_eq!(packet.timestamp(), 2);
+        assert_eq!(packet.data(), &[3, 4, 5]);
+        assert!(iter.next().is_none());
+    }
 }

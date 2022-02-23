@@ -346,7 +346,7 @@ impl PacketBuffer {
     #[inline]
     fn last_packet(&self) -> &Packet {
         assert!(!self.as_ref().is_empty());
-        let packets_slice = self.storage.get_slice();
+        let packets_slice = self.storage.get_slice::<u8>();
         let packet_slot = &packets_slice[self.current_packet_offset..];
         unsafe { &*(packet_slot.as_ptr() as *const Packet) }
     }
@@ -407,9 +407,9 @@ impl Storage {
 
     #[inline]
     #[allow(clippy::uninit_vec)]
-    pub(crate) fn with_capacity(capacity: usize) -> Storage {
+    pub(crate) fn with_capacity(capacity: usize) -> Self {
         if capacity <= Self::INLINE_SIZE {
-            Storage::Inline([0; Self::INLINE_SIZE / 4])
+            Self::Inline([0; Self::INLINE_SIZE / 4])
         } else {
             let u32_len = ((capacity - 1) / 4) + 1;
             let mut buffer = Vec::with_capacity(u32_len);

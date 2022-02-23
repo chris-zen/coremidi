@@ -2,6 +2,7 @@ use coremidi_sys::MIDIProtocolID;
 
 /// The [MIDI Protocol](https://developer.apple.com/documentation/coremidi/midiprotocolid) to use for messages
 ///
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Protocol {
     /// MIDI 1.0
     Midi10,

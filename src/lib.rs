@@ -57,7 +57,7 @@ pub use crate::devices::Device;
 pub use crate::endpoints::destinations::{Destination, Destinations, VirtualDestination};
 pub use crate::endpoints::sources::{Source, Sources, VirtualSource};
 pub use crate::endpoints::Endpoint;
-pub use crate::events::{EventList, EventListIter, EventPacket};
+pub use crate::events::{EventBuffer, EventList, EventListIter, EventPacket};
 pub use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
 pub use crate::object::ObjectType;
 pub use crate::packets::{Packet, PacketBuffer, PacketList, PacketListIterator};
@@ -65,6 +65,7 @@ pub use crate::ports::{InputPort, OutputPort};
 pub use crate::properties::{
     BooleanProperty, IntegerProperty, Properties, PropertyGetter, PropertySetter, StringProperty,
 };
+pub use crate::protocol::Protocol;
 
 /// Unschedules previously-sent packets for all the endpoints.
 /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).
