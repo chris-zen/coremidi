@@ -434,27 +434,11 @@ impl Storage {
             match *self {
                 Storage::Inline(ref inline) => slice::from_raw_parts(
                     inline.as_ptr() as *const T,
-                    inline.len() * 4 / size_of::<T>(),
+                    inline.len() * size_of::<u32>() / size_of::<T>(),
                 ),
                 Storage::External(ref vec) => {
                     slice::from_raw_parts(vec.as_ptr() as *const T, vec.len() * 4 / size_of::<T>())
                 }
-            }
-        }
-    }
-
-    #[inline]
-    pub(crate) fn get_slice_mut<T>(&mut self) -> &mut [T] {
-        unsafe {
-            match *self {
-                Storage::Inline(ref mut inline) => slice::from_raw_parts_mut(
-                    inline.as_mut_ptr() as *mut T,
-                    inline.len() * 4 / size_of::<T>(),
-                ),
-                Storage::External(ref mut vec) => slice::from_raw_parts_mut(
-                    vec.as_mut_ptr() as *mut T,
-                    vec.len() * 4 / size_of::<T>(),
-                ),
             }
         }
     }
@@ -490,12 +474,15 @@ impl Storage {
 
     #[inline]
     pub(crate) unsafe fn as_ptr<T>(&self) -> *const T {
-        self.get_slice().as_ptr() as *const T
+        match *self {
+            Storage::Inline(ref inline) => inline.as_ptr() as *const T,
+            Storage::External(ref vec) => vec.as_ptr() as *const T,
+        }
     }
 
     #[inline]
     pub(crate) unsafe fn as_mut_ptr<T>(&mut self) -> *mut T {
-        self.get_slice_mut().as_ptr() as *const T as *mut T
+        self.as_ptr::<T>() as *mut T
     }
 }
 

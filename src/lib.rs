@@ -57,7 +57,7 @@ pub use crate::devices::Device;
 pub use crate::endpoints::destinations::{Destination, Destinations, VirtualDestination};
 pub use crate::endpoints::sources::{Source, Sources, VirtualSource};
 pub use crate::endpoints::Endpoint;
-pub use crate::events::{EventBuffer, EventList, EventListIter, EventPacket};
+pub use crate::events::{EventBuffer, EventList, EventListIter, EventPacket, Timestamp};
 pub use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
 pub use crate::object::ObjectType;
 pub use crate::packets::{Packet, PacketBuffer, PacketList, PacketListIterator};
