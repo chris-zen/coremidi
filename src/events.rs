@@ -173,9 +173,28 @@ impl EventBuffer {
         self
     }
 
+    /// Clears the buffer, removing all packets.
+    /// Note that this method has no effect on the allocated capacity of the buffer.
+    pub fn clear(&mut self) {
+        let event_list_ptr = unsafe { self.storage.as_mut_ptr::<MIDIEventList>() };
+        let protocol = unsafe { (*event_list_ptr).protocol };
+        let current_packet_ptr = unsafe { MIDIEventListInit(event_list_ptr, protocol) };
+        self.current_packet_offset = unsafe {
+            (current_packet_ptr as *const u8).offset_from(event_list_ptr as *const u8) as usize
+        };
+    }
+
     fn ensure_capacity(&mut self, data_len: usize) {
         let next_capacity =
             self.current_bytes_len() + Self::PACKET_HEADER_SIZE + data_len * size_of::<u32>();
+
+        println!(
+            "{} = {} + {} + {}",
+            next_capacity,
+            self.current_bytes_len(),
+            Self::PACKET_HEADER_SIZE,
+            data_len * size_of::<u32>()
+        );
         unsafe {
             // We ensure capacity for the worst case as if there was no merge with the current packet
             self.storage.ensure_capacity(next_capacity);
@@ -294,7 +313,7 @@ mod tests {
     }
 
     #[test]
-    fn event_buffer_push() {
+    fn event_buffer_push_within_capacity() {
         let mut event_buffer = EventBuffer::new(Protocol::Midi20);
         event_buffer.push(10, &[1, 2]).push(20, &[3, 4, 5]);
 
@@ -305,6 +324,50 @@ mod tests {
                 .map(|packet| (packet.timestamp(), packet.data().to_vec()))
                 .collect::<Vec<(Timestamp, Vec<u32>)>>(),
             vec![(10, vec![1, 2]), (20, vec![3, 4, 5]),]
+        );
+    }
+
+    #[test]
+    fn event_buffer_push_over_capacity() {
+        let mut event_buffer = EventBuffer::new(Protocol::Midi20);
+        event_buffer
+            .push(10, &[1, 2])
+            .push(20, &[3, 4, 5, 6, 7, 8, 9, 10]);
+
+        assert_eq!(event_buffer.len(), 2);
+        assert_eq!(
+            event_buffer
+                .iter()
+                .map(|packet| (packet.timestamp(), packet.data().to_vec()))
+                .collect::<Vec<(Timestamp, Vec<u32>)>>(),
+            vec![(10, vec![1, 2]), (20, vec![3, 4, 5, 6, 7, 8, 9, 10])]
+        );
+    }
+
+    #[test]
+    fn event_buffer_clear() {
+        let mut event_buffer = EventBuffer::new(Protocol::Midi20);
+        event_buffer.push(10, &[1, 2]);
+
+        assert_eq!(event_buffer.len(), 1);
+        assert_eq!(
+            event_buffer
+                .iter()
+                .map(|packet| (packet.timestamp(), packet.data().to_vec()))
+                .collect::<Vec<(Timestamp, Vec<u32>)>>(),
+            vec![(10, vec![1, 2])]
+        );
+
+        event_buffer.clear();
+
+        assert_eq!(event_buffer.len(), 0);
+        assert_eq!(event_buffer.capacity(), Storage::INLINE_SIZE);
+        assert_eq!(
+            event_buffer
+                .iter()
+                .map(|packet| (packet.timestamp(), packet.data().to_vec()))
+                .collect::<Vec<(Timestamp, Vec<u32>)>>(),
+            vec![]
         );
     }
 }

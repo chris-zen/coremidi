@@ -403,7 +403,9 @@ pub(crate) enum Storage {
 }
 
 impl Storage {
-    pub(crate) const INLINE_SIZE: usize = (size_of::<Vec<u32>>() + 3) & !(3usize); // must be divisible by 4
+    pub(crate) const INLINE_SIZE: usize = 8 // MIDIEventList header
+                                        + 12 // MIDIEventPacket header
+                                        + 4 * 4; // 4 words
 
     #[inline]
     #[allow(clippy::uninit_vec)]
