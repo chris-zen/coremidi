@@ -3,18 +3,13 @@ use core_foundation::{
     string::CFString,
 };
 
-use coremidi_sys::{
-    MIDIClientCreate, MIDIClientDispose, MIDIDestinationCreateWithBlock,
-    MIDIInputPortCreateWithBlock, MIDIInputPortCreateWithProtocol, MIDINotification,
-    MIDIOutputPortCreate, MIDIPacketList, MIDIReadBlock, MIDISourceCreate,
-};
+use coremidi_sys::{MIDIClientCreate, MIDIClientCreateWithBlock, MIDIClientDispose, MIDIDestinationCreateWithBlock, MIDIInputPortCreateWithBlock, MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate, MIDIPacketList, MIDIReadBlock, MIDISourceCreate};
 
 use block::RcBlock;
 use std::cell::RefCell;
-use std::{mem::MaybeUninit, ops::Deref, os::raw::c_void, panic::catch_unwind, ptr};
+use std::{mem::MaybeUninit, ops::Deref, os::raw::c_void, ptr};
 
 use crate::{
-    callback::BoxedCallback,
     endpoints::{destinations::VirtualDestination, sources::VirtualSource, Endpoint},
     notifications::Notification,
     object::Object,
@@ -34,41 +29,38 @@ use crate::{
 /// ```
 #[derive(Debug)]
 pub struct Client {
-    // Order is important, object needs to be dropped first
     object: Object,
-    _callback: BoxedCallback<Notification>,
 }
 
 impl Client {
     /// Creates a new CoreMIDI client with support for notifications.
-    /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
+    /// See [MIDIClientCreateWithBlock](https://developer.apple.com/documentation/coremidi/1495330-midiclientcreatewithblock).
     ///
     /// The notification callback will be called on the [run loop](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html)
     /// that was current when this associated function is called.
     ///
     /// It follows that this particular run loop needs to be running in order to
     /// actually receive notifications. The run loop can be started after the
-    /// client has been created if need be.
+    /// client has been created if need be. Please see the examples to know how.
+    ///
     pub fn new_with_notifications<F>(name: &str, callback: F) -> Result<Client, OSStatus>
     where
         F: FnMut(&Notification) + Send + 'static,
     {
         let client_name = CFString::new(name);
         let mut client_ref = MaybeUninit::uninit();
-        let mut boxed_callback = BoxedCallback::new(callback);
+        let notify_block = Self::notify_block(callback);
         let status = unsafe {
-            MIDIClientCreate(
+            MIDIClientCreateWithBlock(
                 client_name.as_concrete_TypeRef(),
-                Some(Self::notify_proc as extern "C" fn(_, _)),
-                boxed_callback.raw_ptr(),
                 client_ref.as_mut_ptr(),
+                notify_block.deref() as *const _ as MIDINotifyBlock,
             )
         };
         result_from_status(status, || {
             let client_ref = unsafe { client_ref.assume_init() };
             Client {
                 object: Object(client_ref),
-                _callback: boxed_callback,
             }
         })
     }
@@ -91,7 +83,6 @@ impl Client {
             let client_ref = unsafe { client_ref.assume_init() };
             Client {
                 object: Object(client_ref),
-                _callback: BoxedCallback::null(),
             }
         })
     }
@@ -232,12 +223,20 @@ impl Client {
         })
     }
 
-    extern "C" fn notify_proc(notification_ptr: *const MIDINotification, ref_con: *mut c_void) {
-        let _ = catch_unwind(|| unsafe {
-            if let Ok(notification) = Notification::from(&*notification_ptr) {
-                BoxedCallback::call_from_raw_ptr(ref_con, &notification)
-            }
-        });
+    fn notify_block<F>(callback: F) -> RcBlock<(*const MIDINotification,), ()>
+    where
+        F: FnMut(&Notification) + Send + 'static,
+    {
+        let callback = RefCell::new(callback);
+        let notify_block = block::ConcreteBlock::new(
+            move |message: *const MIDINotification| {
+                let message = unsafe { &*message };
+                if let Ok(notification) = Notification::from(message) {
+                    (callback.borrow_mut())(&notification);
+                }
+            },
+        );
+        notify_block.copy()
     }
 
     fn read_block<F>(callback: F) -> RcBlock<(*const MIDIPacketList, *mut c_void), ()>

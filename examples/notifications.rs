@@ -7,7 +7,7 @@ use core_foundation::runloop::{kCFRunLoopDefaultMode, CFRunLoopRunInMode};
 
 fn main() {
     println!("Logging MIDI Client Notifications");
-    println!("Will Quit Automatically After 10 Seconds");
+    println!("Will Quit Automatically After 60 Seconds");
     println!();
 
     let _client = Client::new_with_notifications("example-client", print_notification).unwrap();
@@ -23,7 +23,7 @@ fn main() {
     //
     // You may not have to do this in your app - see https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html#//apple_ref/doc/uid/10000057i-CH16-SW24
     // for information about when run loops are running automatically.
-    unsafe { CFRunLoopRunInMode(kCFRunLoopDefaultMode, 10.0, 0) };
+    unsafe { CFRunLoopRunInMode(kCFRunLoopDefaultMode, 60.0, 0) };
 }
 
 fn print_notification(notification: &Notification) {

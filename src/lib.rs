@@ -36,7 +36,6 @@ For handling low level MIDI data you may look into:
 
 */
 
-mod callback;
 mod client;
 mod devices;
 mod endpoints;
