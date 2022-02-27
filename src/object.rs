@@ -113,6 +113,18 @@ impl Object {
     pub fn get_property_boolean(&self, name: &str) -> Result<bool, OSStatus> {
         BooleanProperty::new(name).value_from(self)
     }
+
+    pub fn set_property<T>(
+        &self,
+        property: &dyn PropertySetter<T>,
+        value: T,
+    ) -> Result<(), OSStatus> {
+        property.set_value(self, value)
+    }
+
+    pub fn get_property<T>(&self, property: &dyn PropertyGetter<T>) -> Result<T, OSStatus> {
+        property.value_from(self)
+    }
 }
 
 impl fmt::Debug for Object {
