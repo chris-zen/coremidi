@@ -3,7 +3,7 @@ use core_foundation::{
     string::CFString,
 };
 
-use coremidi_sys::{MIDIClientCreate, MIDIClientCreateWithBlock, MIDIClientDispose, MIDIDestinationCreateWithBlock, MIDIInputPortCreateWithBlock, MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate, MIDIPacketList, MIDIReadBlock, MIDISourceCreate};
+use coremidi_sys::{MIDIClientCreate, MIDIClientCreateWithBlock, MIDIClientDispose, MIDIDestinationCreateWithBlock, MIDIDestinationCreateWithProtocol, MIDIEventList, MIDIInputPortCreateWithBlock, MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate, MIDIPacketList, MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate};
 
 use block::RcBlock;
 use std::cell::RefCell;
@@ -139,34 +139,34 @@ impl Client {
     }
 
     /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
-    /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
+    /// It allows to choose which MIDI [Protocol] to use.
+    /// See [MIDIInputPortCreateWithProtocol](https://developer.apple.com/documentation/coremidi/3566488-midiinputportcreatewithprotocol).
     ///
-    // pub fn input_port_with_protocol<F>(&self, name: &str, protocol: Protocol, callback: F) -> Result<InputPort, OSStatus>
-    //     where
-    //         F: FnMut(&EventList) + Send + 'static,
-    // {
-    //     let port_name = CFString::new(name);
-    //     let mut port_ref = MaybeUninit::uninit();
-    //     let mut box_callback = BoxedCallback::new(callback);
-    //     let status = unsafe {
-    //         MIDIInputPortCreateWithProtocol(
-    //             self.object.0,
-    //             port_name.as_concrete_TypeRef(),
-    //             protocol.into(),
-    //             port_ref.as_mut_ptr(),
-    //             receive_block,
-    //         )
-    //     };
-    //     result_from_status(status, || {
-    //         let port_ref = unsafe { port_ref.assume_init() };
-    //         InputPort {
-    //             port: Port {
-    //                 object: Object(port_ref),
-    //             },
-    //             _callback: box_callback,
-    //         }
-    //     })
-    // }
+    pub fn input_port_with_protocol<F>(&self, name: &str, protocol: Protocol, callback: F) -> Result<InputPort, OSStatus>
+    where
+        F: FnMut(&EventList) + Send + 'static,
+    {
+        let port_name = CFString::new(name);
+        let mut port_ref = MaybeUninit::uninit();
+        let receive_block = Self::receive_block(callback);
+        let status = unsafe {
+            MIDIInputPortCreateWithProtocol(
+                self.object.0,
+                port_name.as_concrete_TypeRef(),
+                protocol.into(),
+                port_ref.as_mut_ptr(),
+                receive_block.deref() as *const _ as MIDIReceiveBlock,
+            )
+        };
+        result_from_status(status, || {
+            let port_ref = unsafe { port_ref.assume_init() };
+            InputPort {
+                port: Port {
+                    object: Object(port_ref),
+                },
+            }
+        })
+    }
 
     /// Creates a virtual source in the client.
     /// See [MIDISourceCreate](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate).
@@ -223,6 +223,41 @@ impl Client {
         })
     }
 
+    /// Creates a virtual destination in the client.
+    /// It allows to choose which MIDI [Protocol] to use.
+    /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
+    ///
+    pub fn virtual_destination_with_protocol<F>(
+        &self,
+        name: &str,
+        protocol: Protocol,
+        callback: F,
+    ) -> Result<VirtualDestination, OSStatus>
+    where
+        F: FnMut(&EventList) + Send + 'static,
+    {
+        let virtual_destination_name = CFString::new(name);
+        let mut virtual_destination = MaybeUninit::uninit();
+        let receive_block = Self::receive_block(callback);
+        let status = unsafe {
+            MIDIDestinationCreateWithProtocol(
+                self.object.0,
+                virtual_destination_name.as_concrete_TypeRef(),
+                protocol.into(),
+                virtual_destination.as_mut_ptr(),
+                receive_block.deref() as *const _ as MIDIReceiveBlock,
+            )
+        };
+        result_from_status(status, || {
+            let virtual_destination = unsafe { virtual_destination.assume_init() };
+            VirtualDestination {
+                endpoint: Endpoint {
+                    object: Object(virtual_destination),
+                },
+            }
+        })
+    }
+
     fn notify_block<F>(callback: F) -> RcBlock<(*const MIDINotification,), ()>
     where
         F: FnMut(&Notification) + Send + 'static,
@@ -251,6 +286,20 @@ impl Client {
             },
         );
         read_block.copy()
+    }
+
+    fn receive_block<F>(callback: F) -> RcBlock<(*const MIDIEventList, *mut c_void), ()>
+        where
+            F: FnMut(&EventList) + Send + 'static,
+    {
+        let callback = RefCell::new(callback);
+        let receive_block = block::ConcreteBlock::new(
+            move |evtlist: *const MIDIEventList, _src_conn_ref_con: *mut c_void| {
+                let event_list = unsafe { &*(evtlist as *const EventList) };
+                (callback.borrow_mut())(event_list);
+            },
+        );
+        receive_block.copy()
     }
 }
 

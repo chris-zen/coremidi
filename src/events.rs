@@ -44,8 +44,15 @@ impl EventList {
     }
 }
 
-// TODO impl Debug for EventList
-// TODO impl Display for EventList
+impl std::fmt::Debug for EventList {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(f, "EventList(protocol={:?}, packets={})", self.protocol(), self.len())?;
+        for packet in self.iter() {
+            writeln!(f, "{:?}", packet)?;
+        }
+        Ok(())
+    }
+}
 
 pub struct EventListIter<'a> {
     count: usize,
@@ -85,8 +92,15 @@ impl EventPacket {
     }
 }
 
-// TODO impl Debug for EventPacket
-// TODO impl Display for EventPacket
+impl std::fmt::Debug for EventPacket {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "  {:024}:", self.timestamp())?;
+        for word in self.data().iter() {
+            write!(f, " {:08x}", word)?;
+        }
+        Ok(())
+    }
+}
 
 pub struct EventBuffer {
     storage: Storage,
