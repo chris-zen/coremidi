@@ -4,7 +4,7 @@ use coremidi_sys::{
 
 use std::ops::Deref;
 
-use crate::{callback::BoxedCallback, object::Object, packets::PacketList};
+use crate::object::Object;
 
 use super::Endpoint;
 
@@ -116,9 +116,7 @@ impl Iterator for DestinationsIterator {
 ///
 #[derive(Debug)]
 pub struct VirtualDestination {
-    // Note: the order is important here, endpoint needs to be dropped first
     pub(crate) endpoint: Endpoint,
-    pub(crate) _callback: BoxedCallback<PacketList>,
 }
 
 impl VirtualDestination {}

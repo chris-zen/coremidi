@@ -4,10 +4,13 @@ use core_foundation::{
 };
 
 use coremidi_sys::{
-    MIDIClientCreate, MIDIClientDispose, MIDIDestinationCreate, MIDIInputPortCreate,
-    MIDINotification, MIDIOutputPortCreate, MIDIPacketList, MIDISourceCreate,
+    MIDIClientCreate, MIDIClientDispose, MIDIDestinationCreateWithBlock,
+    MIDIInputPortCreateWithBlock, MIDIInputPortCreateWithProtocol, MIDINotification,
+    MIDIOutputPortCreate, MIDIPacketList, MIDIReadBlock, MIDISourceCreate,
 };
 
+use block::RcBlock;
+use std::cell::RefCell;
 use std::{mem::MaybeUninit, ops::Deref, os::raw::c_void, panic::catch_unwind, ptr};
 
 use crate::{
@@ -17,7 +20,7 @@ use crate::{
     object::Object,
     packets::PacketList,
     ports::{InputPort, OutputPort, Port},
-    result_from_status,
+    result_from_status, EventList, Protocol,
 };
 
 /// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).
@@ -125,14 +128,13 @@ impl Client {
     {
         let port_name = CFString::new(name);
         let mut port_ref = MaybeUninit::uninit();
-        let mut box_callback = BoxedCallback::new(callback);
+        let read_block = Self::read_block(callback);
         let status = unsafe {
-            MIDIInputPortCreate(
+            MIDIInputPortCreateWithBlock(
                 self.object.0,
                 port_name.as_concrete_TypeRef(),
-                Some(Self::read_proc as extern "C" fn(_, _, _)),
-                box_callback.raw_ptr(),
                 port_ref.as_mut_ptr(),
+                read_block.deref() as *const _ as MIDIReadBlock,
             )
         };
         result_from_status(status, || {
@@ -141,10 +143,39 @@ impl Client {
                 port: Port {
                     object: Object(port_ref),
                 },
-                _callback: box_callback,
             }
         })
     }
+
+    /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
+    /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
+    ///
+    // pub fn input_port_with_protocol<F>(&self, name: &str, protocol: Protocol, callback: F) -> Result<InputPort, OSStatus>
+    //     where
+    //         F: FnMut(&EventList) + Send + 'static,
+    // {
+    //     let port_name = CFString::new(name);
+    //     let mut port_ref = MaybeUninit::uninit();
+    //     let mut box_callback = BoxedCallback::new(callback);
+    //     let status = unsafe {
+    //         MIDIInputPortCreateWithProtocol(
+    //             self.object.0,
+    //             port_name.as_concrete_TypeRef(),
+    //             protocol.into(),
+    //             port_ref.as_mut_ptr(),
+    //             receive_block,
+    //         )
+    //     };
+    //     result_from_status(status, || {
+    //         let port_ref = unsafe { port_ref.assume_init() };
+    //         InputPort {
+    //             port: Port {
+    //                 object: Object(port_ref),
+    //             },
+    //             _callback: box_callback,
+    //         }
+    //     })
+    // }
 
     /// Creates a virtual source in the client.
     /// See [MIDISourceCreate](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate).
@@ -182,14 +213,13 @@ impl Client {
     {
         let virtual_destination_name = CFString::new(name);
         let mut virtual_destination = MaybeUninit::uninit();
-        let mut boxed_callback = BoxedCallback::new(callback);
+        let read_block = Self::read_block(callback);
         let status = unsafe {
-            MIDIDestinationCreate(
+            MIDIDestinationCreateWithBlock(
                 self.object.0,
                 virtual_destination_name.as_concrete_TypeRef(),
-                Some(Self::read_proc as extern "C" fn(_, _, _)),
-                boxed_callback.raw_ptr(),
                 virtual_destination.as_mut_ptr(),
+                read_block.deref() as *const _ as MIDIReadBlock,
             )
         };
         result_from_status(status, || {
@@ -198,7 +228,6 @@ impl Client {
                 endpoint: Endpoint {
                     object: Object(virtual_destination),
                 },
-                _callback: boxed_callback,
             }
         })
     }
@@ -211,15 +240,18 @@ impl Client {
         });
     }
 
-    extern "C" fn read_proc(
-        pktlist: *const MIDIPacketList,
-        read_proc_ref_con: *mut c_void,
-        _src_conn_ref_con: *mut c_void,
-    ) {
-        let _ = catch_unwind(|| unsafe {
-            let packet_list = &*(pktlist as *const PacketList);
-            BoxedCallback::call_from_raw_ptr(read_proc_ref_con, packet_list);
-        });
+    fn read_block<F>(callback: F) -> RcBlock<(*const MIDIPacketList, *mut c_void), ()>
+    where
+        F: FnMut(&PacketList) + Send + 'static,
+    {
+        let callback = RefCell::new(callback);
+        let read_block = block::ConcreteBlock::new(
+            move |pktlist: *const MIDIPacketList, _src_conn_ref_con: *mut c_void| {
+                let packet_list = unsafe { &*(pktlist as *const PacketList) };
+                (callback.borrow_mut())(packet_list);
+            },
+        );
+        read_block.copy()
     }
 }
 

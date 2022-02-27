@@ -5,7 +5,6 @@ use coremidi_sys::{MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDisp
 use std::ops::Deref;
 use std::ptr;
 
-use crate::callback::BoxedCallback;
 use crate::endpoints::destinations::Destination;
 use crate::endpoints::sources::Source;
 use crate::object::Object;
@@ -95,9 +94,7 @@ impl Deref for OutputPort {
 /// ```
 #[derive(Debug)]
 pub struct InputPort {
-    // Note: the order is important here, port needs to be dropped first
     pub(crate) port: Port,
-    pub(crate) _callback: BoxedCallback<PacketList>,
 }
 
 impl InputPort {
