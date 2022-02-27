@@ -1,5 +1,5 @@
-use std::env;
 use coremidi::{Client, EventList, Protocol, Source, Sources};
+use std::env;
 
 fn main() {
     let source_index = get_source_index();
@@ -14,7 +14,9 @@ fn main() {
         print!("{:?}", event_list);
     };
 
-    let input_port = client.input_port_with_protocol("Example Port", Protocol::Midi10, callback).unwrap();
+    let input_port = client
+        .input_port_with_protocol("Example Port", Protocol::Midi10, callback)
+        .unwrap();
     input_port.connect_source(&source).unwrap();
 
     let mut input_line = String::new();

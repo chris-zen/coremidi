@@ -3,7 +3,12 @@ use core_foundation::{
     string::CFString,
 };
 
-use coremidi_sys::{MIDIClientCreate, MIDIClientCreateWithBlock, MIDIClientDispose, MIDIDestinationCreateWithBlock, MIDIDestinationCreateWithProtocol, MIDIEventList, MIDIInputPortCreateWithBlock, MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate, MIDIPacketList, MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate};
+use coremidi_sys::{
+    MIDIClientCreate, MIDIClientCreateWithBlock, MIDIClientDispose, MIDIDestinationCreateWithBlock,
+    MIDIDestinationCreateWithProtocol, MIDIEventList, MIDIInputPortCreateWithBlock,
+    MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate,
+    MIDIPacketList, MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate,
+};
 
 use block::RcBlock;
 use std::cell::RefCell;
@@ -142,7 +147,12 @@ impl Client {
     /// It allows to choose which MIDI [Protocol] to use.
     /// See [MIDIInputPortCreateWithProtocol](https://developer.apple.com/documentation/coremidi/3566488-midiinputportcreatewithprotocol).
     ///
-    pub fn input_port_with_protocol<F>(&self, name: &str, protocol: Protocol, callback: F) -> Result<InputPort, OSStatus>
+    pub fn input_port_with_protocol<F>(
+        &self,
+        name: &str,
+        protocol: Protocol,
+        callback: F,
+    ) -> Result<InputPort, OSStatus>
     where
         F: FnMut(&EventList) + Send + 'static,
     {
@@ -263,14 +273,12 @@ impl Client {
         F: FnMut(&Notification) + Send + 'static,
     {
         let callback = RefCell::new(callback);
-        let notify_block = block::ConcreteBlock::new(
-            move |message: *const MIDINotification| {
-                let message = unsafe { &*message };
-                if let Ok(notification) = Notification::from(message) {
-                    (callback.borrow_mut())(&notification);
-                }
-            },
-        );
+        let notify_block = block::ConcreteBlock::new(move |message: *const MIDINotification| {
+            let message = unsafe { &*message };
+            if let Ok(notification) = Notification::from(message) {
+                (callback.borrow_mut())(&notification);
+            }
+        });
         notify_block.copy()
     }
 
@@ -289,8 +297,8 @@ impl Client {
     }
 
     fn receive_block<F>(callback: F) -> RcBlock<(*const MIDIEventList, *mut c_void), ()>
-        where
-            F: FnMut(&EventList) + Send + 'static,
+    where
+        F: FnMut(&EventList) + Send + 'static,
     {
         let callback = RefCell::new(callback);
         let receive_block = block::ConcreteBlock::new(

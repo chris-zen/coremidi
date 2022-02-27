@@ -46,7 +46,12 @@ impl EventList {
 
 impl std::fmt::Debug for EventList {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "EventList(protocol={:?}, packets={})", self.protocol(), self.len())?;
+        writeln!(
+            f,
+            "EventList(protocol={:?}, packets={})",
+            self.protocol(),
+            self.len()
+        )?;
         for packet in self.iter() {
             writeln!(f, "{:?}", packet)?;
         }
