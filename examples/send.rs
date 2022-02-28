@@ -1,4 +1,4 @@
-use coremidi::{Client, Destination, Destinations, PacketBuffer};
+use coremidi::{Client, Destination, Destinations, EventBuffer, Protocol};
 use std::env;
 use std::thread;
 use std::time::Duration;
@@ -16,17 +16,18 @@ fn main() {
     let client = Client::new("Example Client").unwrap();
     let output_port = client.output_port("Example Port").unwrap();
 
-    let note_on = create_note_on(0, 64, 127);
-    let note_off = create_note_off(0, 64, 127);
+    let note_on = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2090407f]);
+
+    let note_off = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2080407f]);
 
     for i in 0..10 {
         println!("[{}] Sending note ...", i);
 
         output_port.send(&destination, &note_on).unwrap();
-
         thread::sleep(Duration::from_millis(1000));
 
         output_port.send(&destination, &note_off).unwrap();
+        thread::sleep(Duration::from_millis(100));
     }
 }
 
@@ -71,14 +72,4 @@ fn print_destinations() {
             println!("[{}] {}", i, display_name)
         }
     }
-}
-
-fn create_note_on(channel: u8, note: u8, velocity: u8) -> PacketBuffer {
-    let data = &[0x90 | (channel & 0x0f), note & 0x7f, velocity & 0x7f];
-    PacketBuffer::new(0, data)
-}
-
-fn create_note_off(channel: u8, note: u8, velocity: u8) -> PacketBuffer {
-    let data = &[0x80 | (channel & 0x0f), note & 0x7f, velocity & 0x7f];
-    PacketBuffer::new(0, data)
 }

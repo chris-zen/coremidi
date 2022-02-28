@@ -393,6 +393,7 @@ impl Deref for PacketBuffer {
     }
 }
 
+#[derive(Clone)]
 pub(crate) enum Storage {
     /// Inline stores the data directly on the stack, if it is small enough.
     /// NOTE: using u32 ensures correct alignment (required on ARM)

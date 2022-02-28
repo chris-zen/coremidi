@@ -1,6 +1,8 @@
 use core_foundation::base::OSStatus;
 
-use coremidi_sys::{MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose, MIDISend};
+use coremidi_sys::{
+    MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose, MIDISend, MIDISendEventList,
+};
 
 use std::ops::Deref;
 use std::ptr;
@@ -9,6 +11,43 @@ use crate::endpoints::destinations::Destination;
 use crate::endpoints::sources::Source;
 use crate::object::Object;
 use crate::packets::PacketList;
+use crate::{EventBuffer, EventList, PacketBuffer};
+
+pub enum Packets<'a> {
+    BorrowedPacketList(&'a PacketList),
+    BorrowedEventList(&'a EventList),
+    OwnedEventBuffer(EventBuffer),
+}
+
+impl<'a> From<&'a PacketList> for Packets<'a> {
+    fn from(packet_list: &'a PacketList) -> Self {
+        Self::BorrowedPacketList(packet_list)
+    }
+}
+
+impl<'a> From<&'a PacketBuffer> for Packets<'a> {
+    fn from(packet_buffer: &'a PacketBuffer) -> Self {
+        Self::BorrowedPacketList(&*packet_buffer)
+    }
+}
+
+impl<'a> From<&'a EventList> for Packets<'a> {
+    fn from(event_list: &'a EventList) -> Self {
+        Self::BorrowedEventList(event_list)
+    }
+}
+
+impl<'a> From<&'a EventBuffer> for Packets<'a> {
+    fn from(event_buffer: &'a EventBuffer) -> Self {
+        Self::BorrowedEventList(&*event_buffer)
+    }
+}
+
+impl<'a> From<EventBuffer> for Packets<'a> {
+    fn from(event_buffer: EventBuffer) -> Self {
+        Self::OwnedEventBuffer(event_buffer)
+    }
+}
 
 /// A MIDI connection port owned by a client.
 /// See [MIDIPortRef](https://developer.apple.com/reference/coremidi/midiportref).
@@ -39,10 +78,11 @@ impl Drop for Port {
 /// A simple example to create an output port and send a MIDI event:
 ///
 /// ```rust,no_run
-/// let client = coremidi::Client::new("example-client").unwrap();
+/// use coremidi::{Client, Destination, EventBuffer, Protocol};
+/// let client = Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
-/// let destination = coremidi::Destination::from_index(0).unwrap();
-/// let packets = coremidi::PacketBuffer::new(0, &[0x90, 0x40, 0x7f]);
+/// let destination = Destination::from_index(0).unwrap();
+/// let packets = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2090407f]);
 /// output_port.send(&destination, &packets).unwrap();
 /// ```
 #[derive(Debug)]
@@ -52,19 +92,35 @@ pub struct OutputPort {
 
 impl OutputPort {
     /// Send a list of packets to a destination.
+    /// See [MIDISendEventList](https://developer.apple.com/documentation/coremidi/3566494-midisendeventlist)
     /// See [MIDISend](https://developer.apple.com/reference/coremidi/1495289-midisend).
     ///
-    pub fn send(
-        &self,
-        destination: &Destination,
-        packet_list: &PacketList,
-    ) -> Result<(), OSStatus> {
-        let status = unsafe {
-            MIDISend(
-                self.port.object.0,
-                destination.endpoint.object.0,
-                packet_list.as_ptr(),
-            )
+    pub fn send<'a, P>(&self, destination: &Destination, packets: P) -> Result<(), OSStatus>
+    where
+        P: Into<Packets<'a>>,
+    {
+        let status = match packets.into() {
+            Packets::BorrowedPacketList(packet_list) => unsafe {
+                MIDISend(
+                    self.port.object.0,
+                    destination.endpoint.object.0,
+                    packet_list.as_ptr(),
+                )
+            },
+            Packets::BorrowedEventList(event_list) => unsafe {
+                MIDISendEventList(
+                    self.port.object.0,
+                    destination.endpoint.object.0,
+                    event_list.as_ptr(),
+                )
+            },
+            Packets::OwnedEventBuffer(event_buffer) => unsafe {
+                MIDISendEventList(
+                    self.port.object.0,
+                    destination.endpoint.object.0,
+                    event_buffer.as_ptr(),
+                )
+            },
         };
         if status == 0 {
             Ok(())

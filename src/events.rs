@@ -42,6 +42,12 @@ impl EventList {
             _phantom: PhantomData,
         }
     }
+
+    /// For internal usage only.
+    /// Requires this instance to actually point to a valid MIDIEventList
+    pub(crate) unsafe fn as_ptr(&self) -> *const MIDIEventList {
+        self as *const EventList as *const MIDIEventList
+    }
 }
 
 impl std::fmt::Debug for EventList {
@@ -107,6 +113,7 @@ impl std::fmt::Debug for EventPacket {
     }
 }
 
+#[derive(Clone)]
 pub struct EventBuffer {
     storage: Storage,
     current_packet_offset: usize,
@@ -143,6 +150,32 @@ impl EventBuffer {
         self.storage.capacity()
     }
 
+    /// Add a new packet containing the provided timestamp and data.
+    /// It consumes the instance and returns it modified with the new packet.
+    ///
+    /// See [EventBuffer::push] for further details.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// use coremidi::{Protocol, Timestamp, EventBuffer};
+    ///
+    /// let buffer = EventBuffer::new(Protocol::Midi20)
+    ///     .with_packet(0, &[0x20903c00, 0xffff0000]); // Note On for Middle C
+    ///
+    /// assert_eq!(buffer.len(), 1);
+    /// assert_eq!(
+    ///     buffer.iter()
+    ///         .map(|packet| (packet.timestamp(), packet.data().to_vec()))
+    ///         .collect::<Vec<(Timestamp, Vec<u32>)>>(),
+    ///     vec![(0, vec![0x20903c00, 0xffff0000])],
+    /// )
+    /// ```
+    pub fn with_packet(mut self, timestamp: Timestamp, data: &[u32]) -> Self {
+        self.push(timestamp, data);
+        self
+    }
+
     /// Add a new event containing the provided timestamp and data.
     ///
     /// According to the official documentation for CoreMIDI, the timestamp represents
@@ -156,8 +189,10 @@ impl EventBuffer {
     ///
     /// ```
     /// use coremidi::{Protocol, Timestamp};
+    ///
     /// let mut buffer = coremidi::EventBuffer::new(Protocol::Midi20);
     /// buffer.push(0, &[0x20903c00, 0xffff0000]); // Note On for Middle C
+    ///
     /// assert_eq!(buffer.len(), 1);
     /// assert_eq!(
     ///     buffer.iter()
@@ -207,13 +242,6 @@ impl EventBuffer {
         let next_capacity =
             self.current_bytes_len() + Self::PACKET_HEADER_SIZE + data_len * size_of::<u32>();
 
-        println!(
-            "{} = {} + {} + {}",
-            next_capacity,
-            self.current_bytes_len(),
-            Self::PACKET_HEADER_SIZE,
-            data_len * size_of::<u32>()
-        );
         unsafe {
             // We ensure capacity for the worst case as if there was no merge with the current packet
             self.storage.ensure_capacity(next_capacity);
@@ -332,6 +360,22 @@ mod tests {
     }
 
     #[test]
+    fn event_buffer_with_packet() {
+        let event_buffer = EventBuffer::new(Protocol::Midi20)
+            .with_packet(10, &[1, 2])
+            .with_packet(20, &[3, 4, 5]);
+
+        assert_eq!(event_buffer.len(), 2);
+        assert_eq!(
+            event_buffer
+                .iter()
+                .map(|packet| (packet.timestamp(), packet.data().to_vec()))
+                .collect::<Vec<(Timestamp, Vec<u32>)>>(),
+            vec![(10, vec![1, 2]), (20, vec![3, 4, 5]),]
+        );
+    }
+
+    #[test]
     fn event_buffer_push_within_capacity() {
         let mut event_buffer = EventBuffer::new(Protocol::Midi20);
         event_buffer.push(10, &[1, 2]).push(20, &[3, 4, 5]);
@@ -365,8 +409,7 @@ mod tests {
 
     #[test]
     fn event_buffer_clear() {
-        let mut event_buffer = EventBuffer::new(Protocol::Midi20);
-        event_buffer.push(10, &[1, 2]);
+        let mut event_buffer = EventBuffer::new(Protocol::Midi20).with_packet(10, &[1, 2]);
 
         assert_eq!(event_buffer.len(), 1);
         assert_eq!(
