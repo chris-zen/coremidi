@@ -275,7 +275,7 @@ impl Client {
         let callback = RefCell::new(callback);
         let notify_block = block::ConcreteBlock::new(move |message: *const MIDINotification| {
             let message = unsafe { &*message };
-            if let Ok(notification) = Notification::from(message) {
+            if let Ok(notification) = Notification::try_from(*message) {
                 (callback.borrow_mut())(&notification);
             }
         });
