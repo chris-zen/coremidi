@@ -424,13 +424,15 @@ impl Properties {
 mod tests {
     use super::*;
 
-    use crate::{endpoints::destinations::VirtualDestination, Client};
+    use crate::{endpoints::destinations::VirtualDestination, Client, Protocol};
 
     const NAME_ORIG: &str = "A";
 
     fn setup() -> (Client, VirtualDestination) {
         let client = Client::new("Test Client").unwrap();
-        let dest = client.virtual_destination(NAME_ORIG, |_| ()).unwrap();
+        let dest = client
+            .virtual_destination_with_protocol(NAME_ORIG, Protocol::Midi10, |_| ())
+            .unwrap();
         (client, dest)
     }
 
