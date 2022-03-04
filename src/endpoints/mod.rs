@@ -1,9 +1,9 @@
 pub mod destinations;
 pub mod sources;
 
+use core_foundation_sys::base::OSStatus;
 use std::ops::Deref;
 
-use core_foundation_sys::base::OSStatus;
 use coremidi_sys::MIDIFlushOutput;
 
 use crate::object::Object;

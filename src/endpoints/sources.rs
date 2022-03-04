@@ -1,10 +1,9 @@
 use core_foundation_sys::base::OSStatus;
+use std::ops::Deref;
 
 use coremidi_sys::{
     ItemCount, MIDIEndpointDispose, MIDIGetNumberOfSources, MIDIGetSource, MIDIReceived,
 };
-
-use std::ops::Deref;
 
 use crate::object::Object;
 use crate::packets::PacketList;

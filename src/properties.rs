@@ -1,11 +1,28 @@
-use std::mem::MaybeUninit;
-
 use core_foundation::{
     base::{CFGetRetainCount, CFIndex, CFTypeRef, OSStatus, TCFType},
     string::{CFString, CFStringRef},
 };
+use std::mem::MaybeUninit;
 
-use coremidi_sys::*;
+use coremidi_sys::{
+    kMIDIPropertyAdvanceScheduleTimeMuSec, kMIDIPropertyCanRoute, kMIDIPropertyConnectionUniqueID,
+    kMIDIPropertyDeviceID, kMIDIPropertyDisplayName, kMIDIPropertyDriverDeviceEditorApp,
+    kMIDIPropertyDriverOwner, kMIDIPropertyDriverVersion, kMIDIPropertyIsBroadcast,
+    kMIDIPropertyIsDrumMachine, kMIDIPropertyIsEffectUnit, kMIDIPropertyIsEmbeddedEntity,
+    kMIDIPropertyIsMixer, kMIDIPropertyIsSampler, kMIDIPropertyManufacturer,
+    kMIDIPropertyMaxReceiveChannels, kMIDIPropertyMaxSysExSpeed, kMIDIPropertyMaxTransmitChannels,
+    kMIDIPropertyModel, kMIDIPropertyName, kMIDIPropertyOffline, kMIDIPropertyPanDisruptsStereo,
+    kMIDIPropertyPrivate, kMIDIPropertyProtocolID, kMIDIPropertyReceiveChannels,
+    kMIDIPropertyReceivesBankSelectLSB, kMIDIPropertyReceivesBankSelectMSB,
+    kMIDIPropertyReceivesClock, kMIDIPropertyReceivesMTC, kMIDIPropertyReceivesNotes,
+    kMIDIPropertyReceivesProgramChanges, kMIDIPropertySingleRealtimeEntity,
+    kMIDIPropertySupportsGeneralMIDI, kMIDIPropertySupportsMMC, kMIDIPropertySupportsShowControl,
+    kMIDIPropertyTransmitChannels, kMIDIPropertyTransmitsBankSelectLSB,
+    kMIDIPropertyTransmitsBankSelectMSB, kMIDIPropertyTransmitsClock, kMIDIPropertyTransmitsMTC,
+    kMIDIPropertyTransmitsNotes, kMIDIPropertyTransmitsProgramChanges, kMIDIPropertyUniqueID,
+    MIDIObjectGetIntegerProperty, MIDIObjectGetStringProperty, MIDIObjectSetIntegerProperty,
+    MIDIObjectSetStringProperty, SInt32,
+};
 
 use crate::{object::Object, result_from_status, unit_result_from_status};
 

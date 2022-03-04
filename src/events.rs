@@ -1,12 +1,13 @@
-use coremidi_sys::{
-    MIDIEventList, MIDIEventListAdd, MIDIEventListInit, MIDIEventPacket, MIDIEventPacketNext,
-};
+use std::fmt::Formatter;
 use std::marker::PhantomData;
 use std::mem::size_of;
 use std::ops::Deref;
 use std::slice;
 
-use crate::packets::Storage;
+use coremidi_sys::{
+    MIDIEventList, MIDIEventListAdd, MIDIEventListInit, MIDIEventPacket, MIDIEventPacketNext,
+};
+
 use crate::protocol::Protocol;
 
 pub type Timestamp = u64;
@@ -208,7 +209,6 @@ impl EventBuffer {
         let current_packet_ptr = unsafe {
             self.storage.as_ptr::<u8>().add(self.current_packet_offset) as *mut MIDIEventPacket
         };
-
         let current_packet_ptr = unsafe {
             MIDIEventListAdd(
                 packet_list_ptr,
@@ -240,7 +240,7 @@ impl EventBuffer {
 
     fn ensure_capacity(&mut self, data_len: usize) {
         let next_capacity =
-            self.current_bytes_len() + Self::PACKET_HEADER_SIZE + data_len * size_of::<u32>();
+            self.aligned_bytes_len() + Self::PACKET_HEADER_SIZE + data_len * size_of::<u32>();
 
         unsafe {
             // We ensure capacity for the worst case as if there was no merge with the current packet
@@ -249,8 +249,8 @@ impl EventBuffer {
     }
 
     #[inline]
-    fn current_bytes_len(&self) -> usize {
-        let start_ptr = unsafe { self.storage.as_ptr::<u8>() };
+    fn aligned_bytes_len(&self) -> usize {
+        let storage_start_ptr = unsafe { self.storage.as_ptr::<u8>() };
         if self.as_ref().is_empty() {
             self.current_packet_offset
         } else {
@@ -258,9 +258,11 @@ impl EventBuffer {
                 &*(self.storage.as_ptr::<u8>().add(self.current_packet_offset)
                     as *const MIDIEventPacket)
             };
-            let packet_data_ptr = current_packet.words.as_ptr() as *const u8;
-            let data_bytes_len = current_packet.wordCount as usize * size_of::<u32>();
-            packet_data_ptr as *const u8 as usize - start_ptr as *const u8 as usize + data_bytes_len
+            let current_packet_data_ptr = current_packet.words.as_ptr() as *const u8;
+            let data_offset = current_packet_data_ptr as *const u8 as usize
+                - storage_start_ptr as *const u8 as usize;
+            let data_len = current_packet.wordCount as usize * size_of::<u32>();
+            (data_offset + data_len + 3) & !3
         }
     }
 }
@@ -281,10 +283,114 @@ impl Deref for EventBuffer {
     }
 }
 
+#[derive(Clone)]
+pub(crate) enum Storage {
+    /// Inline stores the data directly on the stack, if it is small enough.
+    /// NOTE: using u32 ensures correct alignment (required on ARM)
+    Inline([u32; Storage::INLINE_SIZE / 4]),
+    /// External is used whenever the size of the data exceeds INLINE_PACKET_BUFFER_SIZE.
+    /// This means that the size of the contained vector is always greater than INLINE_PACKET_BUFFER_SIZE.
+    External(Vec<u32>),
+}
+
+impl Storage {
+    pub(crate) const INLINE_SIZE: usize = 8 // MIDIEventList header
+        + 12 // MIDIEventPacket header
+        + 4 * 4; // 4 words
+
+    #[inline]
+    #[allow(clippy::uninit_vec)]
+    pub(crate) fn with_capacity(capacity: usize) -> Self {
+        if capacity <= Self::INLINE_SIZE {
+            Self::Inline([0; Self::INLINE_SIZE / 4])
+        } else {
+            let u32_len = ((capacity - 1) / 4) + 1;
+            let mut buffer = Vec::with_capacity(u32_len);
+            unsafe {
+                buffer.set_len(u32_len);
+            }
+            Storage::External(buffer)
+        }
+    }
+
+    #[inline]
+    pub(crate) fn capacity(&self) -> usize {
+        match *self {
+            Storage::Inline(ref inline) => inline.len() * 4,
+            Storage::External(ref vec) => vec.len() * 4,
+        }
+    }
+
+    #[inline]
+    pub(crate) fn get_slice<T>(&self) -> &[T] {
+        unsafe {
+            match *self {
+                Storage::Inline(ref inline) => slice::from_raw_parts(
+                    inline.as_ptr() as *const T,
+                    inline.len() * size_of::<u32>() / size_of::<T>(),
+                ),
+                Storage::External(ref vec) => {
+                    slice::from_raw_parts(vec.as_ptr() as *const T, vec.len() * 4 / size_of::<T>())
+                }
+            }
+        }
+    }
+
+    /// Call this only with larger length values (won't make the buffer smaller)
+    #[allow(clippy::uninit_vec)]
+    pub(crate) unsafe fn ensure_capacity(&mut self, capacity: usize) {
+        if capacity < Self::INLINE_SIZE || capacity < self.get_slice::<u8>().len() {
+            return;
+        }
+
+        let vec_capacity = ((capacity - 1) / 4) + 1;
+        let vec: Option<Vec<u32>> = match *self {
+            Storage::Inline(ref inline) => {
+                let mut v = Vec::with_capacity(vec_capacity);
+                v.extend_from_slice(inline);
+                v.set_len(vec_capacity);
+                Some(v)
+            }
+            Storage::External(ref mut vec) => {
+                let current_len = vec.len();
+                vec.reserve(vec_capacity - current_len);
+                vec.set_len(vec_capacity);
+                None
+            }
+        };
+
+        // to prevent borrow-check errors, this must come after the `match`
+        if let Some(v) = vec {
+            *self = Storage::External(v);
+        }
+    }
+
+    #[inline]
+    pub(crate) unsafe fn as_ptr<T>(&self) -> *const T {
+        match *self {
+            Storage::Inline(ref inline) => inline.as_ptr() as *const T,
+            Storage::External(ref vec) => vec.as_ptr() as *const T,
+        }
+    }
+
+    #[inline]
+    pub(crate) unsafe fn as_mut_ptr<T>(&mut self) -> *mut T {
+        self.as_ptr::<T>() as *mut T
+    }
+}
+
+impl std::fmt::Debug for Storage {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for b in self.get_slice::<u8>() {
+            write!(f, " {:02x}", *b)?;
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::events::Timestamp;
-    use crate::packets::Storage;
+    use crate::events::{Storage, Timestamp};
     use crate::protocol::Protocol;
     use crate::{EventBuffer, EventList};
     use coremidi_sys::{

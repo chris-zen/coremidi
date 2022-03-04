@@ -1,7 +1,10 @@
+use block::RcBlock;
 use core_foundation::{
     base::{OSStatus, TCFType},
     string::CFString,
 };
+use std::cell::RefCell;
+use std::{mem::MaybeUninit, ops::Deref, os::raw::c_void, ptr};
 
 use coremidi_sys::{
     MIDIClientCreate, MIDIClientCreateWithBlock, MIDIClientDispose, MIDIDestinationCreateWithBlock,
@@ -9,10 +12,6 @@ use coremidi_sys::{
     MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate,
     MIDIPacketList, MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate,
 };
-
-use block::RcBlock;
-use std::cell::RefCell;
-use std::{mem::MaybeUninit, ops::Deref, os::raw::c_void, ptr};
 
 use crate::{
     endpoints::{destinations::VirtualDestination, sources::VirtualSource, Endpoint},
@@ -275,7 +274,7 @@ impl Client {
         let callback = RefCell::new(callback);
         let notify_block = block::ConcreteBlock::new(move |message: *const MIDINotification| {
             let message = unsafe { &*message };
-            if let Ok(notification) = Notification::try_from(*message) {
+            if let Ok(notification) = Notification::try_from(message) {
                 (callback.borrow_mut())(&notification);
             }
         });

@@ -1,5 +1,6 @@
-use coremidi_sys::MIDIProtocolID;
 use std::fmt::Formatter;
+
+use coremidi_sys::MIDIProtocolID;
 
 /// The [MIDI Protocol](https://developer.apple.com/documentation/coremidi/midiprotocolid) to use for messages
 ///

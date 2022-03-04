@@ -1,8 +1,8 @@
+use std::ops::Deref;
+
 use coremidi_sys::{
     ItemCount, MIDIEndpointDispose, MIDIGetDestination, MIDIGetNumberOfDestinations,
 };
-
-use std::ops::Deref;
 
 use crate::object::Object;
 

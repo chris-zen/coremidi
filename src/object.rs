@@ -1,8 +1,7 @@
 use core_foundation_sys::base::OSStatus;
+use std::fmt;
 
 use coremidi_sys::{MIDIObjectRef, SInt32};
-
-use std::fmt;
 
 use crate::properties::{
     BooleanProperty, IntegerProperty, Properties, PropertyGetter, PropertySetter, StringProperty,

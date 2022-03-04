@@ -76,7 +76,7 @@ impl Notification {
         }
     }
 
-    fn from_property_changed(notification: &MIDINotification) -> Result<Notification, i32> {
+    fn try_from_property_changed(notification: &MIDINotification) -> Result<Notification, i32> {
         let property_changed_notification =
             unsafe { &*(notification as *const _ as *const MIDIObjectPropertyChangeNotification) };
         match ObjectType::try_from(property_changed_notification.objectType) {
@@ -110,23 +110,23 @@ impl Notification {
     }
 }
 
-impl TryFrom<MIDINotification> for Notification {
+impl TryFrom<&MIDINotification> for Notification {
     type Error = OSStatus;
 
-    fn try_from(notification: MIDINotification) -> Result<Self, Self::Error> {
+    fn try_from(notification: &MIDINotification) -> Result<Self, Self::Error> {
         match notification.messageID as ::std::os::raw::c_uint {
             coremidi_sys::kMIDIMsgSetupChanged => Ok(Notification::SetupChanged),
             coremidi_sys::kMIDIMsgObjectAdded | coremidi_sys::kMIDIMsgObjectRemoved => {
-                Self::try_from_object_added_removed(&notification)
+                Self::try_from_object_added_removed(notification)
             }
-            coremidi_sys::kMIDIMsgPropertyChanged => Self::from_property_changed(&notification),
+            coremidi_sys::kMIDIMsgPropertyChanged => Self::try_from_property_changed(notification),
             coremidi_sys::kMIDIMsgThruConnectionsChanged => {
                 Ok(Notification::ThruConnectionsChanged)
             }
             coremidi_sys::kMIDIMsgSerialPortOwnerChanged => {
                 Ok(Notification::SerialPortOwnerChanged)
             }
-            coremidi_sys::kMIDIMsgIOError => Ok(Self::from_io_error(&notification)),
+            coremidi_sys::kMIDIMsgIOError => Ok(Self::from_io_error(notification)),
             unknown => Err(unknown as OSStatus),
         }
     }
@@ -154,7 +154,7 @@ mod tests {
             messageSize: 8,
         };
 
-        let notification = Notification::try_from(notification_raw);
+        let notification = Notification::try_from(&notification_raw);
 
         assert!(notification.is_err());
         assert_eq!(notification.err().unwrap(), 0xffff as i32);
@@ -167,7 +167,7 @@ mod tests {
             messageSize: 8,
         };
 
-        let notification = Notification::try_from(notification_raw);
+        let notification = Notification::try_from(&notification_raw);
 
         assert!(notification.is_ok());
         assert_eq!(notification.unwrap(), Notification::SetupChanged);
@@ -185,7 +185,7 @@ mod tests {
         };
 
         let notification = Notification::try_from(unsafe {
-            *(&notification_raw as *const _ as *const MIDINotification)
+            &*(&notification_raw as *const _ as *const MIDINotification)
         });
 
         assert!(notification.is_ok());
@@ -212,7 +212,7 @@ mod tests {
         };
 
         let notification = Notification::try_from(unsafe {
-            *(&notification_raw as *const _ as *const MIDINotification)
+            &*(&notification_raw as *const _ as *const MIDINotification)
         });
 
         assert!(notification.is_ok());
@@ -239,7 +239,7 @@ mod tests {
         };
 
         let notification = Notification::try_from(unsafe {
-            *(&notification_raw as *const _ as *const MIDINotification)
+            &*(&notification_raw as *const _ as *const MIDINotification)
         });
 
         assert!(notification.is_err());
@@ -258,7 +258,7 @@ mod tests {
         };
 
         let notification = Notification::try_from(unsafe {
-            *(&notification_raw as *const _ as *const MIDINotification)
+            &*(&notification_raw as *const _ as *const MIDINotification)
         });
 
         assert!(notification.is_err());
@@ -280,7 +280,7 @@ mod tests {
         };
 
         let notification = Notification::try_from(unsafe {
-            *(&notification_raw as *const _ as *const MIDINotification)
+            &*(&notification_raw as *const _ as *const MIDINotification)
         });
 
         assert!(notification.is_ok());
@@ -306,7 +306,7 @@ mod tests {
         };
 
         let notification = Notification::try_from(unsafe {
-            *(&notification_raw as *const _ as *const MIDINotification)
+            &*(&notification_raw as *const _ as *const MIDINotification)
         });
 
         assert!(notification.is_err());
@@ -323,7 +323,7 @@ mod tests {
             messageSize: 8,
         };
 
-        let notification = Notification::try_from(notification_raw);
+        let notification = Notification::try_from(&notification_raw);
 
         assert!(notification.is_ok());
         assert_eq!(notification.unwrap(), Notification::ThruConnectionsChanged);
@@ -336,7 +336,7 @@ mod tests {
             messageSize: 8,
         };
 
-        let notification = Notification::try_from(notification_raw);
+        let notification = Notification::try_from(&notification_raw);
 
         assert!(notification.is_ok());
         assert_eq!(notification.unwrap(), Notification::SerialPortOwnerChanged);
@@ -352,7 +352,7 @@ mod tests {
         };
 
         let notification = Notification::try_from(unsafe {
-            *(&notification_raw as *const _ as *const MIDINotification)
+            &*(&notification_raw as *const _ as *const MIDINotification)
         });
 
         assert!(notification.is_ok());

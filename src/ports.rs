@@ -1,11 +1,10 @@
 use core_foundation::base::OSStatus;
+use std::ops::Deref;
+use std::ptr;
 
 use coremidi_sys::{
     MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose, MIDISend, MIDISendEventList,
 };
-
-use std::ops::Deref;
-use std::ptr;
 
 use crate::endpoints::destinations::Destination;
 use crate::endpoints::sources::Source;
