@@ -189,9 +189,9 @@ impl EventBuffer {
     /// Example:
     ///
     /// ```
-    /// use coremidi::{Protocol, Timestamp};
+    /// use coremidi::{EventBuffer, Protocol, Timestamp};
     ///
-    /// let mut buffer = coremidi::EventBuffer::new(Protocol::Midi20);
+    /// let mut buffer = EventBuffer::new(Protocol::Midi20);
     /// buffer.push(0, &[0x20903c00, 0xffff0000]); // Note On for Middle C
     ///
     /// assert_eq!(buffer.len(), 1);

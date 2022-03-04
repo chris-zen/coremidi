@@ -3,10 +3,11 @@ use std::ops::Deref;
 
 use coremidi_sys::{
     ItemCount, MIDIEndpointDispose, MIDIGetNumberOfSources, MIDIGetSource, MIDIReceived,
+    MIDIReceivedEventList,
 };
 
 use crate::object::Object;
-use crate::packets::PacketList;
+use crate::ports::Packets;
 
 use super::Endpoint;
 
@@ -125,8 +126,22 @@ impl VirtualSource {
     /// Distributes incoming MIDI from a source to the client input ports which are connected to that source.
     /// See [MIDIReceived](https://developer.apple.com/reference/coremidi/1495276-midireceived)
     ///
-    pub fn received(&self, packet_list: &PacketList) -> Result<(), OSStatus> {
-        let status = unsafe { MIDIReceived(self.endpoint.object.0, packet_list.as_ptr()) };
+    pub fn received<'a, P>(&self, packets: P) -> Result<(), OSStatus>
+    where
+        P: Into<Packets<'a>>,
+    {
+        let status = match packets.into() {
+            Packets::BorrowedPacketList(packet_list) => unsafe {
+                MIDIReceived(self.endpoint.object.0, packet_list.as_ptr())
+            },
+            Packets::BorrowedEventList(event_list) => unsafe {
+                MIDIReceivedEventList(self.endpoint.object.0, event_list.as_ptr())
+            },
+            Packets::OwnedEventBuffer(event_buffer) => unsafe {
+                MIDIReceivedEventList(self.endpoint.object.0, event_buffer.as_ptr())
+            },
+        };
+
         if status == 0 {
             Ok(())
         } else {
