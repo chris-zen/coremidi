@@ -14,14 +14,21 @@ extern crate coremidi;
 use coremidi::{Client, Destinations, PacketBuffer};
 use std::time::Duration;
 use std::thread;
-let client = Client::new("example-client").unwrap();
-let output_port = client.output_port("example-port").unwrap();
-let destination = Destinations::from_index(0).unwrap();
-let note_on = PacketBuffer::new(0, &[0x90, 0x40, 0x7f]);
-let note_off = PacketBuffer::new(0, &[0x80, 0x40, 0x7f]);
-output_port.send(&destination, &note_on).unwrap();
-thread::sleep(Duration::from_millis(1000));
-output_port.send(&destination, &note_off).unwrap();
+
+fn main() {
+    let client = Client::new("example-client").unwrap();
+    let output_port = client.output_port("example-port").unwrap();
+    let destination = Destinations::from_index(0).unwrap();
+    let note_on = EventBuffer::new(Protocol::Midi10)
+        .with_packet(0, &[0x2090407f])
+        .with_packet(0, &[0x2090447f]);
+    let note_off = EventBuffer::new(Protocol::Midi10)
+        .with_packet(0, &[0x2080407f])
+        .with_packet(0, &[0x2080447f]);
+    output_port.send(&destination, &note_on).unwrap();
+    thread::sleep(Duration::from_millis(1000));
+    output_port.send(&destination, &note_off).unwrap();
+}
 ```
 
 If you are looking for a portable MIDI library then you can look into:
@@ -46,7 +53,7 @@ The library is published into [crates.io](https://crates.io/crates/coremidi), so
 
 ```toml
 [dependencies]
-coremidi = "^0.6.0"
+coremidi = "^0.7.0"
 ```
 
 If you prefer to live in the edge ;-) you can use the master branch by including this instead:
@@ -103,6 +110,7 @@ These are the provided examples:
 - [x] Stop and restart MIDI I/O
 - [x] MIDI Objects and properties
 - [x] Client notifications
+- [x] MIDI 2.0 protocol
 - [ ] Support Sysex
 - [ ] Support devices
 - [ ] Support entities
