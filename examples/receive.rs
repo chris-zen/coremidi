@@ -20,9 +20,7 @@ fn main() {
         .input_port_with_protocol("Example Port", Protocol::Midi10, callback)
         .unwrap();
 
-    input_port
-        .connect_source(&source, source_id)
-        .unwrap();
+    input_port.connect_source(&source, source_id).unwrap();
 
     let mut input_line = String::new();
     println!("Press Enter to Finish");

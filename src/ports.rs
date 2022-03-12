@@ -220,11 +220,7 @@ impl<T> InputPortWithContext<T> {
         }
     }
 
-    pub fn connect_source(
-        &mut self,
-        source: &Source,
-        context: T,
-    ) -> Result<(), OSStatus> {
+    pub fn connect_source(&mut self, source: &Source, context: T) -> Result<(), OSStatus> {
         let context = Box::new(context);
         let context_ptr = Box::into_raw(context);
         if let Some(prev_context_ptr) = self.contexts.insert(source.object.0, context_ptr) {
