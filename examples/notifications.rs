@@ -23,5 +23,5 @@ fn main() {
 }
 
 fn print_notification(notification: &Notification) {
-    println!("Received Notification: {:?} \r", notification);
+    println!("Received Notification: {:?}", notification);
 }

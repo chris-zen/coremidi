@@ -13,12 +13,13 @@ use coremidi_sys::{
     MIDIPacketList, MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate,
 };
 
+use crate::ports::InputPortWithContext;
 use crate::{
-    endpoints::{destinations::VirtualDestination, sources::VirtualSource, Endpoint},
+    endpoints::{destinations::VirtualDestination, sources::VirtualSource},
     notifications::Notification,
     object::Object,
     packets::PacketList,
-    ports::{InputPort, OutputPort, Port},
+    ports::{InputPort, OutputPort},
     result_from_status, EventList, Protocol,
 };
 
@@ -106,11 +107,7 @@ impl Client {
         };
         result_from_status(status, || {
             let port_ref = unsafe { port_ref.assume_init() };
-            OutputPort {
-                port: Port {
-                    object: Object(port_ref),
-                },
-            }
+            OutputPort::new(port_ref)
         })
     }
 
@@ -138,11 +135,7 @@ impl Client {
         };
         result_from_status(status, || {
             let port_ref = unsafe { port_ref.assume_init() };
-            InputPort {
-                port: Port {
-                    object: Object(port_ref),
-                },
-            }
+            InputPort::new(port_ref)
         })
     }
 
@@ -150,18 +143,18 @@ impl Client {
     /// It allows to choose which MIDI [Protocol] to use.
     /// See [MIDIInputPortCreateWithProtocol](https://developer.apple.com/documentation/coremidi/3566488-midiinputportcreatewithprotocol).
     ///
-    pub fn input_port_with_protocol<F>(
+    pub fn input_port_with_protocol<T, F>(
         &self,
         name: &str,
         protocol: Protocol,
         callback: F,
-    ) -> Result<InputPort, OSStatus>
+    ) -> Result<InputPortWithContext<T>, OSStatus>
     where
-        F: FnMut(&EventList) + Send + 'static,
+        F: FnMut(&EventList, &mut T) + Send + 'static,
     {
         let port_name = CFString::new(name);
         let mut port_ref = MaybeUninit::uninit();
-        let receive_block = Self::receive_block(callback);
+        let receive_block = Self::receive_block::<T, _>(callback);
         let status = unsafe {
             MIDIInputPortCreateWithProtocol(
                 self.object.0,
@@ -173,11 +166,7 @@ impl Client {
         };
         result_from_status(status, || {
             let port_ref = unsafe { port_ref.assume_init() };
-            InputPort {
-                port: Port {
-                    object: Object(port_ref),
-                },
-            }
+            InputPortWithContext::<T>::new(port_ref)
         })
     }
 
@@ -195,12 +184,8 @@ impl Client {
             )
         };
         result_from_status(status, || {
-            let virtual_source = unsafe { virtual_source.assume_init() };
-            VirtualSource {
-                endpoint: Endpoint {
-                    object: Object(virtual_source),
-                },
-            }
+            let endpoint_ref = unsafe { virtual_source.assume_init() };
+            VirtualSource::new(endpoint_ref)
         })
     }
 
@@ -231,12 +216,8 @@ impl Client {
             )
         };
         result_from_status(status, || {
-            let virtual_destination = unsafe { virtual_destination.assume_init() };
-            VirtualDestination {
-                endpoint: Endpoint {
-                    object: Object(virtual_destination),
-                },
-            }
+            let endpoint_ref = unsafe { virtual_destination.assume_init() };
+            VirtualDestination::new(endpoint_ref)
         })
     }
 
@@ -248,14 +229,15 @@ impl Client {
         &self,
         name: &str,
         protocol: Protocol,
-        callback: F,
+        mut callback: F,
     ) -> Result<VirtualDestination, OSStatus>
     where
         F: FnMut(&EventList) + Send + 'static,
     {
         let virtual_destination_name = CFString::new(name);
         let mut virtual_destination = MaybeUninit::uninit();
-        let receive_block = Self::receive_block(callback);
+        let receive_block =
+            Self::receive_block::<(), _>(move |event_list, _| (callback)(event_list));
         let status = unsafe {
             MIDIDestinationCreateWithProtocol(
                 self.object.0,
@@ -266,12 +248,8 @@ impl Client {
             )
         };
         result_from_status(status, || {
-            let virtual_destination = unsafe { virtual_destination.assume_init() };
-            VirtualDestination {
-                endpoint: Endpoint {
-                    object: Object(virtual_destination),
-                },
-            }
+            let endpoint_ref = unsafe { virtual_destination.assume_init() };
+            VirtualDestination::new(endpoint_ref)
         })
     }
 
@@ -303,15 +281,16 @@ impl Client {
         read_block.copy()
     }
 
-    fn receive_block<F>(callback: F) -> RcBlock<(*const MIDIEventList, *mut c_void), ()>
+    fn receive_block<T, F>(callback: F) -> RcBlock<(*const MIDIEventList, *mut c_void), ()>
     where
-        F: FnMut(&EventList) + Send + 'static,
+        F: FnMut(&EventList, &mut T) + Send + 'static,
     {
         let callback = RefCell::new(callback);
         let receive_block = block::ConcreteBlock::new(
-            move |evtlist: *const MIDIEventList, _src_conn_ref_con: *mut c_void| {
+            move |evtlist: *const MIDIEventList, src_conn_ref_con: *mut c_void| {
                 let event_list = unsafe { &*(evtlist as *const EventList) };
-                (callback.borrow_mut())(event_list);
+                let context = unsafe { &mut *(src_conn_ref_con as *mut T) };
+                (callback.borrow_mut())(event_list, context);
             },
         );
         receive_block.copy()

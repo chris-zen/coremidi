@@ -4,7 +4,7 @@ pub mod sources;
 use core_foundation_sys::base::OSStatus;
 use std::ops::Deref;
 
-use coremidi_sys::MIDIFlushOutput;
+use coremidi_sys::{MIDIEndpointRef, MIDIFlushOutput};
 
 use crate::object::Object;
 
@@ -19,6 +19,12 @@ pub struct Endpoint {
 }
 
 impl Endpoint {
+    pub(crate) fn new(endpoint_ref: MIDIEndpointRef) -> Self {
+        Self {
+            object: Object(endpoint_ref),
+        }
+    }
+
     /// Unschedules previously-sent packets.
     /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).
     ///

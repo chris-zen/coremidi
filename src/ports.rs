@@ -1,9 +1,12 @@
 use core_foundation::base::OSStatus;
+use std::collections::HashMap;
+use std::ffi::c_void;
 use std::ops::Deref;
 use std::ptr;
 
 use coremidi_sys::{
-    MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose, MIDISend, MIDISendEventList,
+    MIDIObjectRef, MIDIPortConnectSource, MIDIPortDisconnectSource, MIDIPortDispose, MIDIPortRef,
+    MIDISend, MIDISendEventList,
 };
 
 use crate::endpoints::destinations::Destination;
@@ -58,6 +61,14 @@ pub struct Port {
     pub(crate) object: Object,
 }
 
+impl Port {
+    pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
+        Self {
+            object: Object(port_ref),
+        }
+    }
+}
+
 impl Deref for Port {
     type Target = Object;
 
@@ -81,8 +92,8 @@ impl Drop for Port {
 /// let client = Client::new("example-client").unwrap();
 /// let output_port = client.output_port("example-port").unwrap();
 /// let destination = Destination::from_index(0).unwrap();
-/// let packets = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2090407f]);
-/// output_port.send(&destination, &packets).unwrap();
+/// let events = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2090407f]);
+/// output_port.send(&destination, &events).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct OutputPort {
@@ -90,6 +101,12 @@ pub struct OutputPort {
 }
 
 impl OutputPort {
+    pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
+        Self {
+            port: Port::new(port_ref),
+        }
+    }
+
     /// Send a list of packets to a destination.
     /// See [MIDISendEventList](https://developer.apple.com/documentation/coremidi/3566494-midisendeventlist)
     /// See [MIDISend](https://developer.apple.com/reference/coremidi/1495289-midisend).
@@ -137,22 +154,18 @@ impl Deref for OutputPort {
     }
 }
 
-/// An input [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
-///
-/// A simple example to create an input port:
-///
-/// ```rust,no_run
-/// let client = coremidi::Client::new("example-client").unwrap();
-/// let input_port = client.input_port("example-port", |packet_list| println!("{}", packet_list)).unwrap();
-/// let source = coremidi::Source::from_index(0).unwrap();
-/// input_port.connect_source(&source);
-/// ```
 #[derive(Debug)]
 pub struct InputPort {
     pub(crate) port: Port,
 }
 
 impl InputPort {
+    pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
+        Self {
+            port: Port::new(port_ref),
+        }
+    }
+
     pub fn connect_source(&self, source: &Source) -> Result<(), OSStatus> {
         let status =
             unsafe { MIDIPortConnectSource(self.object.0, source.object.0, ptr::null_mut()) };
@@ -179,4 +192,91 @@ impl Deref for InputPort {
     fn deref(&self) -> &Port {
         &self.port
     }
+}
+
+/// An input [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
+///
+/// A simple example to create an input port:
+///
+/// ```rust,no_run
+/// use coremidi::{Client, Protocol, Source};
+/// let client = Client::new("example-client").unwrap();
+/// let mut input_port = client.input_port_with_protocol("example-port", Protocol::Midi10, |event_list, context: &mut u32| println!("{:08x}: {:?}", context, event_list)).unwrap();
+/// let source = Source::from_index(0).unwrap();
+/// let context = source.unique_id().unwrap_or(0);
+/// input_port.connect_source(&source, context);
+/// ```
+#[derive(Debug)]
+pub struct InputPortWithContext<T> {
+    pub(crate) port: Port,
+    pub(crate) contexts: HashMap<MIDIObjectRef, *mut T>,
+}
+
+impl<T> InputPortWithContext<T> {
+    pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
+        Self {
+            port: Port::new(port_ref),
+            contexts: HashMap::new(),
+        }
+    }
+
+    pub fn connect_source(
+        &mut self,
+        source: &Source,
+        context: T,
+    ) -> Result<(), OSStatus> {
+        let context = Box::new(context);
+        let context_ptr = Box::into_raw(context);
+        if let Some(prev_context_ptr) = self.contexts.insert(source.object.0, context_ptr) {
+            drop_context(prev_context_ptr)
+        }
+        let status = unsafe {
+            MIDIPortConnectSource(self.object.0, source.object.0, context_ptr as *mut c_void)
+        };
+        if status == 0 {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+
+    pub fn disconnect_source(&mut self, source: &Source) -> Result<(), OSStatus> {
+        let status = unsafe { MIDIPortDisconnectSource(self.object.0, source.object.0) };
+        if let Some(context_ptr) = self.contexts.remove(&source.object.0) {
+            drop_context(context_ptr)
+        }
+        if status == 0 {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+}
+
+impl<T> Deref for InputPortWithContext<T> {
+    type Target = Port;
+
+    fn deref(&self) -> &Port {
+        &self.port
+    }
+}
+
+impl<T> Drop for InputPortWithContext<T> {
+    fn drop(&mut self) {
+        let keys = self
+            .contexts
+            .keys()
+            .cloned()
+            .collect::<Vec<MIDIObjectRef>>();
+        for key in keys {
+            if let Some(context_ptr) = self.contexts.remove(&key) {
+                drop_context(context_ptr)
+            }
+        }
+    }
+}
+
+fn drop_context<T>(context_ptr: *mut T) {
+    let context = unsafe { Box::from_raw(context_ptr) };
+    drop(context);
 }

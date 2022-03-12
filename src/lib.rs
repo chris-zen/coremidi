@@ -11,17 +11,20 @@ This library preserves the fundamental concepts behind the CoreMIDI framework, w
 Please see the [examples](https://github.com/chris-zen/coremidi/tree/master/examples) for getting an idea of how it looks like, but if you are eager to see an example, this is how you would send some note:
 
 ```rust,no_run
-extern crate coremidi;
+use coremidi::{Client, Destination, EventBuffer, Protocol};
 use std::time::Duration;
 use std::thread;
-let client = coremidi::Client::new("example-client").unwrap();
-let output_port = client.output_port("example-port").unwrap();
-let destination = coremidi::Destination::from_index(0).unwrap();
-let note_on = coremidi::PacketBuffer::new(0, &[0x90, 0x40, 0x7f]);
-let note_off = coremidi::PacketBuffer::new(0, &[0x80, 0x40, 0x7f]);
-output_port.send(&destination, &note_on).unwrap();
-thread::sleep(Duration::from_millis(1000));
-output_port.send(&destination, &note_off).unwrap();
+
+fn main() {
+    let client = coremidi::Client::new("example-client").unwrap();
+    let output_port = client.output_port("example-port").unwrap();
+    let destination = Destination::from_index(0).unwrap();
+    let note_on = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2090407f]);
+    let note_off = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2080407f]);
+    output_port.send(&destination, &note_on).unwrap();
+    thread::sleep(Duration::from_millis(1000));
+    output_port.send(&destination, &note_off).unwrap();
+}
 ```
 
 If you are looking for a portable MIDI library then you can look into:

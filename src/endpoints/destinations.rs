@@ -1,7 +1,8 @@
 use std::ops::Deref;
 
 use coremidi_sys::{
-    ItemCount, MIDIEndpointDispose, MIDIGetDestination, MIDIGetNumberOfDestinations,
+    ItemCount, MIDIEndpointDispose, MIDIEndpointRef, MIDIGetDestination,
+    MIDIGetNumberOfDestinations,
 };
 
 use crate::object::Object;
@@ -105,13 +106,14 @@ impl Iterator for DestinationsIterator {
     }
 }
 
-/// A [MIDI virtual destination](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate) owned by a client.
+/// A [MIDI virtual destination](https://developer.apple.com/documentation/coremidi/3566476-mididestinationcreatewithprotoco) owned by a client.
 ///
 /// A virtual destination can be created like:
 ///
 /// ```rust,no_run
+/// use coremidi::Protocol;
 /// let client = coremidi::Client::new("example-client").unwrap();
-/// client.virtual_destination("example-destination", |packet_list| println!("{}", packet_list)).unwrap();
+/// client.virtual_destination_with_protocol("example-destination", Protocol::Midi10, |event_list| println!("{:?}", event_list)).unwrap();
 /// ```
 ///
 #[derive(Debug)]
@@ -119,7 +121,13 @@ pub struct VirtualDestination {
     pub(crate) endpoint: Endpoint,
 }
 
-impl VirtualDestination {}
+impl VirtualDestination {
+    pub(crate) fn new(endpoint_ref: MIDIEndpointRef) -> Self {
+        Self {
+            endpoint: Endpoint::new(endpoint_ref),
+        }
+    }
+}
 
 impl Deref for VirtualDestination {
     type Target = Endpoint;

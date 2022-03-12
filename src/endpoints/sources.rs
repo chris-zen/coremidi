@@ -2,8 +2,8 @@ use core_foundation_sys::base::OSStatus;
 use std::ops::Deref;
 
 use coremidi_sys::{
-    ItemCount, MIDIEndpointDispose, MIDIGetNumberOfSources, MIDIGetSource, MIDIReceived,
-    MIDIReceivedEventList,
+    ItemCount, MIDIEndpointDispose, MIDIEndpointRef, MIDIGetNumberOfSources, MIDIGetSource,
+    MIDIReceived, MIDIReceivedEventList,
 };
 
 use crate::object::Object;
@@ -123,6 +123,12 @@ pub struct VirtualSource {
 }
 
 impl VirtualSource {
+    pub(crate) fn new(endpoint_ref: MIDIEndpointRef) -> Self {
+        Self {
+            endpoint: Endpoint::new(endpoint_ref),
+        }
+    }
+
     /// Distributes incoming MIDI from a source to the client input ports which are connected to that source.
     /// See [MIDIReceived](https://developer.apple.com/reference/coremidi/1495276-midireceived)
     ///

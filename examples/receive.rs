@@ -6,18 +6,23 @@ fn main() {
     println!("Source index: {}", source_index);
 
     let source = Source::from_index(source_index).unwrap();
+    let source_id = source.unique_id().unwrap_or(0);
     println!("Source display name: {}", source.display_name().unwrap());
+    println!("Source unique id: {:08x}", source_id);
 
     let client = Client::new("Example Client").unwrap();
 
-    let callback = |event_list: &EventList| {
-        print!("{:?}", event_list);
+    let callback = |event_list: &EventList, context: &mut u32| {
+        print!("{:08x}: {:?}", *context, event_list);
     };
 
-    let input_port = client
+    let mut input_port = client
         .input_port_with_protocol("Example Port", Protocol::Midi10, callback)
         .unwrap();
-    input_port.connect_source(&source).unwrap();
+
+    input_port
+        .connect_source(&source, source_id)
+        .unwrap();
 
     let mut input_line = String::new();
     println!("Press Enter to Finish");
