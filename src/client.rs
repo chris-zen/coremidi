@@ -111,13 +111,11 @@ impl Client {
         })
     }
 
-    /// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.
+    /// Creates an input port through which the client may receive incoming MIDI 1.0 messages from any MIDI source.
     /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
     ///
-    #[deprecated(
-        since = "0.7.0",
-        note = "Please use input_port_with_protocol instead. PacketList is deprecated in CoreMIDI"
-    )]
+    /// **MIDIInputPortCreate is deprecated in CoreMIDI. Please consider using `input_port_with_protocol` instead**
+    ///
     pub fn input_port<F>(&self, name: &str, callback: F) -> Result<InputPort, OSStatus>
     where
         F: FnMut(&PacketList) + Send + 'static,
@@ -192,10 +190,8 @@ impl Client {
     /// Creates a virtual destination in the client.
     /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
     ///
-    #[deprecated(
-        since = "0.7.0",
-        note = "Please use virtual_destination_with_protocol instead. PacketList is deprecated in CoreMIDI"
-    )]
+    /// **MIDIDestinationCreate is deprecated in CoreMIDI. Please consider using `virtual_destination_with_protocol` instead**
+    ///
     pub fn virtual_destination<F>(
         &self,
         name: &str,
