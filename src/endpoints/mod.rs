@@ -9,7 +9,7 @@ use coremidi_sys::{MIDIEndpointRef, MIDIFlushOutput};
 use crate::object::Object;
 
 /// A MIDI source or source, owned by an entity.
-/// See [MIDIEndpointRef](https://developer.apple.com/reference/coremidi/midiendpointref).
+/// See [MIDIEndpointRef](https://developer.apple.com/documentation/coremidi/midiendpointref).
 ///
 /// You don't need to create an endpoint directly, instead you can create system sources and sources or virtual ones from a client.
 ///
@@ -26,7 +26,7 @@ impl Endpoint {
     }
 
     /// Unschedules previously-sent packets.
-    /// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).
+    /// See [MIDIFlushOutput](https://developer.apple.com/documentation/coremidi/1495312-midiflushoutput).
     ///
     pub fn flush(&self) -> Result<(), OSStatus> {
         let status = unsafe { MIDIFlushOutput(self.object.0) };

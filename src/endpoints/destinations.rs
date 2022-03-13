@@ -7,7 +7,7 @@ use coremidi_sys::{
 
 use super::Endpoint;
 
-/// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
+/// A [MIDI source](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
 ///
 /// A source can be created from an index like this:
 ///
@@ -29,7 +29,7 @@ impl Destination {
     }
 
     /// Create a destination endpoint from its index.
-    /// See [MIDIGetDestination](https://developer.apple.com/reference/coremidi/1495108-midigetdestination)
+    /// See [MIDIGetDestination](https://developer.apple.com/documentation/coremidi/1495108-midigetdestination)
     ///
     pub fn from_index(index: usize) -> Option<Destination> {
         let endpoint_ref = unsafe { MIDIGetDestination(index as ItemCount) };
@@ -68,7 +68,7 @@ pub struct Destinations;
 
 impl Destinations {
     /// Get the number of destinations available in the system for sending MIDI messages.
-    /// See [MIDIGetNumberOfDestinations](https://developer.apple.com/reference/coremidi/1495309-midigetnumberofdestinations).
+    /// See [MIDIGetNumberOfDestinations](https://developer.apple.com/documentation/coremidi/1495309-midigetnumberofdestinations).
     ///
     pub fn count() -> usize {
         unsafe { MIDIGetNumberOfDestinations() as usize }

@@ -10,7 +10,7 @@ use crate::ports::Packets;
 
 use super::Endpoint;
 
-/// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
+/// A [MIDI source](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
 ///
 /// A source can be created from an index like this:
 ///
@@ -32,7 +32,7 @@ impl Source {
     }
 
     /// Create a source endpoint from its index.
-    /// See [MIDIGetSource](https://developer.apple.com/reference/coremidi/1495168-midigetsource)
+    /// See [MIDIGetSource](https://developer.apple.com/documentation/coremidi/1495168-midigetsource)
     ///
     pub fn from_index(index: usize) -> Option<Source> {
         let endpoint_ref = unsafe { MIDIGetSource(index as ItemCount) };
@@ -71,7 +71,7 @@ pub struct Sources;
 
 impl Sources {
     /// Get the number of sources available in the system for receiving MIDI messages.
-    /// See [MIDIGetNumberOfSources](https://developer.apple.com/reference/coremidi/1495116-midigetnumberofsources).
+    /// See [MIDIGetNumberOfSources](https://developer.apple.com/documentation/coremidi/1495116-midigetnumberofsources).
     ///
     pub fn count() -> usize {
         unsafe { MIDIGetNumberOfSources() as usize }
@@ -109,7 +109,7 @@ impl Iterator for SourcesIterator {
     }
 }
 
-/// A [MIDI virtual source](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate) owned by a client.
+/// A [MIDI virtual source](https://developer.apple.com/documentation/coremidi/1495212-midisourcecreate) owned by a client.
 ///
 /// A virtual source can be created like:
 ///
@@ -131,7 +131,7 @@ impl VirtualSource {
     }
 
     /// Distributes incoming MIDI from a source to the client input ports which are connected to that source.
-    /// See [MIDIReceived](https://developer.apple.com/reference/coremidi/1495276-midireceived)
+    /// See [MIDIReceived](https://developer.apple.com/documentation/coremidi/1495276-midireceived)
     ///
     pub fn received<'a, P>(&self, packets: P) -> Result<(), OSStatus>
     where

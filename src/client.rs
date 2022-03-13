@@ -23,7 +23,7 @@ use crate::{
     result_from_status, EventList, Protocol,
 };
 
-/// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).
+/// A [MIDI client](https://developer.apple.com/documentation/coremidi/midiclientref).
 ///
 /// An object maintaining per-client state.
 ///
@@ -71,7 +71,7 @@ impl Client {
     }
 
     /// Creates a new CoreMIDI client.
-    /// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).
+    /// See [MIDIClientCreate](https://developer.apple.com/documentation/coremidi/1495360-midiclientcreate).
     ///
     pub fn new(name: &str) -> Result<Client, OSStatus> {
         let client_name = CFString::new(name);
@@ -93,7 +93,7 @@ impl Client {
     }
 
     /// Creates an output port through which the client may send outgoing MIDI messages to any MIDI destination.
-    /// See [MIDIOutputPortCreate](https://developer.apple.com/reference/coremidi/1495166-midioutputportcreate).
+    /// See [MIDIOutputPortCreate](https://developer.apple.com/documentation/coremidi/1495166-midioutputportcreate).
     ///
     pub fn output_port(&self, name: &str) -> Result<OutputPort, OSStatus> {
         let port_name = CFString::new(name);
@@ -112,7 +112,7 @@ impl Client {
     }
 
     /// Creates an input port through which the client may receive incoming MIDI 1.0 messages from any MIDI source.
-    /// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).
+    /// See [MIDIInputPortCreate](https://developer.apple.com/documentation/coremidi/1495225-midiinputportcreate).
     ///
     /// **MIDIInputPortCreate is deprecated in CoreMIDI. Please consider using `input_port_with_protocol` instead**
     ///
@@ -169,7 +169,7 @@ impl Client {
     }
 
     /// Creates a virtual source in the client.
-    /// See [MIDISourceCreate](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate).
+    /// See [MIDISourceCreate](https://developer.apple.com/documentation/coremidi/1495212-midisourcecreate).
     ///
     pub fn virtual_source(&self, name: &str) -> Result<VirtualSource, OSStatus> {
         let virtual_source_name = CFString::new(name);
@@ -188,7 +188,7 @@ impl Client {
     }
 
     /// Creates a virtual destination in the client.
-    /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
+    /// See [MIDIDestinationCreate](https://developer.apple.com/documentation/coremidi/1495347-mididestinationcreate).
     ///
     /// **MIDIDestinationCreate is deprecated in CoreMIDI. Please consider using `virtual_destination_with_protocol` instead**
     ///
@@ -219,7 +219,7 @@ impl Client {
 
     /// Creates a virtual destination in the client.
     /// It allows to choose which MIDI [Protocol] to use.
-    /// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).
+    /// See [MIDIDestinationCreate](https://developer.apple.com/documentation/coremidi/1495347-mididestinationcreate).
     ///
     pub fn virtual_destination_with_protocol<F>(
         &self,

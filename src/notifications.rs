@@ -33,7 +33,7 @@ pub struct IoErrorInfo {
 }
 
 /// A message describing a system state change.
-/// See [MIDINotification](https://developer.apple.com/reference/coremidi/midinotification).
+/// See [MIDINotification](https://developer.apple.com/documentation/coremidi/midinotification).
 ///
 #[derive(Debug, PartialEq)]
 pub enum Notification {

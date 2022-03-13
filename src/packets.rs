@@ -11,7 +11,7 @@ use crate::events::Storage;
 
 pub use crate::events::Timestamp;
 
-/// A [list of MIDI events](https://developer.apple.com/reference/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
+/// A [list of MIDI events](https://developer.apple.com/documentation/coremidi/midipacketlist) being received from, or being sent to, one endpoint.
 ///
 pub struct PacketList(MIDIPacketList);
 
@@ -99,7 +99,7 @@ impl<'a> Iterator for PacketListIterator<'a> {
 }
 
 /// A collection of simultaneous MIDI events.
-/// See [MIDIPacket](https://developer.apple.com/reference/coremidi/midipacket).
+/// See [MIDIPacket](https://developer.apple.com/documentation/coremidi/midipacket).
 ///
 pub struct Packet(MIDIPacket);
 
@@ -162,7 +162,7 @@ impl fmt::Display for Packet {
 
 /// A mutable `PacketList` builder.
 ///
-/// A `PacketList` is an immutable reference to a [MIDIPacketList](https://developer.apple.com/reference/coremidi/midipacketlist) structure,
+/// A `PacketList` is an immutable reference to a [MIDIPacketList](https://developer.apple.com/documentation/coremidi/midipacketlist) structure,
 /// while a `PacketBuffer` is a mutable structure that allows to build a `PacketList` by adding packets.
 /// It dereferences to a `PacketList`, so it can be used whenever a `PacketList` is needed.
 ///

@@ -20,7 +20,7 @@ fn main() {
 
     let note_off = EventBuffer::new(Protocol::Midi10).with_packet(0, &[0x2080407f]);
 
-    for i in 0..1 {
+    for i in 0..10 {
         println!("[{}] Sending note ...", i);
 
         output_port.send(&destination, &note_on).unwrap();

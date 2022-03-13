@@ -3,7 +3,7 @@
 #![doc(html_root_url = "https://chris-zen.github.io/coremidi/")]
 
 /*!
-This is a [CoreMIDI](https://developer.apple.com/reference/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
+This is a [CoreMIDI](https://developer.apple.com/documentation/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
 CoreMIDI is a macOS framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
 
 This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
@@ -70,7 +70,7 @@ pub use crate::properties::{
 pub use crate::protocol::Protocol;
 
 /// Unschedules previously-sent packets for all the endpoints.
-/// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).
+/// See [MIDIFlushOutput](https://developer.apple.com/documentation/coremidi/1495312-midiflushoutput).
 ///
 pub fn flush() -> Result<(), OSStatus> {
     let status = unsafe { MIDIFlushOutput(0) };
@@ -78,7 +78,7 @@ pub fn flush() -> Result<(), OSStatus> {
 }
 
 /// Stops and restarts MIDI I/O.
-/// See [MIDIRestart](https://developer.apple.com/reference/coremidi/1495146-midirestart).
+/// See [MIDIRestart](https://developer.apple.com/documentation/coremidi/1495146-midirestart).
 ///
 pub fn restart() -> Result<(), OSStatus> {
     let status = unsafe { MIDIRestart() };

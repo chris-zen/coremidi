@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use crate::object::Object;
 
-/// A [MIDI object](https://developer.apple.com/reference/coremidi/midideviceref).
+/// A [MIDI object](https://developer.apple.com/documentation/coremidi/midideviceref).
 ///
 /// A MIDI device or external device, containing entities.
 ///

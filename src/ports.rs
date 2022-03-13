@@ -52,7 +52,7 @@ impl<'a> From<EventBuffer> for Packets<'a> {
 }
 
 /// A MIDI connection port owned by a client.
-/// See [MIDIPortRef](https://developer.apple.com/reference/coremidi/midiportref).
+/// See [MIDIPortRef](https://developer.apple.com/documentation/coremidi/midiportref).
 ///
 /// Ports can't be instantiated directly, but through a client.
 ///
@@ -83,7 +83,7 @@ impl Drop for Port {
     }
 }
 
-/// An output [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
+/// An output [MIDI port](https://developer.apple.com/documentation/coremidi/midiportref) owned by a client.
 ///
 /// A simple example to create an output port and send a MIDI event:
 ///
@@ -109,7 +109,7 @@ impl OutputPort {
 
     /// Send a list of packets to a destination.
     /// See [MIDISendEventList](https://developer.apple.com/documentation/coremidi/3566494-midisendeventlist)
-    /// See [MIDISend](https://developer.apple.com/reference/coremidi/1495289-midisend).
+    /// See [MIDISend](https://developer.apple.com/documentation/coremidi/1495289-midisend).
     ///
     pub fn send<'a, P>(&self, destination: &Destination, packets: P) -> Result<(), OSStatus>
     where
@@ -194,7 +194,7 @@ impl Deref for InputPort {
     }
 }
 
-/// An input [MIDI port](https://developer.apple.com/reference/coremidi/midiportref) owned by a client.
+/// An input [MIDI port](https://developer.apple.com/documentation/coremidi/midiportref) owned by a client.
 ///
 /// A simple example to create an input port:
 ///

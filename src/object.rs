@@ -41,7 +41,7 @@ impl TryFrom<i32> for ObjectType {
     }
 }
 
-/// A [MIDI Object](https://developer.apple.com/reference/coremidi/midiobjectref).
+/// A [MIDI Object](https://developer.apple.com/documentation/coremidi/midiobjectref).
 ///
 /// The base class of many CoreMIDI objects.
 ///
