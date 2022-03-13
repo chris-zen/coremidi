@@ -5,8 +5,6 @@ use coremidi_sys::{
     MIDIGetNumberOfDestinations,
 };
 
-use crate::object::Object;
-
 use super::Endpoint;
 
 /// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
@@ -24,6 +22,12 @@ pub struct Destination {
 }
 
 impl Destination {
+    pub(crate) fn new(endpoint_ref: MIDIEndpointRef) -> Self {
+        Self {
+            endpoint: Endpoint::new(endpoint_ref),
+        }
+    }
+
     /// Create a destination endpoint from its index.
     /// See [MIDIGetDestination](https://developer.apple.com/reference/coremidi/1495108-midigetdestination)
     ///
@@ -31,11 +35,7 @@ impl Destination {
         let endpoint_ref = unsafe { MIDIGetDestination(index as ItemCount) };
         match endpoint_ref {
             0 => None,
-            _ => Some(Destination {
-                endpoint: Endpoint {
-                    object: Object(endpoint_ref),
-                },
-            }),
+            _ => Some(Self::new(endpoint_ref)),
         }
     }
 }

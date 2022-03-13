@@ -6,7 +6,6 @@ use coremidi_sys::{
     MIDIReceived, MIDIReceivedEventList,
 };
 
-use crate::object::Object;
 use crate::ports::Packets;
 
 use super::Endpoint;
@@ -26,6 +25,12 @@ pub struct Source {
 }
 
 impl Source {
+    pub(crate) fn new(endpoint_ref: MIDIEndpointRef) -> Self {
+        Self {
+            endpoint: Endpoint::new(endpoint_ref),
+        }
+    }
+
     /// Create a source endpoint from its index.
     /// See [MIDIGetSource](https://developer.apple.com/reference/coremidi/1495168-midigetsource)
     ///
@@ -33,11 +38,7 @@ impl Source {
         let endpoint_ref = unsafe { MIDIGetSource(index as ItemCount) };
         match endpoint_ref {
             0 => None,
-            _ => Some(Source {
-                endpoint: Endpoint {
-                    object: Object(endpoint_ref),
-                },
-            }),
+            _ => Some(Self::new(endpoint_ref)),
         }
     }
 }
