@@ -5,7 +5,8 @@ use coremidi_sys::{
     MIDIGetNumberOfDestinations,
 };
 
-use super::Endpoint;
+use crate::endpoints::endpoint::Endpoint;
+use crate::Object;
 
 /// A [MIDI source](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
 ///
@@ -16,7 +17,7 @@ use super::Endpoint;
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct Destination {
     pub(crate) endpoint: Endpoint,
 }
@@ -45,6 +46,18 @@ impl Deref for Destination {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl From<Object> for Destination {
+    fn from(object: Object) -> Self {
+        Self::new(object.0)
+    }
+}
+
+impl From<Destination> for Object {
+    fn from(destination: Destination) -> Self {
+        destination.endpoint.object
     }
 }
 
@@ -116,7 +129,7 @@ impl Iterator for DestinationsIterator {
 /// client.virtual_destination_with_protocol("example-destination", Protocol::Midi10, |event_list| println!("{:?}", event_list)).unwrap();
 /// ```
 ///
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct VirtualDestination {
     pub(crate) endpoint: Endpoint,
 }
@@ -134,6 +147,12 @@ impl Deref for VirtualDestination {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl From<Object> for VirtualDestination {
+    fn from(object: Object) -> Self {
+        Self::new(object.0)
     }
 }
 

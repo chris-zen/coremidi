@@ -6,9 +6,9 @@ use coremidi_sys::{
     MIDIReceived, MIDIReceivedEventList,
 };
 
+use crate::endpoints::endpoint::Endpoint;
 use crate::ports::Packets;
-
-use super::Endpoint;
+use crate::Object;
 
 /// A [MIDI source](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
 ///
@@ -19,9 +19,9 @@ use super::Endpoint;
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct Source {
-    endpoint: Endpoint,
+    pub(crate) endpoint: Endpoint,
 }
 
 impl Source {
@@ -48,6 +48,18 @@ impl Deref for Source {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl From<Object> for Source {
+    fn from(object: Object) -> Self {
+        Self::new(object.0)
+    }
+}
+
+impl From<Source> for Object {
+    fn from(source: Source) -> Self {
+        source.endpoint.object
     }
 }
 
@@ -118,7 +130,7 @@ impl Iterator for SourcesIterator {
 /// let source = client.virtual_source("example-source").unwrap();
 /// ```
 ///
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct VirtualSource {
     pub(crate) endpoint: Endpoint,
 }
@@ -162,6 +174,12 @@ impl Deref for VirtualSource {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl From<Object> for VirtualSource {
+    fn from(object: Object) -> Self {
+        Self::new(object.0)
     }
 }
 

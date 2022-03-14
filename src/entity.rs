@@ -3,16 +3,16 @@ use std::ops::Deref;
 
 use crate::object::Object;
 
-/// A [MIDI object](https://developer.apple.com/documentation/coremidi/midideviceref).
+/// A [MIDI object](https://developer.apple.com/documentation/coremidi/midientityref).
 ///
-/// A MIDI device or external device, containing entities.
+/// An entity that a device owns and that contains endpoints.
 ///
 #[derive(Debug, PartialEq)]
-pub struct Device {
+pub struct Entity {
     pub(crate) object: Object,
 }
 
-impl Device {
+impl Entity {
     pub(crate) fn new(object_ref: MIDIObjectRef) -> Self {
         Self {
             object: Object(object_ref),
@@ -20,7 +20,7 @@ impl Device {
     }
 }
 
-impl Deref for Device {
+impl Deref for Entity {
     type Target = Object;
 
     fn deref(&self) -> &Object {
@@ -28,14 +28,14 @@ impl Deref for Device {
     }
 }
 
-impl From<Object> for Device {
+impl From<Object> for Entity {
     fn from(object: Object) -> Self {
         Self::new(object.0)
     }
 }
 
-impl From<Device> for Object {
-    fn from(device: Device) -> Self {
-        device.object
+impl From<Entity> for Object {
+    fn from(entity: Entity) -> Self {
+        entity.object
     }
 }

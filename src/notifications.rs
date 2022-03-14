@@ -8,7 +8,7 @@ use coremidi_sys::{
     MIDIObjectPropertyChangeNotification,
 };
 
-use crate::devices::Device;
+use crate::device::Device;
 use crate::object::{Object, ObjectType};
 
 #[derive(Debug, PartialEq)]
@@ -143,7 +143,7 @@ mod tests {
         MIDIObjectAddRemoveNotification, MIDIObjectPropertyChangeNotification, MIDIObjectRef,
     };
 
-    use crate::devices::Device;
+    use crate::device::Device;
     use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
     use crate::object::{Object, ObjectType};
 

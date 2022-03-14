@@ -40,8 +40,9 @@ For handling low level MIDI data you may look into:
 */
 
 mod client;
-mod devices;
+mod device;
 mod endpoints;
+mod entity;
 mod events;
 mod notifications;
 mod object;
@@ -54,11 +55,12 @@ use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{MIDIFlushOutput, MIDIRestart};
 
-pub use crate::client::Client;
-pub use crate::devices::Device;
+pub use crate::client::{Client, NotifyCallback};
+pub use crate::device::Device;
 pub use crate::endpoints::destinations::{Destination, Destinations, VirtualDestination};
+pub use crate::endpoints::endpoint::Endpoint;
 pub use crate::endpoints::sources::{Source, Sources, VirtualSource};
-pub use crate::endpoints::Endpoint;
+pub use crate::entity::Entity;
 pub use crate::events::{EventBuffer, EventList, EventListIter, EventPacket, Timestamp};
 pub use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
 pub use crate::object::{Object, ObjectType};
