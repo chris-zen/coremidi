@@ -23,6 +23,36 @@ use crate::{
     result_from_status, EventList, Protocol,
 };
 
+pub enum NotifyCallback {
+    ByReference(RefCell<Box<dyn FnMut(&Notification) + Send + 'static>>),
+    ByOwnership(RefCell<Box<dyn FnMut(Notification) + Send + 'static>>),
+}
+
+impl NotifyCallback {
+    pub fn by_reference<F>(callback: F) -> Self
+    where
+        F: FnMut(&Notification) + Send + 'static,
+    {
+        Self::ByReference(RefCell::new(Box::new(callback)))
+    }
+
+    pub fn by_ownership<F>(callback: F) -> Self
+    where
+        F: FnMut(Notification) + Send + 'static,
+    {
+        Self::ByOwnership(RefCell::new(Box::new(callback)))
+    }
+}
+
+impl<F> From<F> for NotifyCallback
+where
+    F: FnMut(&Notification) + Send + 'static,
+{
+    fn from(callback: F) -> Self {
+        Self::by_reference(callback)
+    }
+}
+
 /// A [MIDI client](https://developer.apple.com/documentation/coremidi/midiclientref).
 ///
 /// An object maintaining per-client state.
@@ -50,11 +80,11 @@ impl Client {
     ///
     pub fn new_with_notifications<F>(name: &str, callback: F) -> Result<Client, OSStatus>
     where
-        F: FnMut(&Notification) + Send + 'static,
+        F: Into<NotifyCallback>,
     {
         let client_name = CFString::new(name);
         let mut client_ref = MaybeUninit::uninit();
-        let notify_block = Self::notify_block(callback);
+        let notify_block = Self::notify_block(callback.into());
         let status = unsafe {
             MIDIClientCreateWithBlock(
                 client_name.as_concrete_TypeRef(),
@@ -249,15 +279,14 @@ impl Client {
         })
     }
 
-    fn notify_block<F>(callback: F) -> RcBlock<(*const MIDINotification,), ()>
-    where
-        F: FnMut(&Notification) + Send + 'static,
-    {
-        let callback = RefCell::new(callback);
+    fn notify_block(callback: NotifyCallback) -> RcBlock<(*const MIDINotification,), ()> {
         let notify_block = block::ConcreteBlock::new(move |message: *const MIDINotification| {
             let message = unsafe { &*message };
             if let Ok(notification) = Notification::try_from(message) {
-                (callback.borrow_mut())(&notification);
+                match &callback {
+                    NotifyCallback::ByReference(f) => (f.borrow_mut())(&notification),
+                    NotifyCallback::ByOwnership(f) => (f.borrow_mut())(notification),
+                }
             }
         });
         notify_block.copy()

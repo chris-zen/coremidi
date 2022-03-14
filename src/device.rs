@@ -1,4 +1,5 @@
 use std::ops::Deref;
+use coremidi_sys::MIDIObjectRef;
 
 use crate::object::Object;
 
@@ -11,10 +12,24 @@ pub struct Device {
     pub(crate) object: Object,
 }
 
+impl Device {
+    pub(crate) fn new(object_ref: MIDIObjectRef) -> Self {
+        Self {
+            object: Object(object_ref),
+        }
+    }
+}
+
 impl Deref for Device {
     type Target = Object;
 
     fn deref(&self) -> &Object {
         &self.object
+    }
+}
+
+impl From<Object> for Device {
+    fn from(object: Object) -> Self {
+        Self::new(object.0)
     }
 }
