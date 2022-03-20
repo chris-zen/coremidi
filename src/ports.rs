@@ -209,7 +209,7 @@ impl Deref for InputPort {
 #[derive(Debug)]
 pub struct InputPortWithContext<T> {
     pub(crate) port: Port,
-    pub(crate) contexts: HashMap<MIDIObjectRef, *mut T>,
+    pub(crate) contexts: HashMap<MIDIObjectRef, Box<T>>,
 }
 
 impl<T> InputPortWithContext<T> {
@@ -221,15 +221,13 @@ impl<T> InputPortWithContext<T> {
     }
 
     pub fn connect_source(&mut self, source: &Source, context: T) -> Result<(), OSStatus> {
-        let context = Box::new(context);
-        let context_ptr = Box::into_raw(context);
-        if let Some(prev_context_ptr) = self.contexts.insert(source.object.0, context_ptr) {
-            drop_context(prev_context_ptr)
-        }
+        let mut context = Box::new(context);
+        let context_ptr = context.as_mut() as *mut T;
         let status = unsafe {
             MIDIPortConnectSource(self.object.0, source.object.0, context_ptr as *mut c_void)
         };
         if status == 0 {
+            self.contexts.insert(source.object.0, context);
             Ok(())
         } else {
             Err(status)
@@ -238,10 +236,8 @@ impl<T> InputPortWithContext<T> {
 
     pub fn disconnect_source(&mut self, source: &Source) -> Result<(), OSStatus> {
         let status = unsafe { MIDIPortDisconnectSource(self.object.0, source.object.0) };
-        if let Some(context_ptr) = self.contexts.remove(&source.object.0) {
-            drop_context(context_ptr)
-        }
         if status == 0 {
+            self.contexts.remove(&source.object.0);
             Ok(())
         } else {
             Err(status)
@@ -255,24 +251,4 @@ impl<T> Deref for InputPortWithContext<T> {
     fn deref(&self) -> &Port {
         &self.port
     }
-}
-
-impl<T> Drop for InputPortWithContext<T> {
-    fn drop(&mut self) {
-        let keys = self
-            .contexts
-            .keys()
-            .cloned()
-            .collect::<Vec<MIDIObjectRef>>();
-        for key in keys {
-            if let Some(context_ptr) = self.contexts.remove(&key) {
-                drop_context(context_ptr)
-            }
-        }
-    }
-}
-
-fn drop_context<T>(context_ptr: *mut T) {
-    let context = unsafe { Box::from_raw(context_ptr) };
-    drop(context);
 }
