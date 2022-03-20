@@ -162,14 +162,14 @@ impl EventBuffer {
     /// use coremidi::{Protocol, Timestamp, EventBuffer};
     ///
     /// let buffer = EventBuffer::new(Protocol::Midi20)
-    ///     .with_packet(0, &[0x20903c00, 0xffff0000]); // Note On for Middle C
+    ///     .with_packet(0, &[0x40903c00, 0xffff0000]); // Note On for Middle C
     ///
     /// assert_eq!(buffer.len(), 1);
     /// assert_eq!(
     ///     buffer.iter()
     ///         .map(|packet| (packet.timestamp(), packet.data().to_vec()))
     ///         .collect::<Vec<(Timestamp, Vec<u32>)>>(),
-    ///     vec![(0, vec![0x20903c00, 0xffff0000])],
+    ///     vec![(0, vec![0x40903c00, 0xffff0000])],
     /// )
     /// ```
     pub fn with_packet(mut self, timestamp: Timestamp, data: &[u32]) -> Self {
@@ -192,14 +192,14 @@ impl EventBuffer {
     /// use coremidi::{EventBuffer, Protocol, Timestamp};
     ///
     /// let mut buffer = EventBuffer::new(Protocol::Midi20);
-    /// buffer.push(0, &[0x20903c00, 0xffff0000]); // Note On for Middle C
+    /// buffer.push(0, &[0x40903c00, 0xffff0000]); // Note On for Middle C
     ///
     /// assert_eq!(buffer.len(), 1);
     /// assert_eq!(
     ///     buffer.iter()
     ///         .map(|packet| (packet.timestamp(), packet.data().to_vec()))
     ///         .collect::<Vec<(Timestamp, Vec<u32>)>>(),
-    ///     vec![(0, vec![0x20903c00, 0xffff0000])],
+    ///     vec![(0, vec![0x40903c00, 0xffff0000])],
     /// )
     /// ```
     pub fn push(&mut self, timestamp: Timestamp, data: &[u32]) -> &mut Self {
