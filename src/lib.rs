@@ -65,7 +65,7 @@ pub use crate::events::{EventBuffer, EventList, EventListIter, EventPacket, Time
 pub use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
 pub use crate::object::{Object, ObjectType};
 pub use crate::packets::{Packet, PacketBuffer, PacketList, PacketListIterator};
-pub use crate::ports::{InputPort, OutputPort};
+pub use crate::ports::{InputPort, OutputPort, InputPortWithContext};
 pub use crate::properties::{
     BooleanProperty, IntegerProperty, Properties, PropertyGetter, PropertySetter, StringProperty,
 };
