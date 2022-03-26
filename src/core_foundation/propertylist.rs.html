@@ -1,7 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/Users/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/core-foundation-0.9.2/src/propertylist.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>propertylist.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../core_foundation/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;Users&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;core-foundation-0.9.3&#x2F;src&#x2F;propertylist.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>propertylist.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../core_foundation/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -330,8 +328,7 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright 2013 The Servo Project Developers. See the COPYRIGHT</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2013 The Servo Project Developers. See the COPYRIGHT</span>
 <span class="comment">// file at the top-level directory of this distribution.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -342,50 +339,50 @@
 
 <span class="doccomment">//! Core Foundation property lists</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>;
+<span class="kw">use</span> <span class="ident">std::ptr</span>;
+<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use</span> <span class="ident">std::os::raw::c_void</span>;
 
-<span class="kw">use</span> <span class="ident">error</span>::<span class="ident">CFError</span>;
-<span class="kw">use</span> <span class="ident">data</span>::<span class="ident">CFData</span>;
+<span class="kw">use</span> <span class="ident">error::CFError</span>;
+<span class="kw">use</span> <span class="ident">data::CFData</span>;
 <span class="kw">use</span> <span class="ident">base</span>::{<span class="ident">CFType</span>, <span class="ident">TCFType</span>, <span class="ident">TCFTypeRef</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">core_foundation_sys</span>::<span class="ident">propertylist</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">core_foundation_sys</span>::<span class="ident">error</span>::<span class="ident">CFErrorRef</span>;
-<span class="kw">use</span> <span class="ident">core_foundation_sys</span>::<span class="ident">base</span>::{<span class="ident">CFGetRetainCount</span>, <span class="ident">CFGetTypeID</span>, <span class="ident">CFIndex</span>, <span class="ident">CFRetain</span>,
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">core_foundation_sys::propertylist</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">core_foundation_sys::error::CFErrorRef</span>;
+<span class="kw">use</span> <span class="ident">core_foundation_sys::base</span>::{<span class="ident">CFGetRetainCount</span>, <span class="ident">CFGetTypeID</span>, <span class="ident">CFIndex</span>, <span class="ident">CFRetain</span>,
                                 <span class="ident">CFShow</span>, <span class="ident">CFTypeID</span>, <span class="ident">kCFAllocatorDefault</span>};
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_with_data</span>(<span class="ident">data</span>: <span class="ident">CFData</span>,
                         <span class="ident">options</span>: <span class="ident">CFPropertyListMutabilityOptions</span>)
-                        <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>, <span class="ident">CFPropertyListFormat</span>), <span class="ident">CFError</span><span class="op">&gt;</span> {
+                        -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">*const</span> <span class="ident">c_void</span>, <span class="ident">CFPropertyListFormat</span>), <span class="ident">CFError</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span>: <span class="ident">CFErrorRef</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span>: <span class="ident">CFErrorRef</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">format</span>: <span class="ident">CFPropertyListFormat</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">property_list</span> <span class="op">=</span> <span class="ident">CFPropertyListCreateWithData</span>(<span class="ident">kCFAllocatorDefault</span>,
                                                          <span class="ident">data</span>.<span class="ident">as_concrete_TypeRef</span>(),
                                                          <span class="ident">options</span>,
-                                                         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">format</span>,
-                                                         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">error</span>);
+                                                         <span class="kw-2">&amp;mut</span> <span class="ident">format</span>,
+                                                         <span class="kw-2">&amp;mut</span> <span class="ident">error</span>);
         <span class="kw">if</span> <span class="ident">property_list</span>.<span class="ident">is_null</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">TCFType</span>::<span class="ident">wrap_under_create_rule</span>(<span class="ident">error</span>))
+            <span class="prelude-val">Err</span>(<span class="ident">TCFType::wrap_under_create_rule</span>(<span class="ident">error</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>((<span class="ident">property_list</span>, <span class="ident">format</span>))
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_data</span>(<span class="ident">property_list</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>, <span class="ident">format</span>: <span class="ident">CFPropertyListFormat</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CFData</span>, <span class="ident">CFError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_data</span>(<span class="ident">property_list</span>: <span class="kw-2">*const</span> <span class="ident">c_void</span>, <span class="ident">format</span>: <span class="ident">CFPropertyListFormat</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CFData</span>, <span class="ident">CFError</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span>: <span class="ident">CFErrorRef</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span>: <span class="ident">CFErrorRef</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="kw">let</span> <span class="ident">data_ref</span> <span class="op">=</span> <span class="ident">CFPropertyListCreateData</span>(<span class="ident">kCFAllocatorDefault</span>,
                                                 <span class="ident">property_list</span>,
                                                 <span class="ident">format</span>,
                                                 <span class="number">0</span>,
-                                                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">error</span>);
+                                                <span class="kw-2">&amp;mut</span> <span class="ident">error</span>);
         <span class="kw">if</span> <span class="ident">data_ref</span>.<span class="ident">is_null</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">TCFType</span>::<span class="ident">wrap_under_create_rule</span>(<span class="ident">error</span>))
+            <span class="prelude-val">Err</span>(<span class="ident">TCFType::wrap_under_create_rule</span>(<span class="ident">error</span>))
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">TCFType</span>::<span class="ident">wrap_under_create_rule</span>(<span class="ident">data_ref</span>))
+            <span class="prelude-val">Ok</span>(<span class="ident">TCFType::wrap_under_create_rule</span>(<span class="ident">data_ref</span>))
         }
     }
 }
@@ -399,34 +396,34 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CFPropertyList`]: struct.CFPropertyList.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_CFPropertyList</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFPropertyList</span> {
-        <span class="kw">unsafe</span> { <span class="ident">CFPropertyList</span>::<span class="ident">wrap_under_get_rule</span>(<span class="self">self</span>.<span class="ident">as_concrete_TypeRef</span>().<span class="ident">as_void_ptr</span>()) }
+    <span class="kw">fn</span> <span class="ident">to_CFPropertyList</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFPropertyList</span> {
+        <span class="kw">unsafe</span> { <span class="ident">CFPropertyList::wrap_under_get_rule</span>(<span class="self">self</span>.<span class="ident">as_concrete_TypeRef</span>().<span class="ident">as_void_ptr</span>()) }
     }
 
     <span class="doccomment">/// Equal to [`to_CFPropertyList`], but consumes self and avoids changing the reference count.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`to_CFPropertyList`]: #method.to_CFPropertyList</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_CFPropertyList</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFPropertyList</span>
+    <span class="kw">fn</span> <span class="ident">into_CFPropertyList</span>(<span class="self">self</span>) -&gt; <span class="ident">CFPropertyList</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
         <span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_concrete_TypeRef</span>().<span class="ident">as_void_ptr</span>();
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="self">self</span>);
-        <span class="kw">unsafe</span> { <span class="ident">CFPropertyList</span>::<span class="ident">wrap_under_create_rule</span>(<span class="ident">reference</span>) }
+        <span class="ident">mem::forget</span>(<span class="self">self</span>);
+        <span class="kw">unsafe</span> { <span class="ident">CFPropertyList::wrap_under_create_rule</span>(<span class="ident">reference</span>) }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> ::<span class="ident">data</span>::<span class="ident">CFData</span> {}
-<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> ::<span class="ident">string</span>::<span class="ident">CFString</span> {}
-<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> ::<span class="ident">array</span>::<span class="ident">CFArray</span> {}
-<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> ::<span class="ident">dictionary</span>::<span class="ident">CFDictionary</span> {}
-<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> ::<span class="ident">date</span>::<span class="ident">CFDate</span> {}
-<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> ::<span class="ident">boolean</span>::<span class="ident">CFBoolean</span> {}
-<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> ::<span class="ident">number</span>::<span class="ident">CFNumber</span> {}
+<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> <span class="ident">::data::CFData</span> {}
+<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> <span class="ident">::string::CFString</span> {}
+<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> <span class="ident">::array::CFArray</span> {}
+<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> <span class="ident">::dictionary::CFDictionary</span> {}
+<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> <span class="ident">::date::CFDate</span> {}
+<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> <span class="ident">::boolean::CFBoolean</span> {}
+<span class="kw">impl</span> <span class="ident">CFPropertyListSubClass</span> <span class="kw">for</span> <span class="ident">::number::CFNumber</span> {}
 
 
-<span class="macro">declare_TCFType</span><span class="macro">!</span>{
+<span class="macro">declare_TCFType!</span>{
     <span class="doccomment">/// A CFPropertyList struct. This is superclass to [`CFData`], [`CFString`], [`CFArray`],</span>
     <span class="doccomment">/// [`CFDictionary`], [`CFDate`], [`CFBoolean`], and [`CFNumber`].</span>
     <span class="doccomment">///</span>
@@ -446,58 +443,58 @@
     <span class="ident">CFPropertyList</span>, <span class="ident">CFPropertyListRef</span>
 }
 
-<span class="macro">impl_CFTypeDescription</span><span class="macro">!</span>(<span class="ident">CFPropertyList</span>);
+<span class="macro">impl_CFTypeDescription!</span>(<span class="ident">CFPropertyList</span>);
 
 <span class="kw">impl</span> <span class="ident">CFPropertyList</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_concrete_TypeRef</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFPropertyListRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_concrete_TypeRef</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFPropertyListRef</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">wrap_under_get_rule</span>(<span class="ident">reference</span>: <span class="ident">CFPropertyListRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFPropertyList</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">reference</span>.<span class="ident">is_null</span>(), <span class="string">&quot;Attempted to create a NULL object.&quot;</span>);
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">wrap_under_get_rule</span>(<span class="ident">reference</span>: <span class="ident">CFPropertyListRef</span>) -&gt; <span class="ident">CFPropertyList</span> {
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">reference</span>.<span class="ident">is_null</span>(), <span class="string">&quot;Attempted to create a NULL object.&quot;</span>);
         <span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">CFRetain</span>(<span class="ident">reference</span>);
         <span class="ident">CFPropertyList</span>(<span class="ident">reference</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_CFType</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFType</span> {
-        <span class="kw">unsafe</span> { <span class="ident">CFType</span>::<span class="ident">wrap_under_get_rule</span>(<span class="self">self</span>.<span class="ident">as_CFTypeRef</span>()) }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_CFType</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFType</span> {
+        <span class="kw">unsafe</span> { <span class="ident">CFType::wrap_under_get_rule</span>(<span class="self">self</span>.<span class="ident">as_CFTypeRef</span>()) }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_CFType</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFType</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_CFType</span>(<span class="self">self</span>) -&gt; <span class="ident">CFType</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
         <span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_CFTypeRef</span>();
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="self">self</span>);
-        <span class="kw">unsafe</span> { <span class="ident">TCFType</span>::<span class="ident">wrap_under_create_rule</span>(<span class="ident">reference</span>) }
+        <span class="ident">mem::forget</span>(<span class="self">self</span>);
+        <span class="kw">unsafe</span> { <span class="ident">TCFType::wrap_under_create_rule</span>(<span class="ident">reference</span>) }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_CFTypeRef</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core_foundation_sys</span>::<span class="ident">base</span>::<span class="ident">CFTypeRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_CFTypeRef</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">::core_foundation_sys::base::CFTypeRef</span> {
         <span class="self">self</span>.<span class="ident">as_concrete_TypeRef</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">wrap_under_create_rule</span>(<span class="ident">obj</span>: <span class="ident">CFPropertyListRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFPropertyList</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">obj</span>.<span class="ident">is_null</span>(), <span class="string">&quot;Attempted to create a NULL object.&quot;</span>);
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">wrap_under_create_rule</span>(<span class="ident">obj</span>: <span class="ident">CFPropertyListRef</span>) -&gt; <span class="ident">CFPropertyList</span> {
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">obj</span>.<span class="ident">is_null</span>(), <span class="string">&quot;Attempted to create a NULL object.&quot;</span>);
         <span class="ident">CFPropertyList</span>(<span class="ident">obj</span>)
     }
 
     <span class="doccomment">/// Returns the reference count of the object. It is unwise to do anything other than test</span>
     <span class="doccomment">/// whether the return value of this method is greater than zero.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFIndex</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFIndex</span> {
         <span class="kw">unsafe</span> { <span class="ident">CFGetRetainCount</span>(<span class="self">self</span>.<span class="ident">as_CFTypeRef</span>()) }
     }
 
     <span class="doccomment">/// Returns the type ID of this object. Will be one of CFData, CFString, CFArray, CFDictionary,</span>
     <span class="doccomment">/// CFDate, CFBoolean, or CFNumber.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_of</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFTypeID</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_of</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFTypeID</span> {
         <span class="kw">unsafe</span> { <span class="ident">CFGetTypeID</span>(<span class="self">self</span>.<span class="ident">as_CFTypeRef</span>()) }
     }
 
@@ -508,21 +505,21 @@
 
     <span class="doccomment">/// Returns true if this value is an instance of another type.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instance_of</span><span class="op">&lt;</span><span class="ident">OtherCFType</span>: <span class="ident">TCFType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">type_of</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">OtherCFType</span>::<span class="ident">type_id</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instance_of</span><span class="op">&lt;</span><span class="ident">OtherCFType</span>: <span class="ident">TCFType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">type_of</span>() <span class="op">==</span> <span class="ident">OtherCFType::type_id</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">CFPropertyList</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFPropertyList</span> {
-        <span class="kw">unsafe</span> { <span class="ident">CFPropertyList</span>::<span class="ident">wrap_under_get_rule</span>(<span class="self">self</span>.<span class="number">0</span>) }
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CFPropertyList</span> {
+        <span class="kw">unsafe</span> { <span class="ident">CFPropertyList::wrap_under_get_rule</span>(<span class="self">self</span>.<span class="number">0</span>) }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">CFPropertyList</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">CFPropertyList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">CFPropertyList</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">as_CFType</span>().<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">as_CFType</span>())
     }
 }
@@ -550,11 +547,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CFPropertyList`]: struct.CFPropertyList.html</span>
     <span class="doccomment">/// [`Box::downcast`]: https://doc.rust-lang.org/std/boxed/struct.Box.html#method.downcast</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CFPropertyListSubClass</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CFPropertyListSubClass</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">instance_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
             <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">subclass_ref</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Ref</span>::<span class="ident">from_void_ptr</span>(<span class="self">self</span>.<span class="number">0</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">T</span>::<span class="ident">wrap_under_get_rule</span>(<span class="ident">subclass_ref</span>))
+                <span class="kw">let</span> <span class="ident">subclass_ref</span> <span class="op">=</span> <span class="ident">T::Ref::from_void_ptr</span>(<span class="self">self</span>.<span class="number">0</span>);
+                <span class="prelude-val">Some</span>(<span class="ident">T::wrap_under_get_rule</span>(<span class="ident">subclass_ref</span>))
             }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -564,12 +561,12 @@
     <span class="doccomment">/// Similar to [`downcast`], but consumes self and can thus avoid touching the retain count.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`downcast`]: #method.downcast</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_into</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CFPropertyListSubClass</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_into</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CFPropertyListSubClass</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">instance_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
             <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">subclass_ref</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Ref</span>::<span class="ident">from_void_ptr</span>(<span class="self">self</span>.<span class="number">0</span>);
-                <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="self">self</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">T</span>::<span class="ident">wrap_under_create_rule</span>(<span class="ident">subclass_ref</span>))
+                <span class="kw">let</span> <span class="ident">subclass_ref</span> <span class="op">=</span> <span class="ident">T::Ref::from_void_ptr</span>(<span class="self">self</span>.<span class="number">0</span>);
+                <span class="ident">mem::forget</span>(<span class="self">self</span>);
+                <span class="prelude-val">Some</span>(<span class="ident">T::wrap_under_create_rule</span>(<span class="ident">subclass_ref</span>))
             }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -582,84 +579,84 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">string</span>::<span class="ident">CFString</span>;
-    <span class="kw">use</span> <span class="ident">boolean</span>::<span class="ident">CFBoolean</span>;
+    <span class="kw">use</span> <span class="ident">string::CFString</span>;
+    <span class="kw">use</span> <span class="ident">boolean::CFBoolean</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_property_list_serialization</span>() {
         <span class="kw">use</span> <span class="ident">base</span>::{<span class="ident">TCFType</span>, <span class="ident">CFEqual</span>};
-        <span class="kw">use</span> <span class="ident">boolean</span>::<span class="ident">CFBoolean</span>;
-        <span class="kw">use</span> <span class="ident">number</span>::<span class="ident">CFNumber</span>;
-        <span class="kw">use</span> <span class="ident">dictionary</span>::<span class="ident">CFDictionary</span>;
-        <span class="kw">use</span> <span class="ident">string</span>::<span class="ident">CFString</span>;
+        <span class="kw">use</span> <span class="ident">boolean::CFBoolean</span>;
+        <span class="kw">use</span> <span class="ident">number::CFNumber</span>;
+        <span class="kw">use</span> <span class="ident">dictionary::CFDictionary</span>;
+        <span class="kw">use</span> <span class="ident">string::CFString</span>;
         <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">bar</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
-        <span class="kw">let</span> <span class="ident">baz</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Baz&quot;</span>);
-        <span class="kw">let</span> <span class="ident">boo</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Boo&quot;</span>);
-        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Foo&quot;</span>);
-        <span class="kw">let</span> <span class="ident">tru</span> <span class="op">=</span> <span class="ident">CFBoolean</span>::<span class="ident">true_value</span>();
-        <span class="kw">let</span> <span class="ident">n42</span> <span class="op">=</span> <span class="ident">CFNumber</span>::<span class="ident">from</span>(<span class="number">1i64</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="number">33</span>);
+        <span class="kw">let</span> <span class="ident">bar</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">baz</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Baz&quot;</span>);
+        <span class="kw">let</span> <span class="ident">boo</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Boo&quot;</span>);
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Foo&quot;</span>);
+        <span class="kw">let</span> <span class="ident">tru</span> <span class="op">=</span> <span class="ident">CFBoolean::true_value</span>();
+        <span class="kw">let</span> <span class="ident">n42</span> <span class="op">=</span> <span class="ident">CFNumber::from</span>(<span class="number">1i64</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="number">33</span>);
 
-        <span class="kw">let</span> <span class="ident">dict1</span> <span class="op">=</span> <span class="ident">CFDictionary</span>::<span class="ident">from_CFType_pairs</span>(<span class="kw-2">&amp;</span>[(<span class="ident">bar</span>.<span class="ident">as_CFType</span>(), <span class="ident">boo</span>.<span class="ident">as_CFType</span>()),
+        <span class="kw">let</span> <span class="ident">dict1</span> <span class="op">=</span> <span class="ident">CFDictionary::from_CFType_pairs</span>(<span class="kw-2">&amp;</span>[(<span class="ident">bar</span>.<span class="ident">as_CFType</span>(), <span class="ident">boo</span>.<span class="ident">as_CFType</span>()),
                                                       (<span class="ident">baz</span>.<span class="ident">as_CFType</span>(), <span class="ident">tru</span>.<span class="ident">as_CFType</span>()),
                                                       (<span class="ident">foo</span>.<span class="ident">as_CFType</span>(), <span class="ident">n42</span>.<span class="ident">as_CFType</span>())]);
 
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">create_data</span>(<span class="ident">dict1</span>.<span class="ident">as_CFTypeRef</span>(), <span class="ident">kCFPropertyListXMLFormat_v1_0</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> (<span class="ident">dict2</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">create_with_data</span>(<span class="ident">data</span>, <span class="ident">kCFPropertyListImmutable</span>).<span class="ident">unwrap</span>();
         <span class="kw">unsafe</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">CFEqual</span>(<span class="ident">dict1</span>.<span class="ident">as_CFTypeRef</span>(), <span class="ident">dict2</span>), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">CFEqual</span>(<span class="ident">dict1</span>.<span class="ident">as_CFTypeRef</span>(), <span class="ident">dict2</span>), <span class="number">1</span>);
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">to_propertylist_retain_count</span>() {
-        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">1</span>);
 
         <span class="kw">let</span> <span class="ident">propertylist</span> <span class="op">=</span> <span class="ident">string</span>.<span class="ident">to_CFPropertyList</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">propertylist</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">propertylist</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
 
-        <span class="ident">mem</span>::<span class="ident">drop</span>(<span class="ident">string</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">propertylist</span>.<span class="ident">retain_count</span>(), <span class="number">1</span>);
+        <span class="ident">mem::drop</span>(<span class="ident">string</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">propertylist</span>.<span class="ident">retain_count</span>(), <span class="number">1</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">downcast_string</span>() {
-        <span class="kw">let</span> <span class="ident">propertylist</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Bar&quot;</span>).<span class="ident">to_CFPropertyList</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFString</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;Bar&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFBoolean</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
+        <span class="kw">let</span> <span class="ident">propertylist</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Bar&quot;</span>).<span class="ident">to_CFPropertyList</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFString</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;Bar&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFBoolean</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">downcast_boolean</span>() {
-        <span class="kw">let</span> <span class="ident">propertylist</span> <span class="op">=</span> <span class="ident">CFBoolean</span>::<span class="ident">true_value</span>().<span class="ident">to_CFPropertyList</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFBoolean</span><span class="op">&gt;</span>().<span class="ident">is_some</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFString</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
+        <span class="kw">let</span> <span class="ident">propertylist</span> <span class="op">=</span> <span class="ident">CFBoolean::true_value</span>().<span class="ident">to_CFPropertyList</span>();
+        <span class="macro">assert!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFBoolean</span><span class="op">&gt;</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">CFString</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">downcast_into_fail</span>() {
-        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
         <span class="kw">let</span> <span class="ident">propertylist</span> <span class="op">=</span> <span class="ident">string</span>.<span class="ident">to_CFPropertyList</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast_into</span>::<span class="op">&lt;</span><span class="ident">CFBoolean</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">1</span>);
+        <span class="macro">assert!</span>(<span class="ident">propertylist</span>.<span class="ident">downcast_into</span>::<span class="op">&lt;</span><span class="ident">CFBoolean</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">1</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">downcast_into</span>() {
-        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CFString::from_static_string</span>(<span class="string">&quot;Bar&quot;</span>);
         <span class="kw">let</span> <span class="ident">propertylist</span> <span class="op">=</span> <span class="ident">string</span>.<span class="ident">to_CFPropertyList</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">string</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
 
         <span class="kw">let</span> <span class="ident">string2</span> <span class="op">=</span> <span class="ident">propertylist</span>.<span class="ident">downcast_into</span>::<span class="op">&lt;</span><span class="ident">CFString</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">string2</span>.<span class="ident">to_string</span>(), <span class="string">&quot;Bar&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">string2</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">string2</span>.<span class="ident">to_string</span>(), <span class="string">&quot;Bar&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">string2</span>.<span class="ident">retain_count</span>(), <span class="number">2</span>);
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="core_foundation"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="core_foundation" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</body></html>

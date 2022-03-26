@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["block","core_foundation","core_foundation_sys","coremidi","coremidi_sys","libc"];

@@ -1,106 +1,111 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../coremidi/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
-<span id="10">10</span>
-<span id="11">11</span>
-<span id="12">12</span>
-<span id="13">13</span>
-<span id="14">14</span>
-<span id="15">15</span>
-<span id="16">16</span>
-<span id="17">17</span>
-<span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">crate_name</span> <span class="op">=</span> <span class="string">&quot;coremidi&quot;</span>]</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../coremidi/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">crate_name</span> <span class="op">=</span> <span class="string">&quot;coremidi&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">crate_type</span> <span class="op">=</span> <span class="string">&quot;lib&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://chris-zen.github.io/coremidi/&quot;</span>)]</span>
 
 <span class="doccomment">/*!
-This is a [CoreMIDI](https://developer.apple.com/reference/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
+This is a [CoreMIDI](https://developer.apple.com/documentation/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
 CoreMIDI is a macOS framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
 
 This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
@@ -108,17 +113,20 @@ This library preserves the fundamental concepts behind the CoreMIDI framework, w
 Please see the [examples](https://github.com/chris-zen/coremidi/tree/master/examples) for getting an idea of how it looks like, but if you are eager to see an example, this is how you would send some note:
 
 ```rust,no_run
-extern crate coremidi;
+use coremidi::{Client, Destination, EventBuffer, Protocol};
 use std::time::Duration;
 use std::thread;
-let client = coremidi::Client::new(&quot;example-client&quot;).unwrap();
-let output_port = client.output_port(&quot;example-port&quot;).unwrap();
-let destination = coremidi::Destination::from_index(0).unwrap();
-let note_on = coremidi::PacketBuffer::new(0, &amp;[0x90, 0x40, 0x7f]);
-let note_off = coremidi::PacketBuffer::new(0, &amp;[0x80, 0x40, 0x7f]);
-output_port.send(&amp;destination, &amp;note_on).unwrap();
-thread::sleep(Duration::from_millis(1000));
-output_port.send(&amp;destination, &amp;note_off).unwrap();
+
+fn main() {
+    let client = coremidi::Client::new(&quot;example-client&quot;).unwrap();
+    let output_port = client.output_port(&quot;example-port&quot;).unwrap();
+    let destination = Destination::from_index(0).unwrap();
+    let note_on = EventBuffer::new(Protocol::Midi10).with_packet(0, &amp;[0x2090407f]);
+    let note_off = EventBuffer::new(Protocol::Midi10).with_packet(0, &amp;[0x2080407f]);
+    output_port.send(&amp;destination, &amp;note_on).unwrap();
+    thread::sleep(Duration::from_millis(1000));
+    output_port.send(&amp;destination, &amp;note_off).unwrap();
+}
 ```
 
 If you are looking for a portable MIDI library then you can look into:
@@ -133,61 +141,66 @@ For handling low level MIDI data you may look into:
 
 */</span>
 
-<span class="kw">mod</span> <span class="ident">callback</span>;
 <span class="kw">mod</span> <span class="ident">client</span>;
-<span class="kw">mod</span> <span class="ident">devices</span>;
+<span class="kw">mod</span> <span class="ident">device</span>;
 <span class="kw">mod</span> <span class="ident">endpoints</span>;
+<span class="kw">mod</span> <span class="ident">entity</span>;
+<span class="kw">mod</span> <span class="ident">events</span>;
 <span class="kw">mod</span> <span class="ident">notifications</span>;
 <span class="kw">mod</span> <span class="ident">object</span>;
 <span class="kw">mod</span> <span class="ident">packets</span>;
 <span class="kw">mod</span> <span class="ident">ports</span>;
 <span class="kw">mod</span> <span class="ident">properties</span>;
+<span class="kw">mod</span> <span class="ident">protocol</span>;
 
-<span class="kw">use</span> <span class="ident">core_foundation_sys</span>::<span class="ident">base</span>::<span class="ident">OSStatus</span>;
+<span class="kw">use</span> <span class="ident">core_foundation_sys::base::OSStatus</span>;
 
 <span class="kw">use</span> <span class="ident">coremidi_sys</span>::{<span class="ident">MIDIFlushOutput</span>, <span class="ident">MIDIRestart</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Client</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">devices</span>::<span class="ident">Device</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">endpoints</span>::<span class="ident">destinations</span>::{<span class="ident">Destination</span>, <span class="ident">Destinations</span>, <span class="ident">VirtualDestination</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">endpoints</span>::<span class="ident">sources</span>::{<span class="ident">Source</span>, <span class="ident">Sources</span>, <span class="ident">VirtualSource</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">endpoints</span>::<span class="ident">Endpoint</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">notifications</span>::{<span class="ident">AddedRemovedInfo</span>, <span class="ident">IoErrorInfo</span>, <span class="ident">Notification</span>, <span class="ident">PropertyChangedInfo</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">object</span>::<span class="ident">ObjectType</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">packets</span>::{<span class="ident">Packet</span>, <span class="ident">PacketBuffer</span>, <span class="ident">PacketList</span>, <span class="ident">PacketListIterator</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ports</span>::{<span class="ident">InputPort</span>, <span class="ident">OutputPort</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">properties</span>::{
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">Client</span>, <span class="ident">NotifyCallback</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::device::Device</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endpoints::destinations</span>::{<span class="ident">Destination</span>, <span class="ident">Destinations</span>, <span class="ident">VirtualDestination</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endpoints::endpoint::Endpoint</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endpoints::sources</span>::{<span class="ident">Source</span>, <span class="ident">Sources</span>, <span class="ident">VirtualSource</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::entity::Entity</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::events</span>::{<span class="ident">EventBuffer</span>, <span class="ident">EventList</span>, <span class="ident">EventListIter</span>, <span class="ident">EventPacket</span>, <span class="ident">Timestamp</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::notifications</span>::{<span class="ident">AddedRemovedInfo</span>, <span class="ident">IoErrorInfo</span>, <span class="ident">Notification</span>, <span class="ident">PropertyChangedInfo</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object</span>::{<span class="ident">Object</span>, <span class="ident">ObjectType</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::packets</span>::{<span class="ident">Packet</span>, <span class="ident">PacketBuffer</span>, <span class="ident">PacketList</span>, <span class="ident">PacketListIterator</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ports</span>::{<span class="ident">InputPort</span>, <span class="ident">InputPortWithContext</span>, <span class="ident">OutputPort</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::properties</span>::{
     <span class="ident">BooleanProperty</span>, <span class="ident">IntegerProperty</span>, <span class="ident">Properties</span>, <span class="ident">PropertyGetter</span>, <span class="ident">PropertySetter</span>, <span class="ident">StringProperty</span>,
 };
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::protocol::Protocol</span>;
 
 <span class="doccomment">/// Unschedules previously-sent packets for all the endpoints.</span>
-<span class="doccomment">/// See [MIDIFlushOutput](https://developer.apple.com/reference/coremidi/1495312-midiflushoutput).</span>
+<span class="doccomment">/// See [MIDIFlushOutput](https://developer.apple.com/documentation/coremidi/1495312-midiflushoutput).</span>
 <span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MIDIFlushOutput</span>(<span class="number">0</span>) };
     <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>)
 }
 
 <span class="doccomment">/// Stops and restarts MIDI I/O.</span>
-<span class="doccomment">/// See [MIDIRestart](https://developer.apple.com/reference/coremidi/1495146-midirestart).</span>
+<span class="doccomment">/// See [MIDIRestart](https://developer.apple.com/documentation/coremidi/1495146-midirestart).</span>
 <span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MIDIRestart</span>() };
     <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>)
 }
 
 <span class="doccomment">/// Convert an OSStatus into a Result&lt;T, OSStatus&gt; given a mapping closure</span>
-<span class="kw">fn</span> <span class="ident">result_from_status</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">status</span>: <span class="ident">OSStatus</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">result_from_status</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">status</span>: <span class="ident">OSStatus</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">status</span> {
-        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">f</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">status</span>),
+        <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">f</span>()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">status</span>),
     }
 }
 
 <span class="doccomment">/// Convert an OSSStatus into a Result&lt;(), OSStatus&gt;</span>
-<span class="kw">fn</span> <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>: <span class="ident">OSStatus</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>: <span class="ident">OSStatus</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
     <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> ())
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</body></html>

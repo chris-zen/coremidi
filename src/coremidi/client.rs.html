@@ -1,7 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../coremidi/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../coremidi/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -239,30 +237,161 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
-</pre><div class="example-wrap"><pre class="rust ">
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">block::RcBlock</span>;
 <span class="kw">use</span> <span class="ident">core_foundation</span>::{
     <span class="ident">base</span>::{<span class="ident">OSStatus</span>, <span class="ident">TCFType</span>},
-    <span class="ident">string</span>::<span class="ident">CFString</span>,
+    <span class="ident">string::CFString</span>,
 };
+<span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">mem::MaybeUninit</span>, <span class="ident">ops::Deref</span>, <span class="ident">os::raw::c_void</span>, <span class="ident">ptr</span>};
 
 <span class="kw">use</span> <span class="ident">coremidi_sys</span>::{
-    <span class="ident">MIDIClientCreate</span>, <span class="ident">MIDIClientDispose</span>, <span class="ident">MIDIDestinationCreate</span>, <span class="ident">MIDIInputPortCreate</span>,
-    <span class="ident">MIDINotification</span>, <span class="ident">MIDIOutputPortCreate</span>, <span class="ident">MIDIPacketList</span>, <span class="ident">MIDISourceCreate</span>,
+    <span class="ident">MIDIClientCreate</span>, <span class="ident">MIDIClientCreateWithBlock</span>, <span class="ident">MIDIClientDispose</span>, <span class="ident">MIDIDestinationCreateWithBlock</span>,
+    <span class="ident">MIDIDestinationCreateWithProtocol</span>, <span class="ident">MIDIEventList</span>, <span class="ident">MIDIInputPortCreateWithBlock</span>,
+    <span class="ident">MIDIInputPortCreateWithProtocol</span>, <span class="ident">MIDINotification</span>, <span class="ident">MIDINotifyBlock</span>, <span class="ident">MIDIOutputPortCreate</span>,
+    <span class="ident">MIDIPacketList</span>, <span class="ident">MIDIReadBlock</span>, <span class="ident">MIDIReceiveBlock</span>, <span class="ident">MIDISourceCreate</span>,
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>, <span class="ident">ops</span>::<span class="ident">Deref</span>, <span class="ident">os</span>::<span class="ident">raw</span>::<span class="ident">c_void</span>, <span class="ident">panic</span>::<span class="ident">catch_unwind</span>, <span class="ident">ptr</span>};
-
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ports::InputPortWithContext</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">callback</span>::<span class="ident">BoxedCallback</span>,
-    <span class="ident">endpoints</span>::{<span class="ident">destinations</span>::<span class="ident">VirtualDestination</span>, <span class="ident">sources</span>::<span class="ident">VirtualSource</span>, <span class="ident">Endpoint</span>},
-    <span class="ident">notifications</span>::<span class="ident">Notification</span>,
-    <span class="ident">object</span>::<span class="ident">Object</span>,
-    <span class="ident">packets</span>::<span class="ident">PacketList</span>,
-    <span class="ident">ports</span>::{<span class="ident">InputPort</span>, <span class="ident">OutputPort</span>, <span class="ident">Port</span>},
-    <span class="ident">result_from_status</span>,
+    <span class="ident">endpoints</span>::{<span class="ident">destinations::VirtualDestination</span>, <span class="ident">sources::VirtualSource</span>},
+    <span class="ident">notifications::Notification</span>,
+    <span class="ident">object::Object</span>,
+    <span class="ident">packets::PacketList</span>,
+    <span class="ident">ports</span>::{<span class="ident">InputPort</span>, <span class="ident">OutputPort</span>},
+    <span class="ident">result_from_status</span>, <span class="ident">EventList</span>, <span class="ident">Protocol</span>,
 };
 
-<span class="doccomment">/// A [MIDI client](https://developer.apple.com/reference/coremidi/midiclientref).</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NotifyCallback</span> {
+    <span class="ident">ByReference</span>(<span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Notification</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+    <span class="ident">ByOwnership</span>(<span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="ident">Notification</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">NotifyCallback</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_reference</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Notification</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="ident"><span class="self">Self</span>::ByReference</span>(<span class="ident">RefCell::new</span>(<span class="ident">Box::new</span>(<span class="ident">callback</span>)))
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_ownership</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Notification</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="ident"><span class="self">Self</span>::ByOwnership</span>(<span class="ident">RefCell::new</span>(<span class="ident">Box::new</span>(<span class="ident">callback</span>)))
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NotifyCallback</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Notification</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+{
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::by_reference</span>(<span class="ident">callback</span>)
+    }
+}
+
+<span class="doccomment">/// A [MIDI client](https://developer.apple.com/documentation/coremidi/midiclientref).</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// An object maintaining per-client state.</span>
 <span class="doccomment">///</span>
@@ -273,56 +402,53 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
-    <span class="comment">// Order is important, object needs to be dropped first</span>
     <span class="ident">object</span>: <span class="ident">Object</span>,
-    <span class="ident">callback</span>: <span class="ident">BoxedCallback</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Client</span> {
     <span class="doccomment">/// Creates a new CoreMIDI client with support for notifications.</span>
-    <span class="doccomment">/// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).</span>
+    <span class="doccomment">/// See [MIDIClientCreateWithBlock](https://developer.apple.com/documentation/coremidi/1495330-midiclientcreatewithblock).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The notification callback will be called on the [run loop](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html)</span>
     <span class="doccomment">/// that was current when this associated function is called.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// It follows that this particular run loop needs to be running in order to</span>
     <span class="doccomment">/// actually receive notifications. The run loop can be started after the</span>
-    <span class="doccomment">/// client has been created if need be.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_notifications</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">callback</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
+    <span class="doccomment">/// client has been created if need be. Please see the examples to know how.</span>
+    <span class="doccomment">///</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_notifications</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Notification</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">F</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">NotifyCallback</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">client_name</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">boxed_callback</span> <span class="op">=</span> <span class="ident">BoxedCallback</span>::<span class="ident">new</span>(<span class="ident">callback</span>);
+        <span class="kw">let</span> <span class="ident">client_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="ident">notify_block</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::notify_block</span>(<span class="ident">callback</span>.<span class="ident">into</span>());
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">MIDIClientCreate</span>(
+            <span class="ident">MIDIClientCreateWithBlock</span>(
                 <span class="ident">client_name</span>.<span class="ident">as_concrete_TypeRef</span>(),
-                <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">notify_proc</span> <span class="kw">as</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="kw">_</span>, <span class="kw">_</span>)),
-                <span class="ident">boxed_callback</span>.<span class="ident">raw_ptr</span>(),
                 <span class="ident">client_ref</span>.<span class="ident">as_mut_ptr</span>(),
+                <span class="ident">notify_block</span>.<span class="ident">deref</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">MIDINotifyBlock</span>,
             )
         };
         <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">client_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">client_ref</span>.<span class="ident">assume_init</span>() };
             <span class="ident">Client</span> {
                 <span class="ident">object</span>: <span class="ident">Object</span>(<span class="ident">client_ref</span>),
-                <span class="ident">callback</span>: <span class="ident">boxed_callback</span>,
             }
         })
     }
 
     <span class="doccomment">/// Creates a new CoreMIDI client.</span>
-    <span class="doccomment">/// See [MIDIClientCreate](https://developer.apple.com/reference/coremidi/1495360-midiclientcreate).</span>
+    <span class="doccomment">/// See [MIDIClientCreate](https://developer.apple.com/documentation/coremidi/1495360-midiclientcreate).</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client_name</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">client_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">MIDIClientCreate</span>(
                 <span class="ident">client_name</span>.<span class="ident">as_concrete_TypeRef</span>(),
                 <span class="prelude-val">None</span>,
-                <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                <span class="ident">ptr::null_mut</span>(),
                 <span class="ident">client_ref</span>.<span class="ident">as_mut_ptr</span>(),
             )
         };
@@ -330,17 +456,16 @@
             <span class="kw">let</span> <span class="ident">client_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">client_ref</span>.<span class="ident">assume_init</span>() };
             <span class="ident">Client</span> {
                 <span class="ident">object</span>: <span class="ident">Object</span>(<span class="ident">client_ref</span>),
-                <span class="ident">callback</span>: <span class="ident">BoxedCallback</span>::<span class="ident">null</span>(),
             }
         })
     }
 
     <span class="doccomment">/// Creates an output port through which the client may send outgoing MIDI messages to any MIDI destination.</span>
-    <span class="doccomment">/// See [MIDIOutputPortCreate](https://developer.apple.com/reference/coremidi/1495166-midioutputportcreate).</span>
+    <span class="doccomment">/// See [MIDIOutputPortCreate](https://developer.apple.com/documentation/coremidi/1495166-midioutputportcreate).</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">output_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OutputPort</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">port_name</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">output_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OutputPort</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">port_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">MIDIOutputPortCreate</span>(
                 <span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>,
@@ -350,50 +475,73 @@
         };
         <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">port_ref</span>.<span class="ident">assume_init</span>() };
-            <span class="ident">OutputPort</span> {
-                <span class="ident">port</span>: <span class="ident">Port</span> {
-                    <span class="ident">object</span>: <span class="ident">Object</span>(<span class="ident">port_ref</span>),
-                },
-            }
+            <span class="ident">OutputPort::new</span>(<span class="ident">port_ref</span>)
         })
     }
 
-    <span class="doccomment">/// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.</span>
-    <span class="doccomment">/// See [MIDIInputPortCreate](https://developer.apple.com/reference/coremidi/1495225-midiinputportcreate).</span>
+    <span class="doccomment">/// Creates an input port through which the client may receive incoming MIDI 1.0 messages from any MIDI source.</span>
+    <span class="doccomment">/// See [MIDIInputPortCreate](https://developer.apple.com/documentation/coremidi/1495225-midiinputportcreate).</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_port</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">callback</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InputPort</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
+    <span class="doccomment">/// **MIDIInputPortCreate is deprecated in CoreMIDI. Please consider using `input_port_with_protocol` instead**</span>
+    <span class="doccomment">///</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_port</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InputPort</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">PacketList</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">port_name</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">box_callback</span> <span class="op">=</span> <span class="ident">BoxedCallback</span>::<span class="ident">new</span>(<span class="ident">callback</span>);
+        <span class="kw">let</span> <span class="ident">port_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="ident">read_block</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_block</span>(<span class="ident">callback</span>);
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">MIDIInputPortCreate</span>(
+            <span class="ident">MIDIInputPortCreateWithBlock</span>(
                 <span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>,
                 <span class="ident">port_name</span>.<span class="ident">as_concrete_TypeRef</span>(),
-                <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">read_proc</span> <span class="kw">as</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)),
-                <span class="ident">box_callback</span>.<span class="ident">raw_ptr</span>(),
                 <span class="ident">port_ref</span>.<span class="ident">as_mut_ptr</span>(),
+                <span class="ident">read_block</span>.<span class="ident">deref</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">MIDIReadBlock</span>,
             )
         };
         <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">port_ref</span>.<span class="ident">assume_init</span>() };
-            <span class="ident">InputPort</span> {
-                <span class="ident">port</span>: <span class="ident">Port</span> {
-                    <span class="ident">object</span>: <span class="ident">Object</span>(<span class="ident">port_ref</span>),
-                },
-                <span class="ident">callback</span>: <span class="ident">box_callback</span>,
-            }
+            <span class="ident">InputPort::new</span>(<span class="ident">port_ref</span>)
+        })
+    }
+
+    <span class="doccomment">/// Creates an input port through which the client may receive incoming MIDI messages from any MIDI source.</span>
+    <span class="doccomment">/// It allows to choose which MIDI [Protocol] to use.</span>
+    <span class="doccomment">/// See [MIDIInputPortCreateWithProtocol](https://developer.apple.com/documentation/coremidi/3566488-midiinputportcreatewithprotocol).</span>
+    <span class="doccomment">///</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_port_with_protocol</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">protocol</span>: <span class="ident">Protocol</span>,
+        <span class="ident">callback</span>: <span class="ident">F</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InputPortWithContext</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">EventList</span>, <span class="kw-2">&amp;mut</span> <span class="ident">T</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">let</span> <span class="ident">port_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="ident">receive_block</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::receive_block</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">callback</span>);
+        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+            <span class="ident">MIDIInputPortCreateWithProtocol</span>(
+                <span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>,
+                <span class="ident">port_name</span>.<span class="ident">as_concrete_TypeRef</span>(),
+                <span class="ident">protocol</span>.<span class="ident">into</span>(),
+                <span class="ident">port_ref</span>.<span class="ident">as_mut_ptr</span>(),
+                <span class="ident">receive_block</span>.<span class="ident">deref</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">MIDIReceiveBlock</span>,
+            )
+        };
+        <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">port_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">port_ref</span>.<span class="ident">assume_init</span>() };
+            <span class="ident">InputPortWithContext</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">port_ref</span>)
         })
     }
 
     <span class="doccomment">/// Creates a virtual source in the client.</span>
-    <span class="doccomment">/// See [MIDISourceCreate](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate).</span>
+    <span class="doccomment">/// See [MIDISourceCreate](https://developer.apple.com/documentation/coremidi/1495212-midisourcecreate).</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">virtual_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VirtualSource</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">virtual_source_name</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">virtual_source</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">virtual_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VirtualSource</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">virtual_source_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">virtual_source</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">MIDISourceCreate</span>(
                 <span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>,
@@ -402,82 +550,129 @@
             )
         };
         <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">virtual_source</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">virtual_source</span>.<span class="ident">assume_init</span>() };
-            <span class="ident">VirtualSource</span> {
-                <span class="ident">endpoint</span>: <span class="ident">Endpoint</span> {
-                    <span class="ident">object</span>: <span class="ident">Object</span>(<span class="ident">virtual_source</span>),
-                },
-            }
+            <span class="kw">let</span> <span class="ident">endpoint_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">virtual_source</span>.<span class="ident">assume_init</span>() };
+            <span class="ident">VirtualSource::new</span>(<span class="ident">endpoint_ref</span>)
         })
     }
 
     <span class="doccomment">/// Creates a virtual destination in the client.</span>
-    <span class="doccomment">/// See [MIDIDestinationCreate](https://developer.apple.com/reference/coremidi/1495347-mididestinationcreate).</span>
+    <span class="doccomment">/// See [MIDIDestinationCreate](https://developer.apple.com/documentation/coremidi/1495347-mididestinationcreate).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **MIDIDestinationCreate is deprecated in CoreMIDI. Please consider using `virtual_destination_with_protocol` instead**</span>
     <span class="doccomment">///</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">virtual_destination</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">callback</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VirtualDestination</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VirtualDestination</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">PacketList</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">virtual_destination_name</span> <span class="op">=</span> <span class="ident">CFString</span>::<span class="ident">new</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">virtual_destination</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">boxed_callback</span> <span class="op">=</span> <span class="ident">BoxedCallback</span>::<span class="ident">new</span>(<span class="ident">callback</span>);
+        <span class="kw">let</span> <span class="ident">virtual_destination_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">virtual_destination</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="ident">read_block</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::read_block</span>(<span class="ident">callback</span>);
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">MIDIDestinationCreate</span>(
+            <span class="ident">MIDIDestinationCreateWithBlock</span>(
                 <span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>,
                 <span class="ident">virtual_destination_name</span>.<span class="ident">as_concrete_TypeRef</span>(),
-                <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">read_proc</span> <span class="kw">as</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)),
-                <span class="ident">boxed_callback</span>.<span class="ident">raw_ptr</span>(),
                 <span class="ident">virtual_destination</span>.<span class="ident">as_mut_ptr</span>(),
+                <span class="ident">read_block</span>.<span class="ident">deref</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">MIDIReadBlock</span>,
             )
         };
         <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">virtual_destination</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">virtual_destination</span>.<span class="ident">assume_init</span>() };
-            <span class="ident">VirtualDestination</span> {
-                <span class="ident">endpoint</span>: <span class="ident">Endpoint</span> {
-                    <span class="ident">object</span>: <span class="ident">Object</span>(<span class="ident">virtual_destination</span>),
-                },
-                <span class="ident">callback</span>: <span class="ident">boxed_callback</span>,
-            }
+            <span class="kw">let</span> <span class="ident">endpoint_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">virtual_destination</span>.<span class="ident">assume_init</span>() };
+            <span class="ident">VirtualDestination::new</span>(<span class="ident">endpoint_ref</span>)
         })
     }
 
-    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">notify_proc</span>(<span class="ident">notification_ptr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">MIDINotification</span>, <span class="ident">ref_con</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">catch_unwind</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">unsafe</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">notification</span>) <span class="op">=</span> <span class="ident">Notification</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">notification_ptr</span>) {
-                <span class="ident">BoxedCallback</span>::<span class="ident">call_from_raw_ptr</span>(<span class="ident">ref_con</span>, <span class="kw-2">&amp;</span><span class="ident">notification</span>)
-            }
-        });
+    <span class="doccomment">/// Creates a virtual destination in the client.</span>
+    <span class="doccomment">/// It allows to choose which MIDI [Protocol] to use.</span>
+    <span class="doccomment">/// See [MIDIDestinationCreate](https://developer.apple.com/documentation/coremidi/1495347-mididestinationcreate).</span>
+    <span class="doccomment">///</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">virtual_destination_with_protocol</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">protocol</span>: <span class="ident">Protocol</span>,
+        <span class="kw-2">mut</span> <span class="ident">callback</span>: <span class="ident">F</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VirtualDestination</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">EventList</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">let</span> <span class="ident">virtual_destination_name</span> <span class="op">=</span> <span class="ident">CFString::new</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">virtual_destination</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">let</span> <span class="ident">receive_block</span> <span class="op">=</span>
+            <span class="ident"><span class="self">Self</span>::receive_block</span>::<span class="op">&lt;</span>(), <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">event_list</span>, <span class="kw">_</span><span class="op">|</span> (<span class="ident">callback</span>)(<span class="ident">event_list</span>));
+        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+            <span class="ident">MIDIDestinationCreateWithProtocol</span>(
+                <span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>,
+                <span class="ident">virtual_destination_name</span>.<span class="ident">as_concrete_TypeRef</span>(),
+                <span class="ident">protocol</span>.<span class="ident">into</span>(),
+                <span class="ident">virtual_destination</span>.<span class="ident">as_mut_ptr</span>(),
+                <span class="ident">receive_block</span>.<span class="ident">deref</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">MIDIReceiveBlock</span>,
+            )
+        };
+        <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">endpoint_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">virtual_destination</span>.<span class="ident">assume_init</span>() };
+            <span class="ident">VirtualDestination::new</span>(<span class="ident">endpoint_ref</span>)
+        })
     }
 
-    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">read_proc</span>(
-        <span class="ident">pktlist</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">MIDIPacketList</span>,
-        <span class="ident">read_proc_ref_con</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-        <span class="ident">_src_conn_ref_con</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    ) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">catch_unwind</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">packet_list</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">pktlist</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PacketList</span>);
-            <span class="ident">BoxedCallback</span>::<span class="ident">call_from_raw_ptr</span>(<span class="ident">read_proc_ref_con</span>, <span class="ident">packet_list</span>);
+    <span class="kw">fn</span> <span class="ident">notify_block</span>(<span class="ident">callback</span>: <span class="ident">NotifyCallback</span>) -&gt; <span class="ident">RcBlock</span><span class="op">&lt;</span>(<span class="kw-2">*const</span> <span class="ident">MIDINotification</span>,), ()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">notify_block</span> <span class="op">=</span> <span class="ident">block::ConcreteBlock::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">message</span>: <span class="kw-2">*const</span> <span class="ident">MIDINotification</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">message</span> };
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">notification</span>) <span class="op">=</span> <span class="ident">Notification::try_from</span>(<span class="ident">message</span>) {
+                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">callback</span> {
+                    <span class="ident">NotifyCallback::ByReference</span>(<span class="ident">f</span>) =&gt; (<span class="ident">f</span>.<span class="ident">borrow_mut</span>())(<span class="kw-2">&amp;</span><span class="ident">notification</span>),
+                    <span class="ident">NotifyCallback::ByOwnership</span>(<span class="ident">f</span>) =&gt; (<span class="ident">f</span>.<span class="ident">borrow_mut</span>())(<span class="ident">notification</span>),
+                }
+            }
         });
+        <span class="ident">notify_block</span>.<span class="ident">copy</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">read_block</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="ident">RcBlock</span><span class="op">&lt;</span>(<span class="kw-2">*const</span> <span class="ident">MIDIPacketList</span>, <span class="kw-2">*mut</span> <span class="ident">c_void</span>), ()<span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">PacketList</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">let</span> <span class="ident">callback</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="ident">callback</span>);
+        <span class="kw">let</span> <span class="ident">read_block</span> <span class="op">=</span> <span class="ident">block::ConcreteBlock::new</span>(
+            <span class="kw">move</span> <span class="op">|</span><span class="ident">pktlist</span>: <span class="kw-2">*const</span> <span class="ident">MIDIPacketList</span>, <span class="ident">_src_conn_ref_con</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">packet_list</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">pktlist</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">PacketList</span>) };
+                (<span class="ident">callback</span>.<span class="ident">borrow_mut</span>())(<span class="ident">packet_list</span>);
+            },
+        );
+        <span class="ident">read_block</span>.<span class="ident">copy</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">receive_block</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="ident">RcBlock</span><span class="op">&lt;</span>(<span class="kw-2">*const</span> <span class="ident">MIDIEventList</span>, <span class="kw-2">*mut</span> <span class="ident">c_void</span>), ()<span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">EventList</span>, <span class="kw-2">&amp;mut</span> <span class="ident">T</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">let</span> <span class="ident">callback</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="ident">callback</span>);
+        <span class="kw">let</span> <span class="ident">receive_block</span> <span class="op">=</span> <span class="ident">block::ConcreteBlock::new</span>(
+            <span class="kw">move</span> <span class="op">|</span><span class="ident">evtlist</span>: <span class="kw-2">*const</span> <span class="ident">MIDIEventList</span>, <span class="ident">src_conn_ref_con</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">event_list</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">evtlist</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">EventList</span>) };
+                <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">src_conn_ref_con</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>) };
+                (<span class="ident">callback</span>.<span class="ident">borrow_mut</span>())(<span class="ident">event_list</span>, <span class="ident">context</span>);
+            },
+        );
+        <span class="ident">receive_block</span>.<span class="ident">copy</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Client</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Object</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Object</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Object</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">object</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Client</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">unsafe</span> { <span class="ident">MIDIClientDispose</span>(<span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>) };
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</body></html>
