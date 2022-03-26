@@ -1,17 +1,16 @@
 use core_foundation_sys::base::OSStatus;
-
-use coremidi_sys::{
-    ItemCount, MIDIEndpointDispose, MIDIGetNumberOfSources, MIDIGetSource, MIDIReceived,
-};
-
 use std::ops::Deref;
 
-use crate::object::Object;
-use crate::packets::PacketList;
+use coremidi_sys::{
+    ItemCount, MIDIEndpointDispose, MIDIEndpointRef, MIDIGetNumberOfSources, MIDIGetSource,
+    MIDIReceived, MIDIReceivedEventList,
+};
 
-use super::Endpoint;
+use crate::endpoints::endpoint::Endpoint;
+use crate::ports::Packets;
+use crate::Object;
 
-/// A [MIDI source](https://developer.apple.com/reference/coremidi/midiendpointref) owned by an entity.
+/// A [MIDI source](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
 ///
 /// A source can be created from an index like this:
 ///
@@ -20,24 +19,26 @@ use super::Endpoint;
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct Source {
-    endpoint: Endpoint,
+    pub(crate) endpoint: Endpoint,
 }
 
 impl Source {
+    pub(crate) fn new(endpoint_ref: MIDIEndpointRef) -> Self {
+        Self {
+            endpoint: Endpoint::new(endpoint_ref),
+        }
+    }
+
     /// Create a source endpoint from its index.
-    /// See [MIDIGetSource](https://developer.apple.com/reference/coremidi/1495168-midigetsource)
+    /// See [MIDIGetSource](https://developer.apple.com/documentation/coremidi/1495168-midigetsource)
     ///
     pub fn from_index(index: usize) -> Option<Source> {
         let endpoint_ref = unsafe { MIDIGetSource(index as ItemCount) };
         match endpoint_ref {
             0 => None,
-            _ => Some(Source {
-                endpoint: Endpoint {
-                    object: Object(endpoint_ref),
-                },
-            }),
+            _ => Some(Self::new(endpoint_ref)),
         }
     }
 }
@@ -47,6 +48,18 @@ impl Deref for Source {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl From<Object> for Source {
+    fn from(object: Object) -> Self {
+        Self::new(object.0)
+    }
+}
+
+impl From<Source> for Object {
+    fn from(source: Source) -> Self {
+        source.endpoint.object
     }
 }
 
@@ -70,7 +83,7 @@ pub struct Sources;
 
 impl Sources {
     /// Get the number of sources available in the system for receiving MIDI messages.
-    /// See [MIDIGetNumberOfSources](https://developer.apple.com/reference/coremidi/1495116-midigetnumberofsources).
+    /// See [MIDIGetNumberOfSources](https://developer.apple.com/documentation/coremidi/1495116-midigetnumberofsources).
     ///
     pub fn count() -> usize {
         unsafe { MIDIGetNumberOfSources() as usize }
@@ -108,7 +121,7 @@ impl Iterator for SourcesIterator {
     }
 }
 
-/// A [MIDI virtual source](https://developer.apple.com/reference/coremidi/1495212-midisourcecreate) owned by a client.
+/// A [MIDI virtual source](https://developer.apple.com/documentation/coremidi/1495212-midisourcecreate) owned by a client.
 ///
 /// A virtual source can be created like:
 ///
@@ -117,17 +130,37 @@ impl Iterator for SourcesIterator {
 /// let source = client.virtual_source("example-source").unwrap();
 /// ```
 ///
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct VirtualSource {
     pub(crate) endpoint: Endpoint,
 }
 
 impl VirtualSource {
+    pub(crate) fn new(endpoint_ref: MIDIEndpointRef) -> Self {
+        Self {
+            endpoint: Endpoint::new(endpoint_ref),
+        }
+    }
+
     /// Distributes incoming MIDI from a source to the client input ports which are connected to that source.
-    /// See [MIDIReceived](https://developer.apple.com/reference/coremidi/1495276-midireceived)
+    /// See [MIDIReceived](https://developer.apple.com/documentation/coremidi/1495276-midireceived)
     ///
-    pub fn received(&self, packet_list: &PacketList) -> Result<(), OSStatus> {
-        let status = unsafe { MIDIReceived(self.endpoint.object.0, packet_list.as_ptr()) };
+    pub fn received<'a, P>(&self, packets: P) -> Result<(), OSStatus>
+    where
+        P: Into<Packets<'a>>,
+    {
+        let status = match packets.into() {
+            Packets::BorrowedPacketList(packet_list) => unsafe {
+                MIDIReceived(self.endpoint.object.0, packet_list.as_ptr())
+            },
+            Packets::BorrowedEventList(event_list) => unsafe {
+                MIDIReceivedEventList(self.endpoint.object.0, event_list.as_ptr())
+            },
+            Packets::OwnedEventBuffer(event_buffer) => unsafe {
+                MIDIReceivedEventList(self.endpoint.object.0, event_buffer.as_ptr())
+            },
+        };
+
         if status == 0 {
             Ok(())
         } else {
@@ -141,6 +174,12 @@ impl Deref for VirtualSource {
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
+    }
+}
+
+impl From<Object> for VirtualSource {
+    fn from(object: Object) -> Self {
+        Self::new(object.0)
     }
 }
 

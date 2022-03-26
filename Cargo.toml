@@ -1,6 +1,6 @@
 [package]
 name = "coremidi"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Christian Perez-Llamas"]
 description = "CoreMIDI library for Rust"
 license = "MIT"
@@ -9,10 +9,11 @@ repository = "https://github.com/chris-zen/coremidi"
 documentation = "https://chris-zen.github.io/coremidi/coremidi/"
 readme = "README.md"
 keywords = ["CoreMIDI", "MIDI", "OSX", "macOS", "music"]
-edition = "2018"
+edition = "2021"
 
 
 [dependencies]
-core-foundation-sys = "0.8.2"
-core-foundation = "0.9.1"
-coremidi-sys = "3.0.1"
+block = "0.1.6"
+core-foundation-sys = "0.8.3"
+core-foundation = "0.9.3"
+coremidi-sys = "3.1.0"

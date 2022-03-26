@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        rust: [1.51.0]
+        rust: [1.58.1]
         os: [macOS-latest]
     steps:
       - uses: actions/checkout@v2
