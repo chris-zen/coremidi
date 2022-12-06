@@ -10,14 +10,14 @@ The **documentation** for the master branch can be found here: https://chris-zen
 Please see the [examples](examples) for an idea on how to use it, but if you are eager to see some code, this is how you would send some note:
 
 ```rust
-use coremidi::{Client, Destinations, PacketBuffer};
+use coremidi::{Client, Destination, EventBuffer, Protocol};
 use std::time::Duration;
 use std::thread;
 
 fn main() {
   let client = Client::new("example-client").unwrap();
   let output_port = client.output_port("example-port").unwrap();
-  let destination = Destinations::from_index(0).unwrap();
+  let destination = Destination::from_index(0).unwrap();
   let chord_on = EventBuffer::new(Protocol::Midi10)
     .with_packet(0, &[0x2090407f])
     .with_packet(0, &[0x2090447f]);
