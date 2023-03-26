@@ -57,19 +57,21 @@ impl<'a> From<EventBuffer> for Packets<'a> {
 /// Ports can't be instantiated directly, but through a client.
 ///
 #[derive(Debug)]
-pub struct Port {
+pub struct Port<'c> {
     pub(crate) object: Object,
+    _phantom: std::marker::PhantomData<&'c ()>,
 }
 
-impl Port {
+impl<'c> Port<'c> {
     pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
         Self {
             object: Object(port_ref),
+            _phantom: std::marker::PhantomData,
         }
     }
 }
 
-impl Deref for Port {
+impl<'c> Deref for Port<'c> {
     type Target = Object;
 
     fn deref(&self) -> &Object {
@@ -77,7 +79,7 @@ impl Deref for Port {
     }
 }
 
-impl Drop for Port {
+impl<'c> Drop for Port<'c> {
     fn drop(&mut self) {
         unsafe { MIDIPortDispose(self.object.0) };
     }
@@ -96,11 +98,11 @@ impl Drop for Port {
 /// output_port.send(&destination, &events).unwrap();
 /// ```
 #[derive(Debug)]
-pub struct OutputPort {
-    pub(crate) port: Port,
+pub struct OutputPort<'c> {
+    pub(crate) port: Port<'c>,
 }
 
-impl OutputPort {
+impl<'c> OutputPort<'c> {
     pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
         Self {
             port: Port::new(port_ref),
@@ -146,20 +148,20 @@ impl OutputPort {
     }
 }
 
-impl Deref for OutputPort {
-    type Target = Port;
+impl<'c> Deref for OutputPort<'c> {
+    type Target = Port<'c>;
 
-    fn deref(&self) -> &Port {
+    fn deref(&self) -> &Port<'c> {
         &self.port
     }
 }
 
 #[derive(Debug)]
-pub struct InputPort {
-    pub(crate) port: Port,
+pub struct InputPort<'c> {
+    pub(crate) port: Port<'c>,
 }
 
-impl InputPort {
+impl<'c> InputPort<'c> {
     pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
         Self {
             port: Port::new(port_ref),
@@ -186,10 +188,10 @@ impl InputPort {
     }
 }
 
-impl Deref for InputPort {
-    type Target = Port;
+impl<'c> Deref for InputPort<'c> {
+    type Target = Port<'c>;
 
-    fn deref(&self) -> &Port {
+    fn deref(&self) -> &Port<'c> {
         &self.port
     }
 }
@@ -207,12 +209,12 @@ impl Deref for InputPort {
 /// input_port.connect_source(&source, context);
 /// ```
 #[derive(Debug)]
-pub struct InputPortWithContext<T> {
-    pub(crate) port: Port,
+pub struct InputPortWithContext<'c, T> {
+    pub(crate) port: Port<'c>,
     pub(crate) contexts: HashMap<MIDIObjectRef, Box<T>>,
 }
 
-impl<T> InputPortWithContext<T> {
+impl<'c, T> InputPortWithContext<'c, T> {
     pub(crate) fn new(port_ref: MIDIPortRef) -> Self {
         Self {
             port: Port::new(port_ref),
@@ -245,10 +247,10 @@ impl<T> InputPortWithContext<T> {
     }
 }
 
-impl<T> Deref for InputPortWithContext<T> {
-    type Target = Port;
+impl<'c, T> Deref for InputPortWithContext<'c, T> {
+    type Target = Port<'c>;
 
-    fn deref(&self) -> &Port {
+    fn deref(&self) -> &Port<'c> {
         &self.port
     }
 }
