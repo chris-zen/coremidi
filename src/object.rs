@@ -45,7 +45,7 @@ impl TryFrom<i32> for ObjectType {
 ///
 /// The base class of many CoreMIDI objects.
 ///
-#[derive(Hash, Eq, PartialEq)]
+#[derive(Clone, Hash, Eq, PartialEq)]
 pub struct Object(pub(crate) MIDIObjectRef);
 
 impl Object {

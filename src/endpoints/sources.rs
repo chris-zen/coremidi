@@ -19,7 +19,7 @@ use crate::Object;
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Source {
     pub(crate) endpoint: Endpoint,
 }
@@ -40,6 +40,13 @@ impl Source {
             0 => None,
             _ => Some(Self::new(endpoint_ref)),
         }
+    }
+
+    /// Create a source endpoint from its name.
+    pub fn from_name(name: &str) -> Option<Source> {
+        Sources
+            .into_iter()
+            .find(|source| source.name().as_deref() == Some(name))
     }
 }
 
