@@ -8,9 +8,9 @@ use crate::object::Object;
 /// A MIDI source or source, owned by an entity.
 /// See [MIDIEndpointRef](https://developer.apple.com/documentation/coremidi/midiendpointref).
 ///
-/// You don't need to create an endpoint directly, instead you can create system sources and sources or virtual ones from a client.
+/// You don't need to create an endpoint directly, instead you can create system sources or virtual ones from a client.
 ///
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Endpoint {
     pub(crate) object: Object,
 }

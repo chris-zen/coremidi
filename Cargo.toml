@@ -1,6 +1,6 @@
 [package]
 name = "coremidi"
-version = "0.7.0"
+version = "0.7.1"
 authors = ["Christian Perez-Llamas"]
 description = "CoreMIDI library for Rust"
 license = "MIT"
@@ -14,6 +14,6 @@ edition = "2021"
 
 [dependencies]
 block = "0.1.6"
-core-foundation-sys = "0.8.3"
+core-foundation-sys = "0.8.4"
 core-foundation = "0.9.3"
 coremidi-sys = "3.1.0"
