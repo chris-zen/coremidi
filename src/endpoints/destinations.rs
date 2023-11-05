@@ -17,7 +17,7 @@ use crate::Object;
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Destination {
     pub(crate) endpoint: Endpoint,
 }
