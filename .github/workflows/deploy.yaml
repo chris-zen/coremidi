@@ -8,21 +8,16 @@ jobs:
   deploy:
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
             toolchain: 1.58.1
             override: true
-      - uses: Swatinem/rust-cache@v1
 
-      - name: Run cargo doc
-        uses: actions-rs/cargo@v1
-        with:
-          command: doc
-
-      - name: Override index.html
+      - name: Generate docs
         run: |
+          cargo doc
           REPO_NAME=$(echo ${{ github.repository }} | cut -d '/' -f 2)
           echo "<meta http-equiv=refresh content=0;url=${REPO_NAME}/index.html>" > target/doc/index.html
 

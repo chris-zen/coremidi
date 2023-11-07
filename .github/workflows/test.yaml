@@ -13,28 +13,19 @@ jobs:
         rust: [1.58.1]
         os: [macOS-latest]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
             toolchain: ${{ matrix.rust }}
             override: true
             components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v1
 
-      - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: Check format
+        run: cargo fmt --all -- --check
       
-      - name: Run cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
+      - name: Check clippy
+        run: cargo clippy -- -D warnings
       
-      - name: Run cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
+      - name: Run tests
+        run: cargo test
