@@ -8,21 +8,19 @@ use coremidi_sys::{
     MIDIObjectPropertyChangeNotification,
 };
 
+use crate::any_object::AnyObject;
 use crate::device::Device;
-use crate::object::{Object, ObjectType};
+use crate::object::Object;
 
 #[derive(Debug, PartialEq)]
 pub struct AddedRemovedInfo {
-    pub parent: Object,
-    pub parent_type: ObjectType,
-    pub child: Object,
-    pub child_type: ObjectType,
+    pub parent: AnyObject,
+    pub child: AnyObject,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct PropertyChangedInfo {
-    pub object: Object,
-    pub object_type: ObjectType,
+    pub object: AnyObject,
     pub property_name: String,
 }
 
@@ -52,48 +50,46 @@ impl Notification {
     ) -> Result<Notification, OSStatus> {
         let add_remove_notification =
             unsafe { &*(notification as *const _ as *const MIDIObjectAddRemoveNotification) };
-        let parent_type = ObjectType::try_from(add_remove_notification.parentType);
-        let child_type = ObjectType::try_from(add_remove_notification.childType);
-        match (parent_type, child_type) {
-            (Ok(parent_type), Ok(child_type)) => {
-                let add_remove_info = AddedRemovedInfo {
-                    parent: Object(add_remove_notification.parent),
-                    parent_type,
-                    child: Object(add_remove_notification.child),
-                    child_type,
-                };
-                match notification.messageID as ::std::os::raw::c_uint {
-                    coremidi_sys::kMIDIMsgObjectAdded => {
-                        Ok(Notification::ObjectAdded(add_remove_info))
-                    }
-                    coremidi_sys::kMIDIMsgObjectRemoved => {
-                        Ok(Notification::ObjectRemoved(add_remove_info))
-                    }
-                    _ => unreachable!(),
-                }
+        let parent = AnyObject::create(
+            add_remove_notification.parentType,
+            add_remove_notification.parent,
+        );
+        let child = AnyObject::create(
+            add_remove_notification.childType,
+            add_remove_notification.child,
+        );
+        if let Some((parent, child)) = parent.zip(child) {
+            let info = AddedRemovedInfo { parent, child };
+            match notification.messageID as ::std::os::raw::c_uint {
+                coremidi_sys::kMIDIMsgObjectAdded => Ok(Notification::ObjectAdded(info)),
+                coremidi_sys::kMIDIMsgObjectRemoved => Ok(Notification::ObjectRemoved(info)),
+                _ => unreachable!(),
             }
-            _ => Err(notification.messageID as OSStatus),
+        } else {
+            Err(notification.messageID as OSStatus)
         }
     }
 
     fn try_from_property_changed(notification: &MIDINotification) -> Result<Notification, i32> {
         let property_changed_notification =
             unsafe { &*(notification as *const _ as *const MIDIObjectPropertyChangeNotification) };
-        match ObjectType::try_from(property_changed_notification.objectType) {
-            Ok(object_type) => {
-                let property_name = {
-                    let name_ref: CFStringRef = property_changed_notification.propertyName;
-                    let name: CFString = unsafe { TCFType::wrap_under_get_rule(name_ref) };
-                    name.to_string()
-                };
-                let property_changed_info = PropertyChangedInfo {
-                    object: Object(property_changed_notification.object),
-                    object_type,
-                    property_name,
-                };
-                Ok(Notification::PropertyChanged(property_changed_info))
-            }
-            Err(_) => Err(notification.messageID as i32),
+        let maybe_object = AnyObject::create(
+            property_changed_notification.objectType,
+            property_changed_notification.object,
+        );
+        if let Some(object) = maybe_object {
+            let property_name = {
+                let name_ref: CFStringRef = property_changed_notification.propertyName;
+                let name: CFString = unsafe { TCFType::wrap_under_get_rule(name_ref) };
+                name.to_string()
+            };
+            let property_changed_info = PropertyChangedInfo {
+                object,
+                property_name,
+            };
+            Ok(Notification::PropertyChanged(property_changed_info))
+        } else {
+            Err(notification.messageID as i32)
         }
     }
 
@@ -143,9 +139,10 @@ mod tests {
         MIDIObjectAddRemoveNotification, MIDIObjectPropertyChangeNotification, MIDIObjectRef,
     };
 
+    use crate::any_object::AnyObject;
     use crate::device::Device;
     use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
-    use crate::object::{Object, ObjectType};
+    use crate::object::Object;
 
     #[test]
     fn notification_from_error() {
@@ -191,10 +188,8 @@ mod tests {
         assert!(notification.is_ok());
 
         let info = AddedRemovedInfo {
-            parent: Object(1),
-            parent_type: ObjectType::Device,
-            child: Object(2),
-            child_type: ObjectType::Other,
+            parent: AnyObject::Device(Device::new(1)),
+            child: AnyObject::Other(Object(2)),
         };
 
         assert_eq!(notification.unwrap(), Notification::ObjectAdded(info));
@@ -218,10 +213,8 @@ mod tests {
         assert!(notification.is_ok());
 
         let info = AddedRemovedInfo {
-            parent: Object(1),
-            parent_type: ObjectType::Device,
-            child: Object(2),
-            child_type: ObjectType::Other,
+            parent: AnyObject::Device(Device::new(1)),
+            child: AnyObject::Other(Object(2)),
         };
 
         assert_eq!(notification.unwrap(), Notification::ObjectRemoved(info));
@@ -286,8 +279,7 @@ mod tests {
         assert!(notification.is_ok());
 
         let info = PropertyChangedInfo {
-            object: Object(1),
-            object_type: ObjectType::Device,
+            object: AnyObject::Device(Device::new(1)),
             property_name: "name".to_string(),
         };
 

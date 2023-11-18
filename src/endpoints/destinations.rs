@@ -17,7 +17,7 @@ use crate::Object;
 /// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
 /// ```
 ///
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct Destination {
     pub(crate) endpoint: Endpoint,
 }
@@ -41,23 +41,29 @@ impl Destination {
     }
 }
 
+impl Clone for Destination {
+    fn clone(&self) -> Self {
+        Self::new(self.endpoint.object.0)
+    }
+}
+
+impl AsRef<Object> for Destination {
+    fn as_ref(&self) -> &Object {
+        &self.endpoint.object
+    }
+}
+
+impl AsRef<Endpoint> for Destination {
+    fn as_ref(&self) -> &Endpoint {
+        &self.endpoint
+    }
+}
+
 impl Deref for Destination {
     type Target = Endpoint;
 
     fn deref(&self) -> &Endpoint {
         &self.endpoint
-    }
-}
-
-impl From<Object> for Destination {
-    fn from(object: Object) -> Self {
-        Self::new(object.0)
-    }
-}
-
-impl From<Destination> for Object {
-    fn from(destination: Destination) -> Self {
-        destination.endpoint.object
     }
 }
 

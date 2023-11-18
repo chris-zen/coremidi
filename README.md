@@ -51,7 +51,7 @@ The library is published into [crates.io](https://crates.io/crates/coremidi), so
 
 ```toml
 [dependencies]
-coremidi = "^0.7.0"
+coremidi = "^0.7.1"
 ```
 
 If you prefer to live in the edge ;-) you can use the master branch by including this instead:
@@ -68,8 +68,7 @@ git clone https://github.com/chris-zen/coremidi.git
 cd coremidi
 cargo build
 cargo test
-cargo doc
-open target/doc/coremidi/index.html
+cargo doc --open
 ```
 
 # Examples
