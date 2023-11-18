@@ -51,7 +51,7 @@ The library is published into [crates.io](https://crates.io/crates/coremidi), so
 
 ```toml
 [dependencies]
-coremidi = "^0.7.1"
+coremidi = "^0.8.0"
 ```
 
 If you prefer to live in the edge ;-) you can use the master branch by including this instead:
