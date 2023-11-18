@@ -100,6 +100,7 @@
 <span id="99"> 99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">crate_name</span> <span class="op">=</span> <span class="string">&quot;coremidi&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">crate_type</span> <span class="op">=</span> <span class="string">&quot;lib&quot;</span>]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://chris-zen.github.io/coremidi/&quot;</span>)]</span>
@@ -141,6 +142,7 @@ For handling low level MIDI data you may look into:
 
 */</span>
 
+<span class="kw">mod</span> <span class="ident">any_object</span>;
 <span class="kw">mod</span> <span class="ident">client</span>;
 <span class="kw">mod</span> <span class="ident">device</span>;
 <span class="kw">mod</span> <span class="ident">endpoints</span>;
@@ -165,7 +167,7 @@ For handling low level MIDI data you may look into:
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::entity::Entity</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::events</span>::{<span class="ident">EventBuffer</span>, <span class="ident">EventList</span>, <span class="ident">EventListIter</span>, <span class="ident">EventPacket</span>, <span class="ident">Timestamp</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::notifications</span>::{<span class="ident">AddedRemovedInfo</span>, <span class="ident">IoErrorInfo</span>, <span class="ident">Notification</span>, <span class="ident">PropertyChangedInfo</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object</span>::{<span class="ident">Object</span>, <span class="ident">ObjectType</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::Object</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::packets</span>::{<span class="ident">Packet</span>, <span class="ident">PacketBuffer</span>, <span class="ident">PacketList</span>, <span class="ident">PacketListIterator</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ports</span>::{<span class="ident">InputPort</span>, <span class="ident">InputPortWithContext</span>, <span class="ident">OutputPort</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::properties</span>::{

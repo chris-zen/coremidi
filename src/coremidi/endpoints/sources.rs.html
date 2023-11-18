@@ -189,6 +189,19 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core_foundation_sys::base::OSStatus</span>;
 <span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
 
@@ -232,6 +245,31 @@
             <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">endpoint_ref</span>)),
         }
     }
+
+    <span class="doccomment">/// Create a source endpoint from its name.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Source</span><span class="op">&gt;</span> {
+        <span class="ident">Sources</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">name</span>().<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Source</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="self">self</span>.<span class="ident">endpoint</span>.<span class="ident">object</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Object</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Source</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Object</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">endpoint</span>.<span class="ident">object</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Endpoint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Source</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Endpoint</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">endpoint</span>
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Source</span> {
@@ -239,18 +277,6 @@
 
     <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Endpoint</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">endpoint</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Object</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Source</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">object</span>: <span class="ident">Object</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">object</span>.<span class="number">0</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Source</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Object</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">source</span>: <span class="ident">Source</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">source</span>.<span class="ident">endpoint</span>.<span class="ident">object</span>
     }
 }
 
