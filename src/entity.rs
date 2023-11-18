@@ -7,7 +7,7 @@ use crate::object::Object;
 ///
 /// An entity that a device owns and that contains endpoints.
 ///
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Entity {
     pub(crate) object: Object,
 }
@@ -20,22 +20,22 @@ impl Entity {
     }
 }
 
+impl Clone for Entity {
+    fn clone(&self) -> Self {
+        Self::new(self.object.0)
+    }
+}
+
+impl AsRef<Object> for Entity {
+    fn as_ref(&self) -> &Object {
+        &self.object
+    }
+}
+
 impl Deref for Entity {
     type Target = Object;
 
     fn deref(&self) -> &Object {
         &self.object
-    }
-}
-
-impl From<Object> for Entity {
-    fn from(object: Object) -> Self {
-        Self::new(object.0)
-    }
-}
-
-impl From<Entity> for Object {
-    fn from(entity: Entity) -> Self {
-        entity.object
     }
 }

@@ -7,45 +7,11 @@ use crate::properties::{
     BooleanProperty, IntegerProperty, Properties, PropertyGetter, PropertySetter, StringProperty,
 };
 
-#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
-pub enum ObjectType {
-    Other,
-    Device,
-    Entity,
-    Source,
-    Destination,
-    ExternalDevice,
-    ExternalEntity,
-    ExternalSource,
-    ExternalDestination,
-}
-
-impl TryFrom<i32> for ObjectType {
-    type Error = i32;
-
-    fn try_from(value: i32) -> Result<Self, Self::Error> {
-        match value {
-            coremidi_sys::kMIDIObjectType_Other => Ok(ObjectType::Other),
-            coremidi_sys::kMIDIObjectType_Device => Ok(ObjectType::Device),
-            coremidi_sys::kMIDIObjectType_Entity => Ok(ObjectType::Entity),
-            coremidi_sys::kMIDIObjectType_Source => Ok(ObjectType::Source),
-            coremidi_sys::kMIDIObjectType_Destination => Ok(ObjectType::Destination),
-            coremidi_sys::kMIDIObjectType_ExternalDevice => Ok(ObjectType::ExternalDevice),
-            coremidi_sys::kMIDIObjectType_ExternalEntity => Ok(ObjectType::ExternalEntity),
-            coremidi_sys::kMIDIObjectType_ExternalSource => Ok(ObjectType::ExternalSource),
-            coremidi_sys::kMIDIObjectType_ExternalDestination => {
-                Ok(ObjectType::ExternalDestination)
-            }
-            unknown => Err(unknown),
-        }
-    }
-}
-
 /// A [MIDI Object](https://developer.apple.com/documentation/coremidi/midiobjectref).
 ///
 /// The base class of many CoreMIDI objects.
 ///
-#[derive(Clone, Hash, Eq, PartialEq)]
+#[derive(Hash, Eq, PartialEq)]
 pub struct Object(pub(crate) MIDIObjectRef);
 
 impl Object {
@@ -126,55 +92,5 @@ impl Object {
 impl fmt::Debug for Object {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Object({:x})", self.0 as usize)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::object::ObjectType;
-
-    #[test]
-    fn objecttype_try_from() {
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_Other),
-            Ok(ObjectType::Other)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_Device),
-            Ok(ObjectType::Device)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_Entity),
-            Ok(ObjectType::Entity)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_Source),
-            Ok(ObjectType::Source)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_Destination),
-            Ok(ObjectType::Destination)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_ExternalDevice),
-            Ok(ObjectType::ExternalDevice)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_ExternalEntity),
-            Ok(ObjectType::ExternalEntity)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_ExternalSource),
-            Ok(ObjectType::ExternalSource)
-        );
-        assert_eq!(
-            ObjectType::try_from(coremidi_sys::kMIDIObjectType_ExternalDestination),
-            Ok(ObjectType::ExternalDestination)
-        );
-    }
-
-    #[test]
-    fn objecttype_from_error() {
-        assert_eq!(ObjectType::try_from(0xffff_i32), Err(0xffff));
     }
 }

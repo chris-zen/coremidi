@@ -39,6 +39,7 @@ For handling low level MIDI data you may look into:
 
 */
 
+mod any_object;
 mod client;
 mod device;
 mod endpoints;
@@ -63,7 +64,7 @@ pub use crate::endpoints::sources::{Source, Sources, VirtualSource};
 pub use crate::entity::Entity;
 pub use crate::events::{EventBuffer, EventList, EventListIter, EventPacket, Timestamp};
 pub use crate::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
-pub use crate::object::{Object, ObjectType};
+pub use crate::object::Object;
 pub use crate::packets::{Packet, PacketBuffer, PacketList, PacketListIterator};
 pub use crate::ports::{InputPort, InputPortWithContext, OutputPort};
 pub use crate::properties::{

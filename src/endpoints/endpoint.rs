@@ -10,7 +10,7 @@ use crate::object::Object;
 ///
 /// You don't need to create an endpoint directly, instead you can create system sources or virtual ones from a client.
 ///
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub struct Endpoint {
     pub(crate) object: Object,
 }

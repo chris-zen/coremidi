@@ -7,7 +7,7 @@ use crate::object::Object;
 ///
 /// A MIDI device or external device, containing entities.
 ///
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Device {
     pub(crate) object: Object,
 }
@@ -20,22 +20,22 @@ impl Device {
     }
 }
 
+impl Clone for Device {
+    fn clone(&self) -> Self {
+        Self::new(self.object.0)
+    }
+}
+
+impl AsRef<Object> for Device {
+    fn as_ref(&self) -> &Object {
+        &self.object
+    }
+}
+
 impl Deref for Device {
     type Target = Object;
 
     fn deref(&self) -> &Object {
         &self.object
-    }
-}
-
-impl From<Object> for Device {
-    fn from(object: Object) -> Self {
-        Self::new(object.0)
-    }
-}
-
-impl From<Device> for Object {
-    fn from(device: Device) -> Self {
-        device.object
     }
 }
