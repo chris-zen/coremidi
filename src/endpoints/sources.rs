@@ -2,8 +2,9 @@ use core_foundation_sys::base::OSStatus;
 use std::ops::Deref;
 
 use coremidi_sys::{
-    ItemCount, MIDIEndpointDispose, MIDIEndpointRef, MIDIGetNumberOfSources, MIDIGetSource,
-    MIDIReceived, MIDIReceivedEventList,
+    kMIDIObjectType_Source, ItemCount, MIDIEndpointDispose, MIDIEndpointRef,
+    MIDIGetNumberOfSources, MIDIGetSource, MIDIObjectFindByUniqueID, MIDIObjectRef, MIDIObjectType,
+    MIDIReceived, MIDIReceivedEventList, MIDIUniqueID,
 };
 
 use crate::endpoints::endpoint::Endpoint;
@@ -47,6 +48,23 @@ impl Source {
         Sources
             .into_iter()
             .find(|source| source.name().as_deref() == Some(name))
+    }
+
+    /// Create a source from it's unique id.
+    pub fn from_unique_id(unique_id: u32) -> Option<Source> {
+        let mut obj_ref: MIDIObjectRef = 0;
+        let mut obj_type: MIDIObjectType = 0;
+        let status = unsafe {
+            MIDIObjectFindByUniqueID(unique_id as MIDIUniqueID, &mut obj_ref, &mut obj_type)
+        };
+        if status != 0 {
+            return None;
+        }
+        if obj_type == kMIDIObjectType_Source {
+            Some(Source::new(obj_ref as MIDIEndpointRef))
+        } else {
+            None
+        }
     }
 }
 
