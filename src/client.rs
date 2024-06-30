@@ -7,7 +7,7 @@ use std::cell::RefCell;
 use std::{mem::MaybeUninit, ops::Deref, os::raw::c_void, ptr};
 
 use coremidi_sys::{
-    MIDIClientCreate, MIDIClientCreateWithBlock, MIDIClientDispose, MIDIDestinationCreateWithBlock,
+    MIDIClientCreate, MIDIClientCreateWithBlock, MIDIDestinationCreateWithBlock,
     MIDIDestinationCreateWithProtocol, MIDIEventList, MIDIInputPortCreateWithBlock,
     MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate,
     MIDIPacketList, MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate,
@@ -330,8 +330,15 @@ impl Deref for Client {
     }
 }
 
-impl Drop for Client {
-    fn drop(&mut self) {
-        unsafe { MIDIClientDispose(self.object.0) };
-    }
-}
+// According to Apple docs:
+//
+// > Don’t explicitly dispose of your client; the system automatically disposes all clients when an app terminates.
+// > However, if you call this method to dispose the last or only client owned by an app, the MIDI server may exit
+// > if there are no other clients remaining in the system. If this occurs, all subsequent calls by your app to
+// > MIDIClientCreate and MIDIClientCreateWithBlock fail.
+//
+// impl Drop for Client {
+//     fn drop(&mut self) {
+//         unsafe { MIDIClientDispose(self.object.0) };
+//     }
+// }
