@@ -56,6 +56,7 @@ use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{MIDIFlushOutput, MIDIRestart};
 
+pub use crate::any_object::AnyObject;
 pub use crate::client::{Client, NotifyCallback};
 pub use crate::device::Device;
 pub use crate::endpoints::destinations::{Destination, Destinations, VirtualDestination};
