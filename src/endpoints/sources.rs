@@ -51,20 +51,10 @@ impl Source {
     }
 
     /// Create a source from it's unique id.
+    /// See [MIDIObjectFindByUniqueID](https://developer.apple.com/documentation/coremidi/1495191-midiobjectfindbyuniqueid).
+    ///
     pub fn from_unique_id(unique_id: u32) -> Option<Source> {
-        let mut obj_ref: MIDIObjectRef = 0;
-        let mut obj_type: MIDIObjectType = 0;
-        let status = unsafe {
-            MIDIObjectFindByUniqueID(unique_id as MIDIUniqueID, &mut obj_ref, &mut obj_type)
-        };
-        if status != 0 {
-            return None;
-        }
-        if obj_type == kMIDIObjectType_Source {
-            Some(Source::new(obj_ref as MIDIEndpointRef))
-        } else {
-            None
-        }
+        Sources::find_by_unique_id(unique_id)
     }
 }
 
@@ -118,6 +108,22 @@ impl Sources {
     ///
     pub fn count() -> usize {
         unsafe { MIDIGetNumberOfSources() as usize }
+    }
+
+    /// Find a source based on its unique id.
+    /// See [MIDIObjectFindByUniqueID](https://developer.apple.com/documentation/coremidi/1495191-midiobjectfindbyuniqueid).
+    ///
+    fn find_by_unique_id(unique_id: u32) -> Option<Source> {
+        let mut obj_ref: MIDIObjectRef = 0;
+        let mut obj_type: MIDIObjectType = 0;
+        let status = unsafe {
+            MIDIObjectFindByUniqueID(unique_id as MIDIUniqueID, &mut obj_ref, &mut obj_type)
+        };
+        if status != 0 || obj_type != kMIDIObjectType_Source {
+            None
+        } else {
+            Some(Source::new(obj_ref as MIDIEndpointRef))
+        }
     }
 }
 
