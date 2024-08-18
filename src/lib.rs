@@ -52,7 +52,7 @@ mod ports;
 mod properties;
 mod protocol;
 
-use core_foundation_sys::base::OSStatus;
+pub use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{MIDIFlushOutput, MIDIRestart};
 
