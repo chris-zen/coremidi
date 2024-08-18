@@ -97,7 +97,7 @@ fn result_from_status<T, F: FnOnce() -> T>(status: OSStatus, f: F) -> Result<T, 
     }
 }
 
-/// Convert an OSSStatus into a Result<(), OSStatus>
+/// Convert an OSStatus into a Result<(), OSStatus>
 fn unit_result_from_status(status: OSStatus) -> Result<(), OSStatus> {
     result_from_status(status, || ())
 }
