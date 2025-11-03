@@ -205,6 +205,11 @@ impl PacketBuffer {
                 data.as_ptr(),
             )
         };
+
+        if current_packet_ptr.is_null() {
+            panic!("MIDIPacketListAdd was unable to add the packet")
+        }
+
         let current_packet_offset = unsafe {
             (current_packet_ptr as *const u8).offset_from(packet_list_ptr as *const u8) as usize
         };
@@ -280,6 +285,10 @@ impl PacketBuffer {
                 data.as_ptr(),
             )
         };
+
+        if current_packet_ptr.is_null() {
+            panic!("MIDIPacketListAdd was unable to add the packet")
+        }
 
         self.current_packet_offset = unsafe {
             (current_packet_ptr as *const u8).offset_from(packet_list_ptr as *const u8) as usize

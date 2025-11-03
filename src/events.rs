@@ -220,6 +220,10 @@ impl EventBuffer {
             )
         };
 
+        if current_packet_ptr.is_null() {
+            panic!("MIDIEventListAdd was unable to add the event")
+        }
+
         self.current_packet_offset = unsafe {
             (current_packet_ptr as *const u8).offset_from(packet_list_ptr as *const u8) as usize
         };
