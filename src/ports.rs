@@ -29,7 +29,7 @@ impl<'a> From<&'a PacketList> for Packets<'a> {
 
 impl<'a> From<&'a PacketBuffer> for Packets<'a> {
     fn from(packet_buffer: &'a PacketBuffer) -> Self {
-        Self::BorrowedPacketList(&*packet_buffer)
+        Self::BorrowedPacketList(packet_buffer)
     }
 }
 
@@ -41,7 +41,7 @@ impl<'a> From<&'a EventList> for Packets<'a> {
 
 impl<'a> From<&'a EventBuffer> for Packets<'a> {
     fn from(event_buffer: &'a EventBuffer) -> Self {
-        Self::BorrowedEventList(&*event_buffer)
+        Self::BorrowedEventList(event_buffer)
     }
 }
 
