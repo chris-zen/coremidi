@@ -207,7 +207,7 @@ impl PacketBuffer {
         };
 
         if current_packet_ptr.is_null() {
-            panic!("MIDIPacketListAdd was unable to add the packet")
+            panic!("not enough room in the packet for the event")
         }
 
         let current_packet_offset = unsafe {
