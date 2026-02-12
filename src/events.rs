@@ -221,7 +221,7 @@ impl EventBuffer {
         };
 
         if current_packet_ptr.is_null() {
-            panic!("MIDIEventListAdd was unable to add the event")
+            panic!("not enough room in the packet for the event")
         }
 
         self.current_packet_offset = unsafe {
