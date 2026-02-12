@@ -52,7 +52,7 @@ mod ports;
 mod properties;
 mod protocol;
 
-use core_foundation_sys::base::OSStatus;
+pub use core_foundation_sys::base::OSStatus;
 
 use coremidi_sys::{MIDIFlushOutput, MIDIRestart};
 
@@ -97,7 +97,7 @@ fn result_from_status<T, F: FnOnce() -> T>(status: OSStatus, f: F) -> Result<T, 
     }
 }
 
-/// Convert an OSSStatus into a Result<(), OSStatus>
+/// Convert an OSStatus into a Result<(), OSStatus>
 fn unit_result_from_status(status: OSStatus) -> Result<(), OSStatus> {
     result_from_status(status, || ())
 }
