@@ -10,7 +10,7 @@ documentation = "https://chris-zen.github.io/coremidi/coremidi/"
 readme = "README.md"
 keywords = ["CoreMIDI", "MIDI", "OSX", "macOS", "music"]
 edition = "2021"
-
+rust-version = "1.63"
 
 [dependencies]
 block = "0.1.6"
