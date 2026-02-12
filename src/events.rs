@@ -36,7 +36,7 @@ impl EventList {
 
     /// Get an iterator for the packets in the list.
     ///
-    pub fn iter(&self) -> EventListIter {
+    pub fn iter(&self) -> EventListIter<'_> {
         EventListIter {
             count: self.len(),
             packet_ptr: std::ptr::addr_of!(self.0.packet) as *const MIDIEventPacket,

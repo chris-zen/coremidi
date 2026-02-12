@@ -38,7 +38,7 @@ impl PacketList {
 
     /// Get an iterator for the packets in the list.
     ///
-    pub fn iter(&self) -> PacketListIterator {
+    pub fn iter(&self) -> PacketListIterator<'_> {
         PacketListIterator {
             count: self.len(),
             packet_ptr: std::ptr::addr_of!(self.0.packet) as *const MIDIPacket,
