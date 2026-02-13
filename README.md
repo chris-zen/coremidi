@@ -1,11 +1,15 @@
 # coremidi
 
+[![CI](https://github.com/chris-zen/coremidi/actions/workflows/test.yaml/badge.svg)](https://github.com/chris-zen/coremidi/actions/workflows/test.yaml)
+[![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://crates.io/crates/coremidi)
+[![Crates.io](https://img.shields.io/crates/d/coremidi.svg)](https://crates.io/crates/coremidi)
+[![docs.rs](https://img.shields.io/docsrs/coremidi)](https://docs.rs/coremidi)
+[![Minimum rustc version](https://img.shields.io/badge/rustc-1.63+-blue.svg)](https://blog.rust-lang.org/2022/08/11/Rust-1.63.0.html)
+
 This is a [CoreMIDI](https://developer.apple.com/documentation/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
 CoreMIDI is a macOS framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
 
 This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
-
-The **documentation** for the master branch can be found here: https://chris-zen.github.io/coremidi/coremidi/
 
 Please see the [examples](examples) for an idea on how to use it, but if you are eager to see some code, this is how you would send some note:
 
@@ -38,27 +42,13 @@ For handling low level MIDI data you may look into:
 - [rimd](https://github.com/RustAudio/rimd)
 - [midi-rs](https://github.com/samdoshi/midi-rs)
 
-[![Build Status](https://travis-ci.org/chris-zen/coremidi.svg?branch=master)](https://travis-ci.org/chris-zen/coremidi)
-[![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://crates.io/crates/coremidi)
-[![Crates.io](https://img.shields.io/crates/d/coremidi.svg)](https://crates.io/crates/coremidi)
-[![Crates.io](https://img.shields.io/crates/dv/coremidi.svg)](https://crates.io/crates/coremidi)
-[![GitHub tag](https://img.shields.io/github/tag/chris-zen/coremidi.svg)](https://github.com/chris-zen/coremidi/tags)
-[![Minimum rustc version](https://img.shields.io/badge/rustc-1.36+-blue.svg)](https://blog.rust-lang.org/2019/07/04/Rust-1.36.0.html)
-
 # Installation
 
-The library is published into [crates.io](https://crates.io/crates/coremidi), so it can be used by adding the following lines into your `Cargo.toml` file (but remember to update the version number accordingly):
+Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-coremidi = "^0.8.1"
-```
-
-If you prefer to live in the edge ;-) you can use the master branch by including this instead:
-
-```toml
-[dependencies]
-coremidi = { git = "https://github.com/chris-zen/coremidi", branch="master" }
+coremidi = "0.8.1"
 ```
 
 To play with the source code yourself you can clone the repo and build the code and documentation with the following commands:

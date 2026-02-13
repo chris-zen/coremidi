@@ -7,7 +7,7 @@ use crate::object::Object;
 ///
 /// A MIDI device or external device, containing entities.
 ///
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Device {
     pub(crate) object: Object,
 }

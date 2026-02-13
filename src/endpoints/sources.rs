@@ -9,7 +9,7 @@ use coremidi_sys::{
 
 use crate::endpoints::endpoint::Endpoint;
 use crate::ports::Packets;
-use crate::Object;
+use crate::{unit_result_from_status, Object};
 
 /// A [MIDI source](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
 ///
@@ -50,7 +50,7 @@ impl Source {
             .find(|source| source.name().as_deref() == Some(name))
     }
 
-    /// Create a source from it's unique id.
+    /// Create a source from its unique id.
     /// See [MIDIObjectFindByUniqueID](https://developer.apple.com/documentation/coremidi/1495191-midiobjectfindbyuniqueid).
     ///
     pub fn from_unique_id(unique_id: u32) -> Option<Source> {
@@ -197,12 +197,7 @@ impl VirtualSource {
                 MIDIReceivedEventList(self.endpoint.object.0, event_buffer.as_ptr())
             },
         };
-
-        if status == 0 {
-            Ok(())
-        } else {
-            Err(status)
-        }
+        unit_result_from_status(status)
     }
 }
 

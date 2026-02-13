@@ -2,7 +2,7 @@ use coremidi_sys::{MIDIObjectRef, MIDIObjectType};
 
 use crate::{Destination, Device, Entity, Object, Source};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum AnyObject {
     Other(Object),
     Device(Device),

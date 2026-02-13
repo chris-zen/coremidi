@@ -96,6 +96,25 @@ impl<'a> Iterator for PacketListIterator<'a> {
             None
         }
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.count, Some(self.count))
+    }
+}
+
+impl ExactSizeIterator for PacketListIterator<'_> {
+    fn len(&self) -> usize {
+        self.count
+    }
+}
+
+impl<'a> IntoIterator for &'a PacketList {
+    type Item = &'a Packet;
+    type IntoIter = PacketListIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
 }
 
 /// A collection of simultaneous MIDI events.
@@ -131,7 +150,7 @@ impl fmt::Debug for Packet {
             f,
             "Packet(ptr={:x}, ts={:016x}, data=[",
             self as *const _ as usize,
-            self.timestamp() as u64
+            self.timestamp()
         );
         let result = self
             .data()
@@ -190,6 +209,10 @@ impl PacketBuffer {
     /// assert_eq!(buffer.len(), 1);
     /// assert_eq!(buffer.iter().next().map(|packet| packet.data().to_vec()), Some(vec![0x90, 0x3c, 0x7f]))
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if the buffer capacity is insufficient for the packet (CoreMIDI returns null from `MIDIPacketListAdd`).
     pub fn new(timestamp: Timestamp, data: &[u8]) -> Self {
         let capacity = data.len() + Self::PACKET_LIST_HEADER_SIZE + Self::PACKET_HEADER_SIZE;
         let mut storage = Storage::with_capacity(capacity);
@@ -205,6 +228,10 @@ impl PacketBuffer {
                 data.as_ptr(),
             )
         };
+        assert!(
+            !current_packet_ptr.is_null(),
+            "insufficient buffer capacity for packet"
+        );
         let current_packet_offset = unsafe {
             (current_packet_ptr as *const u8).offset_from(packet_list_ptr as *const u8) as usize
         };
@@ -262,6 +289,10 @@ impl PacketBuffer {
     /// let repr = format!("{}", &chord as &coremidi::PacketList);
     /// assert_eq!(repr, "PacketList(len=1)\n  0000000000000000: 90 3c 7f 90 40 7f");
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if the buffer capacity is insufficient for the packet (CoreMIDI returns null from `MIDIPacketListAdd`).
     pub fn push_data(&mut self, timestamp: Timestamp, data: &[u8]) -> &mut Self {
         self.ensure_capacity(data.len());
 
@@ -280,6 +311,10 @@ impl PacketBuffer {
                 data.as_ptr(),
             )
         };
+        assert!(
+            !current_packet_ptr.is_null(),
+            "insufficient buffer capacity for packet"
+        );
 
         self.current_packet_offset = unsafe {
             (current_packet_ptr as *const u8).offset_from(packet_list_ptr as *const u8) as usize
@@ -301,24 +336,21 @@ impl PacketBuffer {
     fn ensure_capacity(&mut self, data_len: usize) {
         let next_capacity = self.aligned_bytes_len() + Self::PACKET_HEADER_SIZE + data_len;
 
-        unsafe {
-            // We ensure capacity for the worst case as if there was no merge with the current packet
-            self.storage.ensure_capacity(next_capacity);
-        }
+        // We ensure capacity for the worst case as if there was no merge with the current packet
+        self.storage.ensure_capacity(next_capacity);
     }
 
     #[inline]
     fn aligned_bytes_len(&self) -> usize {
-        let storage_start_ptr = unsafe { self.storage.as_ptr::<u8>() };
         if self.as_ref().is_empty() {
             self.current_packet_offset
         } else {
+            let storage_start_ptr = unsafe { self.storage.as_ptr::<u8>() };
             let current_packet = unsafe {
-                &*(self.storage.as_ptr::<u8>().add(self.current_packet_offset) as *const MIDIPacket)
+                &*(storage_start_ptr.add(self.current_packet_offset) as *const MIDIPacket)
             };
-            let current_packet_data_ptr = current_packet.data.as_ptr() as *const u8;
-            let data_offset = current_packet_data_ptr as *const u8 as usize
-                - storage_start_ptr as *const u8 as usize;
+            let current_packet_data_ptr = current_packet.data.as_ptr();
+            let data_offset = current_packet_data_ptr as usize - storage_start_ptr as usize;
             let data_len = current_packet.length as usize;
             (data_offset + data_len + 3) & !3
         }
@@ -338,6 +370,25 @@ impl Deref for PacketBuffer {
     #[inline]
     fn deref(&self) -> &PacketList {
         self.as_ref()
+    }
+}
+
+impl Clone for PacketBuffer {
+    fn clone(&self) -> Self {
+        Self {
+            storage: self.storage.clone(),
+            current_packet_offset: self.current_packet_offset,
+        }
+    }
+}
+
+impl fmt::Debug for PacketBuffer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let packet_list: &PacketList = self.as_ref();
+        f.debug_struct("PacketBuffer")
+            .field("capacity", &self.capacity())
+            .field("packets", &packet_list.len())
+            .finish()
     }
 }
 
@@ -495,6 +546,75 @@ mod tests {
                 (43, sysex),
             ])
         }
+    }
+
+    #[test]
+    fn packet_list_iter_exact_size() {
+        let mut packet_buf = PacketBuffer::new(42, &[0x90, 0x40, 0x7f]);
+        packet_buf.push_data(43, &[0x80, 0x40, 0x7f]);
+
+        let mut iter = packet_buf.iter();
+        assert_eq!(iter.len(), 2);
+        iter.next();
+        assert_eq!(iter.len(), 1);
+        iter.next();
+        assert_eq!(iter.len(), 0);
+    }
+
+    #[test]
+    fn packet_list_into_iterator() {
+        let packet_buf = PacketBuffer::new(42, &[0x90, 0x40, 0x7f]);
+        let packet_list: &PacketList = &packet_buf;
+
+        let data: Vec<Vec<u8>> = packet_list.into_iter().map(|p| p.data().to_vec()).collect();
+        assert_eq!(data, vec![vec![0x90, 0x40, 0x7f]]);
+    }
+
+    #[test]
+    fn packet_display() {
+        let packet_buf = PacketBuffer::new(0, &[0x90, 0x3c, 0x7f]);
+        let packet = packet_buf.iter().next().unwrap();
+        let display = format!("{}", packet);
+        assert_eq!(display, "0000000000000000: 90 3c 7f");
+    }
+
+    #[test]
+    fn packet_list_display() {
+        let packet_buf = PacketBuffer::new(0, &[0x90, 0x3c, 0x7f]);
+        let display = format!("{}", &packet_buf as &PacketList);
+        assert!(display.starts_with("PacketList(len=1)"));
+        assert!(display.contains("90 3c 7f"));
+    }
+
+    #[test]
+    fn packet_buffer_clone() {
+        let mut original = PacketBuffer::new(42, &[0x90, 0x40, 0x7f]);
+        original.push_data(43, &[0x80, 0x40, 0x7f]);
+
+        let cloned = original.clone();
+
+        assert_eq!(cloned.len(), original.len());
+        assert_eq!(cloned.capacity(), original.capacity());
+        for (o, c) in original.iter().zip(cloned.iter()) {
+            assert_eq!(o.timestamp(), c.timestamp());
+            assert_eq!(o.data(), c.data());
+        }
+    }
+
+    #[test]
+    fn packet_buffer_debug() {
+        let packet_buf = PacketBuffer::new(42, &[0x90, 0x40, 0x7f]);
+        let debug = format!("{:?}", packet_buf);
+        assert!(debug.contains("PacketBuffer"));
+        assert!(debug.contains("capacity"));
+        assert!(debug.contains("packets: 1"));
+    }
+
+    #[test]
+    fn packet_buffer_empty_iter_exact_size() {
+        let packet_buf = PacketBuffer::with_capacity(64);
+        assert_eq!(packet_buf.iter().len(), 0);
+        assert!(packet_buf.iter().next().is_none());
     }
 
     /// Compares the results of building a PacketList using our PacketBuffer API
