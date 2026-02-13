@@ -13,7 +13,7 @@ use crate::endpoints::destinations::Destination;
 use crate::endpoints::sources::Source;
 use crate::object::Object;
 use crate::packets::PacketList;
-use crate::{EventBuffer, EventList, PacketBuffer};
+use crate::{unit_result_from_status, EventBuffer, EventList, PacketBuffer};
 
 pub enum Packets<'a> {
     BorrowedPacketList(&'a PacketList),
@@ -29,7 +29,7 @@ impl<'a> From<&'a PacketList> for Packets<'a> {
 
 impl<'a> From<&'a PacketBuffer> for Packets<'a> {
     fn from(packet_buffer: &'a PacketBuffer) -> Self {
-        Self::BorrowedPacketList(&*packet_buffer)
+        Self::BorrowedPacketList(packet_buffer)
     }
 }
 
@@ -41,7 +41,7 @@ impl<'a> From<&'a EventList> for Packets<'a> {
 
 impl<'a> From<&'a EventBuffer> for Packets<'a> {
     fn from(event_buffer: &'a EventBuffer) -> Self {
-        Self::BorrowedEventList(&*event_buffer)
+        Self::BorrowedEventList(event_buffer)
     }
 }
 
@@ -138,11 +138,7 @@ impl OutputPort {
                 )
             },
         };
-        if status == 0 {
-            Ok(())
-        } else {
-            Err(status)
-        }
+        unit_result_from_status(status)
     }
 }
 
@@ -169,20 +165,12 @@ impl InputPort {
     pub fn connect_source(&self, source: &Source) -> Result<(), OSStatus> {
         let status =
             unsafe { MIDIPortConnectSource(self.object.0, source.object.0, ptr::null_mut()) };
-        if status == 0 {
-            Ok(())
-        } else {
-            Err(status)
-        }
+        unit_result_from_status(status)
     }
 
     pub fn disconnect_source(&self, source: &Source) -> Result<(), OSStatus> {
         let status = unsafe { MIDIPortDisconnectSource(self.object.0, source.object.0) };
-        if status == 0 {
-            Ok(())
-        } else {
-            Err(status)
-        }
+        unit_result_from_status(status)
     }
 }
 
@@ -226,22 +214,16 @@ impl<T> InputPortWithContext<T> {
         let status = unsafe {
             MIDIPortConnectSource(self.object.0, source.object.0, context_ptr as *mut c_void)
         };
-        if status == 0 {
+        crate::result_from_status(status, || {
             self.contexts.insert(source.object.0, context);
-            Ok(())
-        } else {
-            Err(status)
-        }
+        })
     }
 
     pub fn disconnect_source(&mut self, source: &Source) -> Result<(), OSStatus> {
         let status = unsafe { MIDIPortDisconnectSource(self.object.0, source.object.0) };
-        if status == 0 {
+        crate::result_from_status(status, || {
             self.contexts.remove(&source.object.0);
-            Ok(())
-        } else {
-            Err(status)
-        }
+        })
     }
 }
 

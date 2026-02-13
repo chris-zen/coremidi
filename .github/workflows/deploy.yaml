@@ -2,30 +2,33 @@ name: Deploy
 
 on:
   push:
-    tags: [ "*" ]
+    tags: ["*"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-            toolchain: 1.63.0
-            override: true
+          toolchain: stable
 
       - name: Generate docs
         run: |
-          cargo doc
-          REPO_NAME=$(echo ${{ github.repository }} | cut -d '/' -f 2)
-          echo "<meta http-equiv=refresh content=0;url=${REPO_NAME}/index.html>" > target/doc/index.html
+          cargo doc --no-deps
+          echo "<meta http-equiv=refresh content=0;url=coremidi/index.html>" > target/doc/index.html
 
-      - name: Publish into Github Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: target/doc
-      
+
       - name: Publish to crates.io
-        run: cargo login ${{ secrets.CARGO_TOKEN }} && cargo publish
+        run: cargo publish --token ${{ secrets.CARGO_TOKEN }}

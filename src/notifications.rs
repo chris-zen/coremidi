@@ -12,19 +12,19 @@ use crate::any_object::AnyObject;
 use crate::device::Device;
 use crate::object::Object;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct AddedRemovedInfo {
     pub parent: AnyObject,
     pub child: AnyObject,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct PropertyChangedInfo {
     pub object: AnyObject,
     pub property_name: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct IoErrorInfo {
     pub driver_device: Device,
     pub error_code: OSStatus,
@@ -33,7 +33,7 @@ pub struct IoErrorInfo {
 /// A message describing a system state change.
 /// See [MIDINotification](https://developer.apple.com/documentation/coremidi/midinotification).
 ///
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Notification {
     SetupChanged,
     ObjectAdded(AddedRemovedInfo),

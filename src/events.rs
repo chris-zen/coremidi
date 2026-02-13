@@ -39,7 +39,7 @@ impl EventList {
     pub fn iter(&self) -> EventListIter<'_> {
         EventListIter {
             count: self.len(),
-            packet_ptr: std::ptr::addr_of!(self.0.packet) as *const MIDIEventPacket,
+            packet_ptr: std::ptr::addr_of!(self.0.packet).cast::<MIDIEventPacket>(),
             _phantom: PhantomData,
         }
     }
@@ -47,22 +47,28 @@ impl EventList {
     /// For internal usage only.
     /// Requires this instance to actually point to a valid MIDIEventList
     pub(crate) unsafe fn as_ptr(&self) -> *const MIDIEventList {
-        self as *const EventList as *const MIDIEventList
+        (self as *const EventList).cast::<MIDIEventList>()
+    }
+}
+
+impl std::fmt::Display for EventList {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "EventList(protocol={:?}, len={})",
+            self.protocol(),
+            self.len()
+        )?;
+        for packet in self.iter() {
+            write!(f, "\n  {}", packet)?;
+        }
+        Ok(())
     }
 }
 
 impl std::fmt::Debug for EventList {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(
-            f,
-            "EventList(protocol={:?}, packets={})",
-            self.protocol(),
-            self.len()
-        )?;
-        for packet in self.iter() {
-            writeln!(f, "{:?}", packet)?;
-        }
-        Ok(())
+        std::fmt::Display::fmt(self, f)
     }
 }
 
@@ -77,13 +83,32 @@ impl<'a> Iterator for EventListIter<'a> {
 
     fn next(&mut self) -> Option<&'a EventPacket> {
         if self.count > 0 {
-            let packet = unsafe { &*(self.packet_ptr as *const EventPacket) };
+            let packet = unsafe { &*self.packet_ptr.cast::<EventPacket>() };
             self.count -= 1;
             self.packet_ptr = unsafe { MIDIEventPacketNext(self.packet_ptr) };
             Some(packet)
         } else {
             None
         }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.count, Some(self.count))
+    }
+}
+
+impl ExactSizeIterator for EventListIter<'_> {
+    fn len(&self) -> usize {
+        self.count
+    }
+}
+
+impl<'a> IntoIterator for &'a EventList {
+    type Item = &'a EventPacket;
+    type IntoIter = EventListIter<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 
@@ -104,13 +129,19 @@ impl EventPacket {
     }
 }
 
-impl std::fmt::Debug for EventPacket {
+impl std::fmt::Display for EventPacket {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "  {:024}:", self.timestamp())?;
-        for word in self.data().iter() {
+        write!(f, "{:016x}:", self.timestamp())?;
+        for word in self.data() {
             write!(f, " {:08x}", word)?;
         }
         Ok(())
+    }
+}
+
+impl std::fmt::Debug for EventPacket {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
     }
 }
 
@@ -137,7 +168,9 @@ impl EventBuffer {
         let event_list_ptr = unsafe { storage.as_mut_ptr::<MIDIEventList>() };
         let current_packet_ptr = unsafe { MIDIEventListInit(event_list_ptr, protocol.into()) };
         let current_packet_offset = unsafe {
-            (current_packet_ptr as *const u8).offset_from(event_list_ptr as *const u8) as usize
+            current_packet_ptr
+                .cast::<u8>()
+                .offset_from(event_list_ptr.cast::<u8>()) as usize
         };
         Self {
             storage,
@@ -202,12 +235,19 @@ impl EventBuffer {
     ///     vec![(0, vec![0x40903c00, 0xffff0000])],
     /// )
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if the buffer capacity is insufficient for the packet (CoreMIDI returns null from `MIDIEventListAdd`).
     pub fn push(&mut self, timestamp: Timestamp, data: &[u32]) -> &mut Self {
         self.ensure_capacity(data.len());
 
         let packet_list_ptr = unsafe { self.storage.as_mut_ptr::<MIDIEventList>() };
         let current_packet_ptr = unsafe {
-            self.storage.as_ptr::<u8>().add(self.current_packet_offset) as *mut MIDIEventPacket
+            self.storage
+                .as_mut_ptr::<u8>()
+                .add(self.current_packet_offset)
+                .cast::<MIDIEventPacket>()
         };
         let current_packet_ptr = unsafe {
             MIDIEventListAdd(
@@ -219,9 +259,15 @@ impl EventBuffer {
                 data.as_ptr(),
             )
         };
+        assert!(
+            !current_packet_ptr.is_null(),
+            "insufficient buffer capacity for packet"
+        );
 
         self.current_packet_offset = unsafe {
-            (current_packet_ptr as *const u8).offset_from(packet_list_ptr as *const u8) as usize
+            current_packet_ptr
+                .cast::<u8>()
+                .offset_from(packet_list_ptr.cast::<u8>()) as usize
         };
 
         self
@@ -234,7 +280,9 @@ impl EventBuffer {
         let protocol = unsafe { (*event_list_ptr).protocol };
         let current_packet_ptr = unsafe { MIDIEventListInit(event_list_ptr, protocol) };
         self.current_packet_offset = unsafe {
-            (current_packet_ptr as *const u8).offset_from(event_list_ptr as *const u8) as usize
+            current_packet_ptr
+                .cast::<u8>()
+                .offset_from(event_list_ptr.cast::<u8>()) as usize
         };
     }
 
@@ -242,25 +290,23 @@ impl EventBuffer {
         let next_capacity =
             self.aligned_bytes_len() + Self::PACKET_HEADER_SIZE + data_len * size_of::<u32>();
 
-        unsafe {
-            // We ensure capacity for the worst case as if there was no merge with the current packet
-            self.storage.ensure_capacity(next_capacity);
-        }
+        // We ensure capacity for the worst case as if there was no merge with the current packet
+        self.storage.ensure_capacity(next_capacity);
     }
 
     #[inline]
     fn aligned_bytes_len(&self) -> usize {
-        let storage_start_ptr = unsafe { self.storage.as_ptr::<u8>() };
         if self.as_ref().is_empty() {
             self.current_packet_offset
         } else {
+            let storage_start_ptr = unsafe { self.storage.as_ptr::<u8>() };
             let current_packet = unsafe {
-                &*(self.storage.as_ptr::<u8>().add(self.current_packet_offset)
-                    as *const MIDIEventPacket)
+                &*storage_start_ptr
+                    .add(self.current_packet_offset)
+                    .cast::<MIDIEventPacket>()
             };
-            let current_packet_data_ptr = current_packet.words.as_ptr() as *const u8;
-            let data_offset = current_packet_data_ptr as *const u8 as usize
-                - storage_start_ptr as *const u8 as usize;
+            let current_packet_data_ptr = current_packet.words.as_ptr().cast::<u8>();
+            let data_offset = current_packet_data_ptr as usize - storage_start_ptr as usize;
             let data_len = current_packet.wordCount as usize * size_of::<u32>();
             (data_offset + data_len + 3) & !3
         }
@@ -283,6 +329,17 @@ impl Deref for EventBuffer {
     }
 }
 
+impl std::fmt::Debug for EventBuffer {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let event_list: &EventList = self.as_ref();
+        f.debug_struct("EventBuffer")
+            .field("capacity", &self.capacity())
+            .field("protocol", &event_list.protocol())
+            .field("packets", &event_list.len())
+            .finish()
+    }
+}
+
 #[derive(Clone)]
 pub(crate) enum Storage {
     /// Inline stores the data directly on the stack, if it is small enough.
@@ -299,17 +356,12 @@ impl Storage {
         + 4 * 4; // 4 words
 
     #[inline]
-    #[allow(clippy::uninit_vec)]
     pub(crate) fn with_capacity(capacity: usize) -> Self {
         if capacity <= Self::INLINE_SIZE {
             Self::Inline([0; Self::INLINE_SIZE / 4])
         } else {
             let u32_len = ((capacity - 1) / 4) + 1;
-            let mut buffer = Vec::with_capacity(u32_len);
-            unsafe {
-                buffer.set_len(u32_len);
-            }
-            Storage::External(buffer)
+            Storage::External(vec![0u32; u32_len])
         }
     }
 
@@ -326,19 +378,18 @@ impl Storage {
         unsafe {
             match *self {
                 Storage::Inline(ref inline) => slice::from_raw_parts(
-                    inline.as_ptr() as *const T,
+                    inline.as_ptr().cast::<T>(),
                     inline.len() * size_of::<u32>() / size_of::<T>(),
                 ),
                 Storage::External(ref vec) => {
-                    slice::from_raw_parts(vec.as_ptr() as *const T, vec.len() * 4 / size_of::<T>())
+                    slice::from_raw_parts(vec.as_ptr().cast::<T>(), vec.len() * 4 / size_of::<T>())
                 }
             }
         }
     }
 
     /// Call this only with larger length values (won't make the buffer smaller)
-    #[allow(clippy::uninit_vec)]
-    pub(crate) unsafe fn ensure_capacity(&mut self, capacity: usize) {
+    pub(crate) fn ensure_capacity(&mut self, capacity: usize) {
         if capacity < Self::INLINE_SIZE || capacity < self.get_slice::<u8>().len() {
             return;
         }
@@ -348,13 +399,11 @@ impl Storage {
             Storage::Inline(ref inline) => {
                 let mut v = Vec::with_capacity(vec_capacity);
                 v.extend_from_slice(inline);
-                v.set_len(vec_capacity);
+                v.resize(vec_capacity, 0);
                 Some(v)
             }
             Storage::External(ref mut vec) => {
-                let current_len = vec.len();
-                vec.reserve(vec_capacity - current_len);
-                vec.set_len(vec_capacity);
+                vec.resize(vec_capacity, 0);
                 None
             }
         };
@@ -368,14 +417,17 @@ impl Storage {
     #[inline]
     pub(crate) unsafe fn as_ptr<T>(&self) -> *const T {
         match *self {
-            Storage::Inline(ref inline) => inline.as_ptr() as *const T,
-            Storage::External(ref vec) => vec.as_ptr() as *const T,
+            Storage::Inline(ref inline) => inline.as_ptr().cast::<T>(),
+            Storage::External(ref vec) => vec.as_ptr().cast::<T>(),
         }
     }
 
     #[inline]
     pub(crate) unsafe fn as_mut_ptr<T>(&mut self) -> *mut T {
-        self.as_ptr::<T>() as *mut T
+        match *self {
+            Storage::Inline(ref mut inline) => inline.as_mut_ptr().cast::<T>(),
+            Storage::External(ref mut vec) => vec.as_mut_ptr().cast::<T>(),
+        }
     }
 }
 
@@ -401,8 +453,8 @@ mod tests {
     #[test]
     fn event_list_accessors() {
         const BUFFER_SIZE: usize = 256;
-        let buffer = [0u8; BUFFER_SIZE];
-        let event_list_ptr = buffer.as_ptr() as *const MIDIEventList as *mut MIDIEventList;
+        let mut buffer = [0u8; BUFFER_SIZE];
+        let event_list_ptr = buffer.as_mut_ptr().cast::<MIDIEventList>();
         let event_packet_ptr =
             unsafe { MIDIEventListInit(event_list_ptr, kMIDIProtocol_2_0 as MIDIProtocolID) };
         let event_packet_ptr = unsafe {
@@ -425,7 +477,7 @@ mod tests {
                 [3, 4, 5].as_ptr(),
             )
         };
-        let event_list = unsafe { &*(event_list_ptr as *const EventList) };
+        let event_list = unsafe { &*event_list_ptr.cast::<EventList>() };
 
         assert_eq!(event_list.protocol(), Protocol::Midi20);
         assert!(!event_list.is_empty());
@@ -537,5 +589,86 @@ mod tests {
                 .collect::<Vec<(Timestamp, Vec<u32>)>>(),
             vec![]
         );
+    }
+
+    #[test]
+    fn event_list_iter_exact_size() {
+        let event_buffer = EventBuffer::new(Protocol::Midi20)
+            .with_packet(10, &[1, 2])
+            .with_packet(20, &[3, 4, 5]);
+
+        let mut iter = event_buffer.iter();
+        assert_eq!(iter.len(), 2);
+        iter.next();
+        assert_eq!(iter.len(), 1);
+        iter.next();
+        assert_eq!(iter.len(), 0);
+    }
+
+    #[test]
+    fn event_list_into_iterator() {
+        let event_buffer = EventBuffer::new(Protocol::Midi20)
+            .with_packet(10, &[1, 2])
+            .with_packet(20, &[3]);
+
+        let event_list: &EventList = event_buffer.as_ref();
+        let timestamps: Vec<Timestamp> = event_list.into_iter().map(|p| p.timestamp()).collect();
+        assert_eq!(timestamps, vec![10, 20]);
+    }
+
+    #[test]
+    fn event_list_display() {
+        let event_buffer =
+            EventBuffer::new(Protocol::Midi20).with_packet(0, &[0x40903c00, 0xffff0000]);
+
+        let event_list: &EventList = event_buffer.as_ref();
+        let display = format!("{}", event_list);
+        assert!(display.starts_with("EventList(protocol=MIDI 2.0, len=1)"));
+        assert!(display.contains("0000000000000000:"));
+        assert!(display.contains("40903c00"));
+        assert!(display.contains("ffff0000"));
+    }
+
+    #[test]
+    fn event_packet_display() {
+        let event_buffer = EventBuffer::new(Protocol::Midi20).with_packet(42, &[0xdeadbeef]);
+
+        let packet = event_buffer.iter().next().unwrap();
+        let display = format!("{}", packet);
+        assert_eq!(display, "000000000000002a: deadbeef");
+    }
+
+    #[test]
+    fn event_buffer_debug() {
+        let event_buffer = EventBuffer::new(Protocol::Midi20).with_packet(0, &[1]);
+
+        let debug = format!("{:?}", event_buffer);
+        assert!(debug.contains("EventBuffer"));
+        assert!(debug.contains("capacity"));
+        assert!(debug.contains("protocol"));
+        assert!(debug.contains("packets: 1"));
+    }
+
+    #[test]
+    fn event_buffer_clone() {
+        let original = EventBuffer::new(Protocol::Midi20).with_packet(10, &[1, 2]);
+        let cloned = original.clone();
+
+        assert_eq!(cloned.len(), 1);
+        assert_eq!(cloned.protocol(), Protocol::Midi20);
+        assert_eq!(
+            cloned
+                .iter()
+                .map(|p| (p.timestamp(), p.data().to_vec()))
+                .collect::<Vec<_>>(),
+            vec![(10, vec![1, 2])]
+        );
+    }
+
+    #[test]
+    fn event_buffer_empty_iter_exact_size() {
+        let event_buffer = EventBuffer::new(Protocol::Midi10);
+        assert_eq!(event_buffer.iter().len(), 0);
+        assert!(event_buffer.iter().next().is_none());
     }
 }

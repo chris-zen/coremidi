@@ -8,13 +8,13 @@ use coremidi_sys::{
 use crate::endpoints::endpoint::Endpoint;
 use crate::Object;
 
-/// A [MIDI source](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
+/// A [MIDI destination](https://developer.apple.com/documentation/coremidi/midiendpointref) owned by an entity.
 ///
-/// A source can be created from an index like this:
+/// A destination can be created from an index like this:
 ///
 /// ```rust,no_run
-/// let source = coremidi::Destination::from_index(0).unwrap();
-/// println!("The source at index 0 has display name '{}'", source.display_name().unwrap());
+/// let destination = coremidi::Destination::from_index(0).unwrap();
+/// println!("The destination at index 0 has display name '{}'", destination.display_name().unwrap());
 /// ```
 ///
 #[derive(Debug, Hash, Eq, PartialEq)]
