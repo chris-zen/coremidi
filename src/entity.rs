@@ -7,7 +7,7 @@ use crate::object::Object;
 ///
 /// An entity that a device owns and that contains endpoints.
 ///
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Entity {
     pub(crate) object: Object,
 }

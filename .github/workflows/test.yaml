@@ -1,31 +1,48 @@
-name: Test
+name: CI
 
 on:
   push:
-    tags-ignore: [ "*" ]
+    branches: [master]
+    tags-ignore: ["*"]
   pull_request: {}
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        rust: [1.63.0]
-        os: [macOS-latest]
+  fmt:
+    name: Format
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-            toolchain: ${{ matrix.rust }}
-            override: true
-            components: rustfmt, clippy
+          components: rustfmt
+      - run: cargo fmt --all -- --check
 
-      - name: Check format
-        run: cargo fmt --all -- --check
-      
-      - name: Check clippy
-        run: cargo clippy -- -D warnings
-      
+  clippy:
+    name: Clippy
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy
+      - run: cargo clippy --all-targets -- -D warnings
+
+  test:
+    name: Test
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        toolchain: [stable]
+        include:
+          - toolchain: "1.75"
+            name_suffix: " MSRV"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
       - name: Run tests
         run: cargo test

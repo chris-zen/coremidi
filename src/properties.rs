@@ -99,7 +99,7 @@ where
     }
 }
 
-impl<'a, T> PropertySetter<T> for StringProperty
+impl<T> PropertySetter<T> for StringProperty
 where
     T: Into<String>,
 {
