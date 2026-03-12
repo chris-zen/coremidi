@@ -1,208 +1,104 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../coremidi/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">crate_name</span> <span class="op">=</span> <span class="string">&quot;coremidi&quot;</span>]</span>
-<span class="attribute">#![<span class="ident">crate_type</span> <span class="op">=</span> <span class="string">&quot;lib&quot;</span>]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://chris-zen.github.io/coremidi/&quot;</span>)]</span>
-
-<span class="doccomment">/*!
-This is a [CoreMIDI](https://developer.apple.com/documentation/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
-CoreMIDI is a macOS framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
-
-This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
-
-Please see the [examples](https://github.com/chris-zen/coremidi/tree/master/examples) for getting an idea of how it looks like, but if you are eager to see an example, this is how you would send some note:
-
-```rust,no_run
-use coremidi::{Client, Destination, EventBuffer, Protocol};
-use std::time::Duration;
-use std::thread;
-
-fn main() {
-    let client = coremidi::Client::new(&quot;example-client&quot;).unwrap();
-    let output_port = client.output_port(&quot;example-port&quot;).unwrap();
-    let destination = Destination::from_index(0).unwrap();
-    let note_on = EventBuffer::new(Protocol::Midi10).with_packet(0, &amp;[0x2090407f]);
-    let note_off = EventBuffer::new(Protocol::Midi10).with_packet(0, &amp;[0x2080407f]);
-    output_port.send(&amp;destination, &amp;note_on).unwrap();
-    thread::sleep(Duration::from_millis(1000));
-    output_port.send(&amp;destination, &amp;note_off).unwrap();
-}
-```
-
-If you are looking for a portable MIDI library then you can look into:
-
-- [midir](https://github.com/Boddlnagg/midir) (which is using this lib)
-- [portmidi-rs](https://github.com/musitdev/portmidi-rs)
-
-For handling low level MIDI data you may look into:
-
-- [midi-rs](https://github.com/samdoshi/midi-rs)
-- [rimd](https://github.com/RustAudio/rimd)
-
-*/</span>
-
-<span class="kw">mod</span> <span class="ident">any_object</span>;
-<span class="kw">mod</span> <span class="ident">client</span>;
-<span class="kw">mod</span> <span class="ident">device</span>;
-<span class="kw">mod</span> <span class="ident">endpoints</span>;
-<span class="kw">mod</span> <span class="ident">entity</span>;
-<span class="kw">mod</span> <span class="ident">events</span>;
-<span class="kw">mod</span> <span class="ident">notifications</span>;
-<span class="kw">mod</span> <span class="ident">object</span>;
-<span class="kw">mod</span> <span class="ident">packets</span>;
-<span class="kw">mod</span> <span class="ident">ports</span>;
-<span class="kw">mod</span> <span class="ident">properties</span>;
-<span class="kw">mod</span> <span class="ident">protocol</span>;
-
-<span class="kw">use</span> <span class="ident">core_foundation_sys::base::OSStatus</span>;
-
-<span class="kw">use</span> <span class="ident">coremidi_sys</span>::{<span class="ident">MIDIFlushOutput</span>, <span class="ident">MIDIRestart</span>};
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">Client</span>, <span class="ident">NotifyCallback</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::device::Device</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endpoints::destinations</span>::{<span class="ident">Destination</span>, <span class="ident">Destinations</span>, <span class="ident">VirtualDestination</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endpoints::endpoint::Endpoint</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endpoints::sources</span>::{<span class="ident">Source</span>, <span class="ident">Sources</span>, <span class="ident">VirtualSource</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::entity::Entity</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::events</span>::{<span class="ident">EventBuffer</span>, <span class="ident">EventList</span>, <span class="ident">EventListIter</span>, <span class="ident">EventPacket</span>, <span class="ident">Timestamp</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::notifications</span>::{<span class="ident">AddedRemovedInfo</span>, <span class="ident">IoErrorInfo</span>, <span class="ident">Notification</span>, <span class="ident">PropertyChangedInfo</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::Object</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::packets</span>::{<span class="ident">Packet</span>, <span class="ident">PacketBuffer</span>, <span class="ident">PacketList</span>, <span class="ident">PacketListIterator</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ports</span>::{<span class="ident">InputPort</span>, <span class="ident">InputPortWithContext</span>, <span class="ident">OutputPort</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::properties</span>::{
-    <span class="ident">BooleanProperty</span>, <span class="ident">IntegerProperty</span>, <span class="ident">Properties</span>, <span class="ident">PropertyGetter</span>, <span class="ident">PropertySetter</span>, <span class="ident">StringProperty</span>,
-};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::protocol::Protocol</span>;
-
-<span class="doccomment">/// Unschedules previously-sent packets for all the endpoints.</span>
-<span class="doccomment">/// See [MIDIFlushOutput](https://developer.apple.com/documentation/coremidi/1495312-midiflushoutput).</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MIDIFlushOutput</span>(<span class="number">0</span>) };
-    <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>)
-}
-
-<span class="doccomment">/// Stops and restarts MIDI I/O.</span>
-<span class="doccomment">/// See [MIDIRestart](https://developer.apple.com/documentation/coremidi/1495146-midirestart).</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restart</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MIDIRestart</span>() };
-    <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>)
-}
-
-<span class="doccomment">/// Convert an OSStatus into a Result&lt;T, OSStatus&gt; given a mapping closure</span>
-<span class="kw">fn</span> <span class="ident">result_from_status</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">status</span>: <span class="ident">OSStatus</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">status</span> {
-        <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">f</span>()),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">status</span>),
-    }
-}
-
-<span class="doccomment">/// Convert an OSSStatus into a Result&lt;(), OSStatus&gt;</span>
-<span class="kw">fn</span> <span class="ident">unit_result_from_status</span>(<span class="ident">status</span>: <span class="ident">OSStatus</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-    <span class="ident">result_from_status</span>(<span class="ident">status</span>, <span class="op">|</span><span class="op">|</span> ())
-}
-</code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="coremidi" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-</body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="coremidi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.0 (4a4ef493e 2026-03-02)" data-channel="1.94.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">coremidi/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![crate_name = <span class="string">"coremidi"</span>]
+<a href=#2 id=2 data-nosnippet>2</a>#![crate_type = <span class="string">"lib"</span>]
+<a href=#3 id=3 data-nosnippet>3</a>#![doc(html_root_url = <span class="string">"https://chris-zen.github.io/coremidi/"</span>)]
+<a href=#4 id=4 data-nosnippet>4</a>
+<a href=#5 id=5 data-nosnippet>5</a></span><span class="doccomment">/*!
+<a href=#6 id=6 data-nosnippet>6</a>This is a [CoreMIDI](https://developer.apple.com/documentation/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
+<a href=#7 id=7 data-nosnippet>7</a>CoreMIDI is a macOS framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
+<a href=#8 id=8 data-nosnippet>8</a>
+<a href=#9 id=9 data-nosnippet>9</a>This library preserves the fundamental concepts behind the CoreMIDI framework, while being Rust idiomatic. This means that if you already know CoreMIDI, you will find very easy to start using it.
+<a href=#10 id=10 data-nosnippet>10</a>
+<a href=#11 id=11 data-nosnippet>11</a>Please see the [examples](https://github.com/chris-zen/coremidi/tree/master/examples) for getting an idea of how it looks like, but if you are eager to see an example, this is how you would send some note:
+<a href=#12 id=12 data-nosnippet>12</a>
+<a href=#13 id=13 data-nosnippet>13</a>```rust,no_run
+<a href=#14 id=14 data-nosnippet>14</a>use coremidi::{Client, Destination, EventBuffer, Protocol};
+<a href=#15 id=15 data-nosnippet>15</a>use std::time::Duration;
+<a href=#16 id=16 data-nosnippet>16</a>use std::thread;
+<a href=#17 id=17 data-nosnippet>17</a>
+<a href=#18 id=18 data-nosnippet>18</a>fn main() {
+<a href=#19 id=19 data-nosnippet>19</a>    let client = coremidi::Client::new("example-client").unwrap();
+<a href=#20 id=20 data-nosnippet>20</a>    let output_port = client.output_port("example-port").unwrap();
+<a href=#21 id=21 data-nosnippet>21</a>    let destination = Destination::from_index(0).unwrap();
+<a href=#22 id=22 data-nosnippet>22</a>    let note_on = EventBuffer::new(Protocol::Midi10).with_packet(0, &amp;[0x2090407f]);
+<a href=#23 id=23 data-nosnippet>23</a>    let note_off = EventBuffer::new(Protocol::Midi10).with_packet(0, &amp;[0x2080407f]);
+<a href=#24 id=24 data-nosnippet>24</a>    output_port.send(&amp;destination, &amp;note_on).unwrap();
+<a href=#25 id=25 data-nosnippet>25</a>    thread::sleep(Duration::from_millis(1000));
+<a href=#26 id=26 data-nosnippet>26</a>    output_port.send(&amp;destination, &amp;note_off).unwrap();
+<a href=#27 id=27 data-nosnippet>27</a>}
+<a href=#28 id=28 data-nosnippet>28</a>```
+<a href=#29 id=29 data-nosnippet>29</a>
+<a href=#30 id=30 data-nosnippet>30</a>If you are looking for a portable MIDI library then you can look into:
+<a href=#31 id=31 data-nosnippet>31</a>
+<a href=#32 id=32 data-nosnippet>32</a>- [midir](https://github.com/Boddlnagg/midir) (which is using this lib)
+<a href=#33 id=33 data-nosnippet>33</a>- [portmidi-rs](https://github.com/musitdev/portmidi-rs)
+<a href=#34 id=34 data-nosnippet>34</a>
+<a href=#35 id=35 data-nosnippet>35</a>For handling low level MIDI data you may look into:
+<a href=#36 id=36 data-nosnippet>36</a>
+<a href=#37 id=37 data-nosnippet>37</a>- [midi-rs](https://github.com/samdoshi/midi-rs)
+<a href=#38 id=38 data-nosnippet>38</a>- [rimd](https://github.com/RustAudio/rimd)
+<a href=#39 id=39 data-nosnippet>39</a>
+<a href=#40 id=40 data-nosnippet>40</a>*/
+<a href=#41 id=41 data-nosnippet>41</a>
+<a href=#42 id=42 data-nosnippet>42</a></span><span class="kw">mod </span>any_object;
+<a href=#43 id=43 data-nosnippet>43</a><span class="kw">mod </span>client;
+<a href=#44 id=44 data-nosnippet>44</a><span class="kw">mod </span>device;
+<a href=#45 id=45 data-nosnippet>45</a><span class="kw">mod </span>endpoints;
+<a href=#46 id=46 data-nosnippet>46</a><span class="kw">mod </span>entity;
+<a href=#47 id=47 data-nosnippet>47</a><span class="kw">mod </span>events;
+<a href=#48 id=48 data-nosnippet>48</a><span class="kw">mod </span>notifications;
+<a href=#49 id=49 data-nosnippet>49</a><span class="kw">mod </span>object;
+<a href=#50 id=50 data-nosnippet>50</a><span class="kw">mod </span>packets;
+<a href=#51 id=51 data-nosnippet>51</a><span class="kw">mod </span>ports;
+<a href=#52 id=52 data-nosnippet>52</a><span class="kw">mod </span>properties;
+<a href=#53 id=53 data-nosnippet>53</a><span class="kw">mod </span>protocol;
+<a href=#54 id=54 data-nosnippet>54</a>
+<a href=#55 id=55 data-nosnippet>55</a><span class="kw">pub use </span>core_foundation_sys::base::OSStatus;
+<a href=#56 id=56 data-nosnippet>56</a>
+<a href=#57 id=57 data-nosnippet>57</a><span class="kw">use </span>coremidi_sys::{MIDIFlushOutput, MIDIRestart};
+<a href=#58 id=58 data-nosnippet>58</a>
+<a href=#59 id=59 data-nosnippet>59</a><span class="kw">pub use </span><span class="kw">crate</span>::any_object::AnyObject;
+<a href=#60 id=60 data-nosnippet>60</a><span class="kw">pub use </span><span class="kw">crate</span>::client::{Client, NotifyCallback};
+<a href=#61 id=61 data-nosnippet>61</a><span class="kw">pub use </span><span class="kw">crate</span>::device::Device;
+<a href=#62 id=62 data-nosnippet>62</a><span class="kw">pub use </span><span class="kw">crate</span>::endpoints::destinations::{Destination, Destinations, VirtualDestination};
+<a href=#63 id=63 data-nosnippet>63</a><span class="kw">pub use </span><span class="kw">crate</span>::endpoints::endpoint::Endpoint;
+<a href=#64 id=64 data-nosnippet>64</a><span class="kw">pub use </span><span class="kw">crate</span>::endpoints::sources::{Source, Sources, VirtualSource};
+<a href=#65 id=65 data-nosnippet>65</a><span class="kw">pub use </span><span class="kw">crate</span>::entity::Entity;
+<a href=#66 id=66 data-nosnippet>66</a><span class="kw">pub use </span><span class="kw">crate</span>::events::{EventBuffer, EventList, EventListIter, EventPacket, Timestamp};
+<a href=#67 id=67 data-nosnippet>67</a><span class="kw">pub use </span><span class="kw">crate</span>::notifications::{AddedRemovedInfo, IoErrorInfo, Notification, PropertyChangedInfo};
+<a href=#68 id=68 data-nosnippet>68</a><span class="kw">pub use </span><span class="kw">crate</span>::object::Object;
+<a href=#69 id=69 data-nosnippet>69</a><span class="kw">pub use </span><span class="kw">crate</span>::packets::{Packet, PacketBuffer, PacketList, PacketListIterator};
+<a href=#70 id=70 data-nosnippet>70</a><span class="kw">pub use </span><span class="kw">crate</span>::ports::{InputPort, InputPortWithContext, OutputPort};
+<a href=#71 id=71 data-nosnippet>71</a><span class="kw">pub use </span><span class="kw">crate</span>::properties::{
+<a href=#72 id=72 data-nosnippet>72</a>    BooleanProperty, IntegerProperty, Properties, PropertyGetter, PropertySetter, StringProperty,
+<a href=#73 id=73 data-nosnippet>73</a>};
+<a href=#74 id=74 data-nosnippet>74</a><span class="kw">pub use </span><span class="kw">crate</span>::protocol::Protocol;
+<a href=#75 id=75 data-nosnippet>75</a>
+<a href=#76 id=76 data-nosnippet>76</a><span class="doccomment">/// Unschedules previously-sent packets for all the endpoints.
+<a href=#77 id=77 data-nosnippet>77</a>/// See [MIDIFlushOutput](https://developer.apple.com/documentation/coremidi/1495312-midiflushoutput).
+<a href=#78 id=78 data-nosnippet>78</a>///
+<a href=#79 id=79 data-nosnippet>79</a></span><span class="kw">pub fn </span>flush() -&gt; <span class="prelude-ty">Result</span>&lt;(), OSStatus&gt; {
+<a href=#80 id=80 data-nosnippet>80</a>    <span class="kw">let </span>status = <span class="kw">unsafe </span>{ MIDIFlushOutput(<span class="number">0</span>) };
+<a href=#81 id=81 data-nosnippet>81</a>    unit_result_from_status(status)
+<a href=#82 id=82 data-nosnippet>82</a>}
+<a href=#83 id=83 data-nosnippet>83</a>
+<a href=#84 id=84 data-nosnippet>84</a><span class="doccomment">/// Stops and restarts MIDI I/O.
+<a href=#85 id=85 data-nosnippet>85</a>/// See [MIDIRestart](https://developer.apple.com/documentation/coremidi/1495146-midirestart).
+<a href=#86 id=86 data-nosnippet>86</a>///
+<a href=#87 id=87 data-nosnippet>87</a></span><span class="kw">pub fn </span>restart() -&gt; <span class="prelude-ty">Result</span>&lt;(), OSStatus&gt; {
+<a href=#88 id=88 data-nosnippet>88</a>    <span class="kw">let </span>status = <span class="kw">unsafe </span>{ MIDIRestart() };
+<a href=#89 id=89 data-nosnippet>89</a>    unit_result_from_status(status)
+<a href=#90 id=90 data-nosnippet>90</a>}
+<a href=#91 id=91 data-nosnippet>91</a>
+<a href=#92 id=92 data-nosnippet>92</a><span class="doccomment">/// Convert an OSStatus into a Result&lt;T, OSStatus&gt; given a mapping closure
+<a href=#93 id=93 data-nosnippet>93</a></span><span class="kw">fn </span>result_from_status&lt;T, F: FnOnce() -&gt; T&gt;(status: OSStatus, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;T, OSStatus&gt; {
+<a href=#94 id=94 data-nosnippet>94</a>    <span class="kw">match </span>status {
+<a href=#95 id=95 data-nosnippet>95</a>        <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(f()),
+<a href=#96 id=96 data-nosnippet>96</a>        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(status),
+<a href=#97 id=97 data-nosnippet>97</a>    }
+<a href=#98 id=98 data-nosnippet>98</a>}
+<a href=#99 id=99 data-nosnippet>99</a>
+<a href=#100 id=100 data-nosnippet>100</a><span class="doccomment">/// Convert an OSStatus into a Result&lt;(), OSStatus&gt;
+<a href=#101 id=101 data-nosnippet>101</a></span><span class="kw">fn </span>unit_result_from_status(status: OSStatus) -&gt; <span class="prelude-ty">Result</span>&lt;(), OSStatus&gt; {
+<a href=#102 id=102 data-nosnippet>102</a>    result_from_status(status, || ())
+<a href=#103 id=103 data-nosnippet>103</a>}
+</code></pre></div></section></main></body></html>

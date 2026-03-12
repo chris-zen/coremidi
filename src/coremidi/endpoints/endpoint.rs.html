@@ -1,104 +1,48 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;endpoints&#x2F;endpoint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>endpoint.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../coremidi/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
-<span id="10">10</span>
-<span id="11">11</span>
-<span id="12">12</span>
-<span id="13">13</span>
-<span id="14">14</span>
-<span id="15">15</span>
-<span id="16">16</span>
-<span id="17">17</span>
-<span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core_foundation_sys::base::OSStatus</span>;
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
-
-<span class="kw">use</span> <span class="ident">coremidi_sys</span>::{<span class="ident">MIDIEndpointRef</span>, <span class="ident">MIDIFlushOutput</span>};
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::Object</span>;
-
-<span class="doccomment">/// A MIDI source or source, owned by an entity.</span>
-<span class="doccomment">/// See [MIDIEndpointRef](https://developer.apple.com/documentation/coremidi/midiendpointref).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You don&#39;t need to create an endpoint directly, instead you can create system sources or virtual ones from a client.</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Endpoint</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">object</span>: <span class="ident">Object</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Endpoint</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">endpoint_ref</span>: <span class="ident">MIDIEndpointRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">object</span>: <span class="ident">Object</span>(<span class="ident">endpoint_ref</span>),
-        }
-    }
-
-    <span class="doccomment">/// Unschedules previously-sent packets.</span>
-    <span class="doccomment">/// See [MIDIFlushOutput](https://developer.apple.com/documentation/coremidi/1495312-midiflushoutput).</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">OSStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MIDIFlushOutput</span>(<span class="self">self</span>.<span class="ident">object</span>.<span class="number">0</span>) };
-        <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">status</span>)
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Object</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Object</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">object</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Object</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Object</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">object</span>
-    }
-}
-</code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="coremidi" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-</body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/endpoints/endpoint.rs`."><title>endpoint.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="coremidi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.0 (4a4ef493e 2026-03-02)" data-channel="1.94.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">coremidi/endpoints/</div>endpoint.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-2"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>core_foundation_sys::base::OSStatus;
+<a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>std::ops::Deref;
+<a href=#3 id=3 data-nosnippet>3</a>
+<a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>coremidi_sys::{MIDIEndpointRef, MIDIFlushOutput};
+<a href=#5 id=5 data-nosnippet>5</a>
+<a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span><span class="kw">crate</span>::object::Object;
+<a href=#7 id=7 data-nosnippet>7</a><span class="kw">use </span><span class="kw">crate</span>::unit_result_from_status;
+<a href=#8 id=8 data-nosnippet>8</a>
+<a href=#9 id=9 data-nosnippet>9</a><span class="doccomment">/// A MIDI source or destination, owned by an entity.
+<a href=#10 id=10 data-nosnippet>10</a>/// See [MIDIEndpointRef](https://developer.apple.com/documentation/coremidi/midiendpointref).
+<a href=#11 id=11 data-nosnippet>11</a>///
+<a href=#12 id=12 data-nosnippet>12</a>/// You don't need to create an endpoint directly, instead you can create system sources or virtual ones from a client.
+<a href=#13 id=13 data-nosnippet>13</a>///
+<a href=#14 id=14 data-nosnippet>14</a></span><span class="attr">#[derive(Debug, Hash, Eq, PartialEq)]
+<a href=#15 id=15 data-nosnippet>15</a></span><span class="kw">pub struct </span>Endpoint {
+<a href=#16 id=16 data-nosnippet>16</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) object: Object,
+<a href=#17 id=17 data-nosnippet>17</a>}
+<a href=#18 id=18 data-nosnippet>18</a>
+<a href=#19 id=19 data-nosnippet>19</a><span class="kw">impl </span>Endpoint {
+<a href=#20 id=20 data-nosnippet>20</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(endpoint_ref: MIDIEndpointRef) -&gt; <span class="self">Self </span>{
+<a href=#21 id=21 data-nosnippet>21</a>        <span class="self">Self </span>{
+<a href=#22 id=22 data-nosnippet>22</a>            object: Object(endpoint_ref),
+<a href=#23 id=23 data-nosnippet>23</a>        }
+<a href=#24 id=24 data-nosnippet>24</a>    }
+<a href=#25 id=25 data-nosnippet>25</a>
+<a href=#26 id=26 data-nosnippet>26</a>    <span class="doccomment">/// Unschedules previously-sent packets.
+<a href=#27 id=27 data-nosnippet>27</a>    /// See [MIDIFlushOutput](https://developer.apple.com/documentation/coremidi/1495312-midiflushoutput).
+<a href=#28 id=28 data-nosnippet>28</a>    ///
+<a href=#29 id=29 data-nosnippet>29</a>    </span><span class="kw">pub fn </span>flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), OSStatus&gt; {
+<a href=#30 id=30 data-nosnippet>30</a>        <span class="kw">let </span>status = <span class="kw">unsafe </span>{ MIDIFlushOutput(<span class="self">self</span>.object.<span class="number">0</span>) };
+<a href=#31 id=31 data-nosnippet>31</a>        unit_result_from_status(status)
+<a href=#32 id=32 data-nosnippet>32</a>    }
+<a href=#33 id=33 data-nosnippet>33</a>}
+<a href=#34 id=34 data-nosnippet>34</a>
+<a href=#35 id=35 data-nosnippet>35</a><span class="kw">impl </span>AsRef&lt;Object&gt; <span class="kw">for </span>Endpoint {
+<a href=#36 id=36 data-nosnippet>36</a>    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Object {
+<a href=#37 id=37 data-nosnippet>37</a>        <span class="kw-2">&amp;</span><span class="self">self</span>.object
+<a href=#38 id=38 data-nosnippet>38</a>    }
+<a href=#39 id=39 data-nosnippet>39</a>}
+<a href=#40 id=40 data-nosnippet>40</a>
+<a href=#41 id=41 data-nosnippet>41</a><span class="kw">impl </span>Deref <span class="kw">for </span>Endpoint {
+<a href=#42 id=42 data-nosnippet>42</a>    <span class="kw">type </span>Target = Object;
+<a href=#43 id=43 data-nosnippet>43</a>
+<a href=#44 id=44 data-nosnippet>44</a>    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Object {
+<a href=#45 id=45 data-nosnippet>45</a>        <span class="kw-2">&amp;</span><span class="self">self</span>.object
+<a href=#46 id=46 data-nosnippet>46</a>    }
+<a href=#47 id=47 data-nosnippet>47</a>}
+</code></pre></div></section></main></body></html>

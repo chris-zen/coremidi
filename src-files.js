@@ -1,0 +1,2 @@
+createSrcSidebar('[["coremidi",["",[["endpoints",[],["destinations.rs","endpoint.rs","mod.rs","sources.rs"]]],["any_object.rs","client.rs","device.rs","entity.rs","events.rs","lib.rs","notifications.rs","object.rs","packets.rs","ports.rs","properties.rs","protocol.rs"]]]]');
+//{"start":19,"fragment_lengths":[252]}
