@@ -37,7 +37,7 @@ fn get_destination_index() -> usize {
         .next()
         .and_then(|path| {
             path.split(std::path::MAIN_SEPARATOR)
-                .last()
+                .next_back()
                 .map(|v| v.to_string())
         })
         .unwrap_or_else(|| "send".to_string());

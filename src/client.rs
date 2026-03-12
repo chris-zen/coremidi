@@ -23,9 +23,12 @@ use crate::{
     result_from_status, EventList, Protocol,
 };
 
+type CallbackByRef = Box<dyn FnMut(&Notification) + Send + 'static>;
+type CallbackByOwn = Box<dyn FnMut(Notification) + Send + 'static>;
+
 pub enum NotifyCallback {
-    ByReference(RefCell<Box<dyn FnMut(&Notification) + Send + 'static>>),
-    ByOwnership(RefCell<Box<dyn FnMut(Notification) + Send + 'static>>),
+    ByReference(RefCell<CallbackByRef>),
+    ByOwnership(RefCell<CallbackByOwn>),
 }
 
 impl NotifyCallback {

@@ -4,8 +4,9 @@ use std::ops::Deref;
 use coremidi_sys::{MIDIEndpointRef, MIDIFlushOutput};
 
 use crate::object::Object;
+use crate::unit_result_from_status;
 
-/// A MIDI source or source, owned by an entity.
+/// A MIDI source or destination, owned by an entity.
 /// See [MIDIEndpointRef](https://developer.apple.com/documentation/coremidi/midiendpointref).
 ///
 /// You don't need to create an endpoint directly, instead you can create system sources or virtual ones from a client.
@@ -27,11 +28,7 @@ impl Endpoint {
     ///
     pub fn flush(&self) -> Result<(), OSStatus> {
         let status = unsafe { MIDIFlushOutput(self.object.0) };
-        if status == 0 {
-            Ok(())
-        } else {
-            Err(status)
-        }
+        unit_result_from_status(status)
     }
 }
 
