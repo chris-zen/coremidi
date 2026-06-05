@@ -282,7 +282,7 @@ impl Client {
         })
     }
 
-    fn notify_block(callback: NotifyCallback) -> RcBlock<dyn Fn(*const c_void) -> ()> {
+    fn notify_block(callback: NotifyCallback) -> RcBlock<dyn Fn(*const c_void)> {
         RcBlock::new(move |message: *const c_void| {
             let message = unsafe { &*(message as *const MIDINotification) };
             if let Ok(notification) = Notification::try_from(message) {
@@ -294,7 +294,7 @@ impl Client {
         })
     }
 
-    fn read_block<F>(callback: F) -> RcBlock<dyn Fn(*const c_void, *mut c_void) -> ()>
+    fn read_block<F>(callback: F) -> RcBlock<dyn Fn(*const c_void, *mut c_void)>
     where
         F: FnMut(&PacketList) + Send + 'static,
     {
@@ -307,7 +307,7 @@ impl Client {
         )
     }
 
-    fn receive_block<T, F>(callback: F) -> RcBlock<dyn Fn(*const c_void, *mut c_void) -> ()>
+    fn receive_block<T, F>(callback: F) -> RcBlock<dyn Fn(*const c_void, *mut c_void)>
     where
         F: FnMut(&EventList, &mut T) + Send + 'static,
     {
