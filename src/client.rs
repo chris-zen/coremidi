@@ -1,4 +1,4 @@
-use block::RcBlock;
+use block2::RcBlock;
 use core_foundation::{
     base::{OSStatus, TCFType},
     string::CFString,
@@ -8,9 +8,9 @@ use std::{mem::MaybeUninit, ops::Deref, os::raw::c_void, ptr};
 
 use coremidi_sys::{
     MIDIClientCreate, MIDIClientCreateWithBlock, MIDIDestinationCreateWithBlock,
-    MIDIDestinationCreateWithProtocol, MIDIEventList, MIDIInputPortCreateWithBlock,
+    MIDIDestinationCreateWithProtocol, MIDIInputPortCreateWithBlock,
     MIDIInputPortCreateWithProtocol, MIDINotification, MIDINotifyBlock, MIDIOutputPortCreate,
-    MIDIPacketList, MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate,
+    MIDIReadBlock, MIDIReceiveBlock, MIDISourceCreate,
 };
 
 use crate::ports::InputPortWithContext;
@@ -282,46 +282,43 @@ impl Client {
         })
     }
 
-    fn notify_block(callback: NotifyCallback) -> RcBlock<(*const MIDINotification,), ()> {
-        let notify_block = block::ConcreteBlock::new(move |message: *const MIDINotification| {
-            let message = unsafe { &*message };
+    fn notify_block(callback: NotifyCallback) -> RcBlock<dyn Fn(*const c_void) -> ()> {
+        RcBlock::new(move |message: *const c_void| {
+            let message = unsafe { &*(message as *const MIDINotification) };
             if let Ok(notification) = Notification::try_from(message) {
                 match &callback {
                     NotifyCallback::ByReference(f) => (f.borrow_mut())(&notification),
                     NotifyCallback::ByOwnership(f) => (f.borrow_mut())(notification),
                 }
             }
-        });
-        notify_block.copy()
+        })
     }
 
-    fn read_block<F>(callback: F) -> RcBlock<(*const MIDIPacketList, *mut c_void), ()>
+    fn read_block<F>(callback: F) -> RcBlock<dyn Fn(*const c_void, *mut c_void) -> ()>
     where
         F: FnMut(&PacketList) + Send + 'static,
     {
         let callback = RefCell::new(callback);
-        let read_block = block::ConcreteBlock::new(
-            move |pktlist: *const MIDIPacketList, _src_conn_ref_con: *mut c_void| {
+        RcBlock::new(
+            move |pktlist: *const c_void, _src_conn_ref_con: *mut c_void| {
                 let packet_list = unsafe { &*(pktlist as *const PacketList) };
                 (callback.borrow_mut())(packet_list);
             },
-        );
-        read_block.copy()
+        )
     }
 
-    fn receive_block<T, F>(callback: F) -> RcBlock<(*const MIDIEventList, *mut c_void), ()>
+    fn receive_block<T, F>(callback: F) -> RcBlock<dyn Fn(*const c_void, *mut c_void) -> ()>
     where
         F: FnMut(&EventList, &mut T) + Send + 'static,
     {
         let callback = RefCell::new(callback);
-        let receive_block = block::ConcreteBlock::new(
-            move |evtlist: *const MIDIEventList, src_conn_ref_con: *mut c_void| {
+        RcBlock::new(
+            move |evtlist: *const c_void, src_conn_ref_con: *mut c_void| {
                 let event_list = unsafe { &*(evtlist as *const EventList) };
                 let context = unsafe { &mut *(src_conn_ref_con as *mut T) };
                 (callback.borrow_mut())(event_list, context);
             },
-        );
-        receive_block.copy()
+        )
     }
 }
 
