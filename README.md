@@ -4,7 +4,6 @@
 [![Crates.io](https://img.shields.io/crates/v/coremidi.svg)](https://crates.io/crates/coremidi)
 [![Crates.io](https://img.shields.io/crates/d/coremidi.svg)](https://crates.io/crates/coremidi)
 [![docs.rs](https://img.shields.io/docsrs/coremidi)](https://docs.rs/coremidi)
-[![Minimum rustc version](https://img.shields.io/badge/rustc-1.63+-blue.svg)](https://blog.rust-lang.org/2022/08/11/Rust-1.63.0.html)
 
 This is a [CoreMIDI](https://developer.apple.com/documentation/coremidi) library for Rust built on top of the low-level bindings [coremidi-sys](https://github.com/jonas-k/coremidi-sys).
 CoreMIDI is a macOS framework that provides APIs for communicating with MIDI (Musical Instrument Digital Interface) devices, including hardware keyboards and synthesizers.
