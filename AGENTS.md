@@ -17,7 +17,7 @@ cargo deny check
 cargo run --example send
 ```
 
-CI (`.github/workflows/test.yaml`) runs fmt, **cargo-deny** (advisories, bans, licenses, sources), clippy, and tests on `macos-latest` for stable and MSRV **1.75** (deny runs on `ubuntu-latest`). Tag pushes are ignored by CI; tags trigger deploy instead. Dependabot (`.github/dependabot.yml`) opens weekly PRs for Cargo and GitHub Actions updates.
+CI (`.github/workflows/test.yaml`) runs fmt, **cargo-deny** (advisories, bans, licenses, sources), clippy, and tests on `macos-latest` for stable and the MSRV from `rust-version` in `Cargo.toml` (deny runs on `ubuntu-latest`). Tag pushes are ignored by CI; tags trigger deploy instead. Dependabot (`.github/dependabot.yml`) opens weekly PRs for Cargo and GitHub Actions updates.
 
 ## Layout
 
@@ -48,7 +48,7 @@ Modules are private; selected types are re-exported from `lib.rs` as the flat pu
 
 ## Conventions
 
-- Edition 2021; MSRV 1.75 (`rust-version` in `Cargo.toml`).
+- Edition 2021; treat `rust-version` in `Cargo.toml` as the MSRV source of truth (do not hardcode it elsewhere).
 - Match existing style: doc comments with CoreMIDI Apple doc links, no drive-by refactors, no new comments unless needed for non-obvious invariants.
 - Do not commit `Cargo.lock` (gitignored for this library), `.idea/`, `.vscode/`, or local scratch such as `src/NOTES.md`.
 - Do not add features that require non-Apple targets unless explicitly requested.
