@@ -1,0 +1,15 @@
+---
+description: Core project conventions for agents working in coremidi
+alwaysApply: true
+---
+
+# coremidi agent rules
+
+- Read and follow [AGENTS.md](../../AGENTS.md) for architecture, commands, and release process.
+- This is an Apple CoreMIDI wrapper. Develop and test on macOS; do not assume Linux CI coverage beyond the existing macOS GitHub Actions.
+- Keep `unsafe` confined to FFI boundaries. Preserve existing ownership rules: do not dispose `Client` on drop; system endpoints are non-owning.
+- Prefer `EventBuffer` / protocol-aware APIs over legacy `PacketBuffer` for new features.
+- Update [CHANGELOG.md](../../CHANGELOG.md) when releasing. Tags are bare SemVer (`0.9.2`), never `v`-prefixed.
+- Do not commit `Cargo.lock`, IDE folders, or `src/NOTES.md`.
+- Run `cargo fmt`, `cargo clippy --all-targets -- -D warnings`, `cargo deny check`, and `cargo test` before considering work done.
+- Keep supply-chain policy in `deny.toml` enforced; do not bypass the CI deny job.

@@ -21,6 +21,20 @@ jobs:
           components: rustfmt
       - run: cargo fmt --all -- --check
 
+  cargo-deny:
+    name: Supply chain
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        checks:
+          - advisories
+          - bans licenses sources
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check ${{ matrix.checks }}
+
   clippy:
     name: Clippy
     runs-on: macos-latest

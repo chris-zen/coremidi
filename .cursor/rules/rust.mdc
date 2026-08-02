@@ -1,0 +1,14 @@
+---
+description: Rust source conventions for the coremidi crate
+globs: "**/*.rs"
+alwaysApply: false
+---
+
+# Rust conventions
+
+- Keep modules private in `src/lib.rs` and re-export the public surface explicitly.
+- Constructors wrapping raw `MIDIObjectRef` / endpoint refs should stay `pub(crate)` unless exposing them is intentional API.
+- Map CoreMIDI failures with the existing `result_from_status` / `unit_result_from_status` helpers; use `Option` for absent objects.
+- Put unit tests in the same file under `#[cfg(test)]`.
+- When touching packet/event layout or callbacks, preserve alignment, timestamp ordering, and Core Foundation retain/get rules already used nearby.
+- Link Apple CoreMIDI docs in public item docs the same way neighboring APIs do.
